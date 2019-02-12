@@ -9,7 +9,7 @@ var raycaster = new THREE.Raycaster(); // create once
 var mouse = new THREE.Vector2(); // create once
 var intersect = null;
 var clock = new THREE.Clock();
-
+var spaceship;
 
 var geometry = new THREE.BoxGeometry(150,150,50);
 var cubeMaterials = [
@@ -24,12 +24,16 @@ var cubeMaterials = [
 var material = new THREE.MeshBasicMaterial(0xFFFFFF);
 var cube = new THREE.Mesh(geometry, cubeMaterials);
 var starsGeometry = new THREE.Geometry();
-var starsMaterial = new THREE.PointsMaterial( { color: 0x444444 } );
+var starsMaterial = new THREE.PointsMaterial( { color: 0xffffff } );
 var starField = new THREE.Points( starsGeometry, starsMaterial );
 
 var ambient = new THREE.AmbientLight( 0xffffff );
 scene.add( ambient );
 var light;
+var iDiv = document.createElement('div');
+var pseudoInputElement = document.createElement('input');
+var welcomeText;
+
 light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
     light.position.set( 0, 1500, 1000 );
     light.target.position.set( 0, 0, 0 );
@@ -42,6 +46,38 @@ light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
 
 renderer.setSize(width, height);
 document.body.appendChild(renderer.domElement);
+
+pseudoInputElement.class = "input";
+pseudoInputElement.id = "pseudoInputElement";
+pseudoInputElement.placeholder = "Pseudo...";
+
+iDiv.class = "container";
+iDiv.id = "welcome";
+iDiv.innerHTML += "<a href='#' id='playButton'>Jouer</a><a href='#' id='scoresButton'>Scores</a><a href='#' id='optionsButton'>Options</a>";
+
+document.body.appendChild(iDiv);
+
+console.log(iDiv.clientWidth);
+
+iDiv.style.left = (width / 2) - (iDiv.clientWidth / 2) + "px";
+
+var playButton = document.getElementById('playButton');
+playButton.addEventListener("click", function() {
+    iDiv.style.display = "none";
+    scene.remove(welcomeText)
+});
+
+
+THREEx.SpaceShips.loadSpaceFighter02(function(object3d){
+    spaceship = object3d;
+    console.log(object3d);
+    object3d.scale.x = 1;
+    object3d.scale.y = 1;
+    object3d.scale.z = 1;
+	scene.add(object3d);
+});
+
+
 
 // initialize object to perform world/screen calculations
 
@@ -82,34 +118,14 @@ loader.load( 'src/medias/models/welcomeFont.json', function ( font ) {
     textGeo.computeBoundingBox();
     var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
     var textMaterial = new THREE.MeshPhongMaterial( { color: 0x888888} );
-    var mesh = new THREE.Mesh( textGeo, textMaterial );
+    welcomeText = new THREE.Mesh( textGeo, textMaterial );
 
 
-    mesh.position.z = 100;
-    mesh.geometry.center();
-    mesh.position.y += 200;
-    scene.add( mesh );
+    welcomeText.position.z = 100;
+    welcomeText.geometry.center();
+    welcomeText.position.y += 400;
+    scene.add( welcomeText );
 } );
-
-loader.load( 'src/medias/models/welcomeFont.json', function ( font ) {
-    var textGeo = new THREE.TextBufferGeometry( "Jouer", {
-        font: font,
-        size: 100,
-        curveSegments: 20
-    } );
-    textGeo.computeBoundingBox();
-    var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
-    var textMaterial = new THREE.MeshPhongMaterial( { color: 0x888888} );
-    var mesh = new THREE.Mesh( textGeo, textMaterial );
-
-
-    mesh.position.z = 100;
-    mesh.geometry.center();
-    mesh.position.y -= 200;
-    mesh.name = "play";
-    scene.add( mesh );
-} );
-
 
 scene.add(cube);
 
@@ -128,18 +144,18 @@ var update = function() {
     var frustum = new THREE.Frustum();
     var cameraViewProjectionMatrix = new THREE.Matrix4();
     var delta = clock.getDelta();
-    
+
     raycaster.setFromCamera( mouse, camera );
 
     var intersects = raycaster.intersectObjects( scene.children);
 
     if(intersects.length > 0) {
         intersect = intersects[0].object;
-        if(intersect.name == "play") {
+        if(intersect.name == "play" || intersect.name == "leave") {
             intersect.material.color.setHex(0xffff00);
         }
     } else {
-        if(intersect != null && intersect.name == "play") {
+        if(intersect != null && (intersect.name == "play" || intersect.name == "leave")) {
             intersect.material.color.setHex(0xffffff);
             intersect = null;
         }
@@ -152,6 +168,11 @@ var update = function() {
 
     cube.position.x += 15;
     cube.position.y += 10;
+    if(spaceship != null) {
+        spaceship.position.x += 10;
+        spaceship.position.y += 5;
+    }
+
 
     if(!frustum.intersectsObject(cube)) {
         let isX = new THREE.Vector3(cube.position.x, 0, cube.position.z);
