@@ -11,18 +11,16 @@ var intersect = null;
 var clock = new THREE.Clock();
 var spaceship;
 
-var geometry = new THREE.BoxGeometry(150,150,50);
-var cubeMaterials = [
-    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('src/medias/images/1.jpg'), side: THREE.DoubleSide}),
-    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('src/medias/images/2.jpg'), side: THREE.DoubleSide}),
-    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('src/medias/images/3.jpg'), side: THREE.DoubleSide}),
-    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('src/medias/images/4.jpg'), side: THREE.DoubleSide}),
-    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('src/medias/images/5.jpg'), side: THREE.DoubleSide}),
-    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('src/medias/images/6.jpg'), side: THREE.DoubleSide})
-];
 
-var material = new THREE.MeshBasicMaterial(0xFFFFFF);
-var cube = new THREE.Mesh(geometry, cubeMaterials);
+var directions = {
+    NE : 1,
+    SE : 2,
+    SO : 3,
+    NO : 4
+};
+
+
+
 var starsGeometry = new THREE.Geometry();
 var starsMaterial = new THREE.PointsMaterial( { color: 0xffffff } );
 var starField = new THREE.Points( starsGeometry, starsMaterial );
@@ -33,16 +31,17 @@ var light;
 var iDiv = document.createElement('div');
 var pseudoInputElement = document.createElement('input');
 var welcomeText;
+var asteroids = createAsteroids();
 
 light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
-    light.position.set( 0, 1500, 1000 );
-    light.target.position.set( 0, 0, 0 );
-    light.castShadow = true;
-    light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
-    light.shadow.bias = 0.0001;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.mapSize.height = 1024;
-    scene.add( light );
+light.position.set( 0, 1500, 1000 );
+light.target.position.set( 0, 0, 0 );
+light.castShadow = true;
+light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+light.shadow.bias = 0.0001;
+light.shadow.mapSize.width = 2048;
+light.shadow.mapSize.height = 1024;
+scene.add( light );
 
 renderer.setSize(width, height);
 document.body.appendChild(renderer.domElement);
@@ -69,12 +68,20 @@ playButton.addEventListener("click", function() {
 
 
 THREEx.SpaceShips.loadSpaceFighter02(function(object3d){
-    spaceship = object3d;
-    console.log(object3d);
     object3d.scale.x = 1;
     object3d.scale.y = 1;
     object3d.scale.z = 1;
-	scene.add(object3d);
+    object3d.position.z = 0;
+    object3d.traverse( function ( child ) {
+        scene.add(child);
+        spaceship = child;
+        child.rotation.x = Math.PI / 2;
+        var box = new THREE.Box3().setFromObject( spaceship );
+        child.size = box.getSize();
+    });
+
+    console.log(spaceship);
+
 });
 
 
@@ -83,7 +90,7 @@ THREEx.SpaceShips.loadSpaceFighter02(function(object3d){
 
 
 // when the mouse moves, call the given function
-document.addEventListener('mousemove', onDocumentMouseMove, false);
+
 
 window.addEventListener('resize', function() {
     var width = window.innerWidth;
@@ -99,13 +106,6 @@ window.onkeyup = function(e) {
         saveAsImage();
     }
 }
-
-controls = new THREE.FlyControls( camera );
-				controls.movementSpeed = 1000;
-				controls.domElement = renderer.domElement;
-				controls.rollSpeed = Math.PI / 24;
-				controls.autoForward = false;
-				controls.dragToLook = false;
 
 
 var loader = new THREE.FontLoader();
@@ -166,24 +166,41 @@ var update = function() {
     cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
     frustum.setFromMatrix( cameraViewProjectionMatrix );
 
-    cube.position.x += 15;
-    cube.position.y += 10;
+
     if(spaceship != null) {
-        spaceship.position.x += 10;
+        spaceship.position.x += 18;
         spaceship.position.y += 5;
+        spaceship.rotation.y += 0.01;
+        isOutOfScreen(spaceship, frustum);
     }
 
+    asteroids.forEach(function(asteroid) {
+        switch(asteroid.direction) {
+            case directions.NE :
+                asteroid.position.x += 15;
+                asteroid.position.y += 10;
+            break;
+            case directions.SE :
+                asteroid.position.x += 15;
+                asteroid.position.y += -10;
+            break;
+            case directions.SO :
+                asteroid.position.x += -15;
+                asteroid.position.y += -10;
+            break;
+            case directions.NO :
+                asteroid.position.x += -15;
+                asteroid.position.y += 10;
+            break;
+        }
 
-    if(!frustum.intersectsObject(cube)) {
-        let isX = new THREE.Vector3(cube.position.x, 0, cube.position.z);
-        let isY = new THREE.Vector3(0, cube.position.y, cube.position.z);
-        if(!frustum.containsPoint(isX)) {;
-            cube.position.x = -cube.position.x +100;
-        }
-        if(!frustum.containsPoint(isY)) {
-            cube.position.y = -cube.position.y +100;
-        }
-    }
+        asteroid.rotation.x += 0.01;
+        asteroid.rotation.y += 0.01;
+        isOutOfScreen(asteroid, frustum);
+    });
+
+
+
 
     for(var i = 0; i < starsGeometry.vertices.length; i++) {
         camera.updateMatrix();
@@ -199,14 +216,89 @@ var update = function() {
     starsGeometry.verticesNeedUpdate = true;
 };
 
-function onDocumentMouseMove(event) {
-  // the following line would stop any other event handler from firing
-  // (such as the mouse's TrackballControls)
-  // event.preventDefault();
+function isOutOfScreen(object, frustum) {
+    if(!frustum.intersectsObject(object)) {
+        let isX = new THREE.Vector3(object.position.x, 0, object.position.z);
+        let isY = new THREE.Vector3(0, object.position.y, object.position.z);
+        if(!frustum.containsPoint(isX)) {;
+            object.position.x = -object.position.x + (object.size.x / 2);
+        }
+        if(!frustum.containsPoint(isY)) {
+            object.position.y = -object.position.y + (object.size.y / 2);
+        }
+    }
+}
 
-  // update the mouse variable
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+function getRandomDirection() {
+    return Math.floor(Math.random() * Math.floor(4)) + 1;
+}
+
+function createAsteroids(){
+    var maxWidth = 1000;
+    var asteroids = [];
+    for(var i=0;i<7;i++){
+        let asteroid = createRock(100,4000,4000,2000,0);
+        asteroid.direction = getRandomDirection();
+        asteroids.push(asteroid);
+    }
+    return asteroids;
+}
+
+function createRock(size,spreadX,maxWidth,maxHeight,maxDepth){
+    geometry = new THREE.DodecahedronGeometry(size, 1);
+  geometry.vertices.forEach(function(v){
+    v.x += (0-Math.random()*(size/4));
+    v.y += (0-Math.random()*(size/4));
+    v.z += (0-Math.random()*(size/4));
+  })
+  var color = '#111111';
+  color = ColorLuminance(color,2+Math.random()*10);
+    texture = new THREE.MeshStandardMaterial({color:color,
+                                        flatShading: true,
+                                     //   shininess: 0.5,
+                                            roughness: 0.8,
+                                            metalness: 1
+                                        });
+
+    cube = new THREE.Mesh(geometry, texture);
+  cube.castShadow = true;
+  cube.receiveShadow = true;
+  cube.scale.set(1, 1, 1);
+    //cube.rotation.y = Math.PI/4;
+    //cube.rotation.x = Math.PI/4;
+  var x = spreadX/2-Math.random()*spreadX;
+  var centeredness = 1-(Math.abs(x)/(maxWidth/2));
+  var y = (maxHeight/2-Math.random()*maxHeight)*centeredness
+  var z = 0
+  cube.position.set(x,y,z)
+  cube.r = {};
+  cube.r.x = Math.random() * 0.005;
+  cube.r.y = Math.random() * 0.005;
+  cube.r.z = 0;
+    scene.add(cube);
+    var box = new THREE.Box3().setFromObject( cube );
+    cube.size = box.getSize();
+  return cube;
+};
+
+function ColorLuminance(hex, lum) {
+
+    // validate hex string
+    hex = String(hex).replace(/[^0-9a-f]/gi, '');
+    if (hex.length < 6) {
+        hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    }
+    lum = lum || 0;
+
+    // convert to decimal and change luminosity
+    var rgb = "#", c, i;
+    for (i = 0; i < 3; i++) {
+        c = parseInt(hex.substr(i*2,2), 16);
+        c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+        rgb += ("00"+c).substr(c.length);
+    }
+
+    return rgb;
 }
 
 

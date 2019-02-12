@@ -28,7 +28,7 @@ canvas {
     color: white;
     text-decoration: none;
     font-family: Lazer84;
-    margin: 20px 0px 20px 0px;
+    padding: 10px 40px;
 }
 
 #welcome a:hover {
