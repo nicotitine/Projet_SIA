@@ -10,6 +10,7 @@ var mouse = new THREE.Vector2(); // create once
 var intersect = null;
 var clock = new THREE.Clock();
 var spaceship;
+var asteroidSpeed = 5;
 
 
 var directions = {
@@ -78,10 +79,8 @@ THREEx.SpaceShips.loadSpaceFighter02(function(object3d){
         child.rotation.x = Math.PI / 2;
         var box = new THREE.Box3().setFromObject( spaceship );
         child.size = box.getSize();
+        console.log(spaceship);
     });
-
-    console.log(spaceship);
-
 });
 
 
@@ -172,30 +171,48 @@ var update = function() {
         spaceship.position.y += 5;
         spaceship.rotation.y += 0.01;
         isOutOfScreen(spaceship, frustum);
+        var cameraForwardDirection = new THREE.Vector3(0,0,-1).applyMatrix4(camera.matrixWorld);
+        var ray = new THREE.Raycaster(camera.position, cameraForwardDirection, camera.position, 0);
+
+        var intersects = ray.intersectObject(spaceship, true);
+        if(intersects.length>0){
+            console.log("test");
+        }
     }
 
     asteroids.forEach(function(asteroid) {
+
+        if(spaceship != null) {
+            var spaceshipBox = new THREE.Box3().setFromObject(spaceship);
+            var asteroidBox = new THREE.Box3().setFromObject(spaceship);
+
+            var collision = spaceshipBox.intersectionBox(asteroidBox);
+            //console.log(collision);
+        }
+
+
         switch(asteroid.direction) {
             case directions.NE :
-                asteroid.position.x += 15;
-                asteroid.position.y += 10;
+                asteroid.position.x += asteroidSpeed;
+                asteroid.position.y += asteroidSpeed;
             break;
             case directions.SE :
-                asteroid.position.x += 15;
-                asteroid.position.y += -10;
+                asteroid.position.x += asteroidSpeed;
+                asteroid.position.y += -asteroidSpeed;
             break;
             case directions.SO :
-                asteroid.position.x += -15;
-                asteroid.position.y += -10;
+                asteroid.position.x += -asteroidSpeed;
+                asteroid.position.y += -asteroidSpeed;
             break;
             case directions.NO :
-                asteroid.position.x += -15;
-                asteroid.position.y += 10;
+                asteroid.position.x += -asteroidSpeed;
+                asteroid.position.y += asteroidSpeed;
             break;
         }
 
         asteroid.rotation.x += 0.01;
         asteroid.rotation.y += 0.01;
+
         isOutOfScreen(asteroid, frustum);
     });
 
@@ -206,7 +223,7 @@ var update = function() {
         camera.updateMatrix();
         camera.updateMatrixWorld();
 
-        if(!frustum.containsPoint(starsGeometry.vertices[i])) {
+        if(!frustum.containsPoint(starsGeometry.vertices[i]) || starsGeometry.vertices[i].z >= 0) {
             starsGeometry.vertices[i].x = THREE.Math.randFloatSpread( 4000 );
             starsGeometry.vertices[i].y = THREE.Math.randFloatSpread( 2000 );
             starsGeometry.vertices[i].z = THREE.Math.randFloatSpread( 2000 );
@@ -214,17 +231,57 @@ var update = function() {
         starsGeometry.vertices[i].z += 2;
     }
     starsGeometry.verticesNeedUpdate = true;
+
+    // COLLISION
 };
 
 function isOutOfScreen(object, frustum) {
     if(!frustum.intersectsObject(object)) {
         let isX = new THREE.Vector3(object.position.x, 0, object.position.z);
         let isY = new THREE.Vector3(0, object.position.y, object.position.z);
-        if(!frustum.containsPoint(isX)) {;
-            object.position.x = -object.position.x + (object.size.x / 2);
-        }
-        if(!frustum.containsPoint(isY)) {
-            object.position.y = -object.position.y + (object.size.y / 2);
+
+        if(object.name == "Asteroid") {
+            switch(object.direction) {
+                case directions.NE:
+                    if(!frustum.containsPoint(isX)) {
+                        object.position.x = -object.position.x + (object.size.x / 2);
+                    }
+                    if(!frustum.containsPoint(isY)) {
+                        object.position.y = -object.position.y + (object.size.y / 2);
+                    }
+                break;
+                case directions.SE:
+                    if(!frustum.containsPoint(isX)) {
+                        object.position.x = -object.position.x + (object.size.x / 2);
+                    }
+                    if(!frustum.containsPoint(isY)) {
+                        object.position.y = -object.position.y - (object.size.y / 2);
+                    }
+                break;
+                case directions.SO :
+                    if(!frustum.containsPoint(isX)) {
+                        object.position.x = -object.position.x - (object.size.x / 2);
+                    }
+                    if(!frustum.containsPoint(isY)) {
+                        object.position.y = -object.position.y - (object.size.y / 2);
+                    }
+                break;
+                case directions.NO :
+                    if(!frustum.containsPoint(isX)) {
+                        object.position.x = -object.position.x - (object.size.x / 2);
+                    }
+                    if(!frustum.containsPoint(isY)) {
+                        object.position.y = -object.position.y + (object.size.y / 2);
+                    }
+                break;
+            }
+        } else {
+            if(!frustum.containsPoint(isX)) {
+                object.position.x = -object.position.x + (object.size.x / 2);
+            }
+            if(!frustum.containsPoint(isY)) {
+                object.position.y = -object.position.y + (object.size.y / 2);
+            }
         }
     }
 }
@@ -278,6 +335,7 @@ function createRock(size,spreadX,maxWidth,maxHeight,maxDepth){
     scene.add(cube);
     var box = new THREE.Box3().setFromObject( cube );
     cube.size = box.getSize();
+    cube.name = "Asteroid";
   return cube;
 };
 
