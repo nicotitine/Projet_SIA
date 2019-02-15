@@ -35,9 +35,9 @@ var directions = {
     NO : 4
 };
 var starsGeometry = new THREE.Geometry();
-var starsMaterial = new THREE.PointsMaterial( { color: 0xffffff } );
-var starField = new THREE.Points( starsGeometry, starsMaterial );
-var ambient = new THREE.AmbientLight( 0xffffff );
+var starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+var starField = new THREE.Points(starsGeometry, starsMaterial);
+var ambient = new THREE.AmbientLight(0xffffff);
 var light;
 var iDiv = document.createElement('div');
 var pseudoInputElement = document.createElement('input');
@@ -46,17 +46,17 @@ var playButton;
 var spaceshipLoader = new THREE.OBJLoader();
 var fontLoader = new THREE.FontLoader();
 
-light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
-light.position.set( 0, 1500, 1000 );
-light.target.position.set( 0, 0, 0 );
+light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI / 2);
+light.position.set(0, 1500, 1000);
+light.target.position.set(0, 0, 0);
 light.castShadow = true;
-light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(50, 1, 1200, 2500));
 light.shadow.bias = 0.0001;
 light.shadow.mapSize.width = 2048;
 light.shadow.mapSize.height = 1024;
 
-scene.add( ambient );
-scene.add( light );
+scene.add(ambient);
+scene.add(light);
 
 renderer.setSize(_viewport.width, _viewport.height);
 
@@ -80,7 +80,7 @@ playButton.addEventListener("click", function() {
 spaceshipLoader.load('src/medias/models/test.obj', function (object) {
     object.traverse(function(child) {
         spaceship = new THREE.Mesh(child.geometry, new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1}));
-        spaceship.size =  new THREE.Box3().setFromObject( spaceship ).getSize();
+        spaceship.size =  new THREE.Box3().setFromObject(spaceship).getSize();
         spaceship.rotation.x = Math.PI / 2;
         spaceship.geometry.computeBoundingBox();
         spaceship.velocity = {
@@ -116,18 +116,18 @@ document.addEventListener('keyup', function(e){
 document.addEventListener("keypress", function(e) {
     if(e.which == 32) {
         var matrix = new THREE.Matrix4();
-        matrix.extractRotation( spaceship.matrix );
-        var direction = new THREE.Vector3( -1, 0, 0 );
-        direction.applyMatrix4( matrix );
-        var geometry = new THREE.BoxGeometry( 30, 30, 30 );
-        var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
-        var cube = new THREE.Mesh( geometry, material );
+        matrix.extractRotation(spaceship.matrix);
+        var direction = new THREE.Vector3(-1, 0, 0);
+        direction.applyMatrix4(matrix);
+        var geometry = new THREE.BoxGeometry(30, 30, 30);
+        var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+        var cube = new THREE.Mesh(geometry, material);
         cube.position.x = spaceship.position.x;
         cube.position.y = spaceship.position.y
         cube.direction = direction;
 
         cube.vector = cube.direction.multiplyScalar(_gameParameters.bulletSpeed, _gameParameters.bulletSpeed, _gameParameters.bulletSpeed);
-        scene.add( cube );
+        scene.add(cube);
         bullets.push(cube);
     }
     if(e.which == 80) {
@@ -139,7 +139,7 @@ document.addEventListener("keypress", function(e) {
 
 
 fontLoader = new THREE.FontLoader();
-fontLoader.load( 'src/medias/models/welcomeFont.json', function (font) {
+fontLoader.load('src/medias/models/welcomeFont.json', function (font) {
     var textGeo = new THREE.TextBufferGeometry("Space Runner", {
         font: font,
         size: 200,
@@ -152,8 +152,8 @@ fontLoader.load( 'src/medias/models/welcomeFont.json', function (font) {
     welcomeText.position.z = 100;
     welcomeText.geometry.center();
     welcomeText.position.y += 400;
-    scene.add( welcomeText );
-} );
+    scene.add(welcomeText);
+});
 
 
 
@@ -244,9 +244,9 @@ var update = function() {
         camera.updateMatrix();
         camera.updateMatrixWorld();
         if(!frustum.containsPoint(starsGeometry.vertices[i]) || starsGeometry.vertices[i].z >= 0) {
-            starsGeometry.vertices[i].x = THREE.Math.randFloatSpread( 4000 );
-            starsGeometry.vertices[i].y = THREE.Math.randFloatSpread( 2000 );
-            starsGeometry.vertices[i].z = THREE.Math.randFloatSpread( 2000 );
+            starsGeometry.vertices[i].x = THREE.Math.randFloatSpread(4000);
+            starsGeometry.vertices[i].y = THREE.Math.randFloatSpread(2000);
+            starsGeometry.vertices[i].z = THREE.Math.randFloatSpread(2000);
         }
         starsGeometry.vertices[i].z += 2;
     }
@@ -363,7 +363,7 @@ function createRock(size, spreadX, maxWidth, maxHeight, maxDepth){
     cube.r.y = Math.random() * 0.005;
     cube.r.z = 0;
     scene.add(cube);
-    var box = new THREE.Box3().setFromObject( cube );
+    var box = new THREE.Box3().setFromObject(cube);
     cube.size = box.getSize();
     cube.name = "Asteroid";
     return cube;
