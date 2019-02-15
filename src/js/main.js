@@ -9,8 +9,19 @@ var raycaster = new THREE.Raycaster(); // create once
 var mouse = new THREE.Vector2(); // create once
 var intersect = null;
 var clock = new THREE.Clock();
-var spaceship;
+var spaceship, spaceshipObject;
 var asteroidSpeed = 5;
+var frustum = new THREE.Frustum();
+var cameraViewProjectionMatrix = new THREE.Matrix4();
+var delta = clock.getDelta();
+var controls = {
+    up: false,
+    right: false,
+    down: false,
+    left: false
+}
+
+var bullets = [];
 
 
 var directions = {
@@ -19,6 +30,31 @@ var directions = {
     SO : 3,
     NO : 4
 };
+
+var friction = 0.98;
+
+function applyFriction(obj){
+    obj.vx *= friction;
+    obj.vy *= friction;
+}
+
+function updatePosition(object) {
+    //update velocity
+    object.vx += object.ax;
+    object.vy += object.ay;
+
+
+    applyFriction(object);
+    //update position
+    object.x += object.vx;
+    object.y += object.vy;
+
+    //console.log(object.x);
+
+
+    //console.log(object.position);
+
+}
 
 
 
@@ -57,8 +93,6 @@ iDiv.innerHTML += "<a href='#' id='playButton'>Jouer</a><a href='#' id='scoresBu
 
 document.body.appendChild(iDiv);
 
-console.log(iDiv.clientWidth);
-
 iDiv.style.left = (width / 2) - (iDiv.clientWidth / 2) + "px";
 
 var playButton = document.getElementById('playButton');
@@ -68,43 +102,75 @@ playButton.addEventListener("click", function() {
 });
 
 
-THREEx.SpaceShips.loadSpaceFighter02(function(object3d){
-    object3d.scale.x = 1;
-    object3d.scale.y = 1;
-    object3d.scale.z = 1;
-    object3d.position.z = 0;
-    object3d.traverse( function ( child ) {
-        scene.add(child);
-        spaceship = child;
-        child.rotation.x = Math.PI / 2;
-        var box = new THREE.Box3().setFromObject( spaceship );
-        child.size = box.getSize();
+var plane = [];
+var cube_box1 = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+var platArray = [];
+
+
+
+var loader = new THREE.OBJLoader();
+loader.load(
+	'src/medias/models/test.obj',
+	function ( object ) {
+        spaceshipObject = object;
+
+        object.traverse(function(child) {
+            spaceship = new THREE.Mesh(child.geometry, new THREE.MeshStandardMaterial({color:"#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1}));
+            spaceship.size =  new THREE.Box3().setFromObject( spaceship ).getSize();
+            spaceship.rotation.x = Math.PI / 2;
+            spaceship.geometry.computeBoundingBox();
+            spaceship.x = width/2;
+            spaceship.y = height/2;
+            spaceship.vx = 0;
+            spaceship.vy = 0;
+            spaceship.ax = 0;
+            spaceship.ay = 0;
+            spaceship.r = 0;
+            spaceship.name = "spaceship";
+        });
+        scene.add(spaceship);
         console.log(spaceship);
-    });
-});
-
-
-
-// initialize object to perform world/screen calculations
-
-
-// when the mouse moves, call the given function
-
+	}
+);
 
 window.addEventListener('resize', function() {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
+    width = window.innerWidth;
+    height = window.innerHeight;
     renderer.setSize(width, height);
     camera.aspect = width  / height;
     camera.updateProjectionMatrix();
+    iDiv.style.left = (width / 2) - (iDiv.clientWidth / 2) + "px";
 });
 
-window.onkeyup = function(e) {
-    var key = e.keyCode ? e.keyCode : e.which;
-    if (key == 80) {
-        saveAsImage();
+var keys = [];
+document.addEventListener('keydown', function(e){
+    if(e.which != 32)
+        keys[e.which] = true;
+});
+document.addEventListener('keyup', function(e){
+    keys[e.which] = false;
+});
+document.addEventListener("keypress", function(e) {
+    if(e.which == 32) {
+        var matrix = new THREE.Matrix4();
+        matrix.extractRotation( spaceship.matrix );
+        var direction = new THREE.Vector3( -1, 0, 0 );
+        direction.applyMatrix4( matrix );
+        var geometry = new THREE.BoxGeometry( 30, 30, 30 );
+        var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+        var cube = new THREE.Mesh( geometry, material );
+        cube.position.x = spaceship.position.x;
+        cube.position.y = spaceship.position.y
+        cube.direction = direction;
+        var speed = 40;
+
+        cube.vector = cube.direction.multiplyScalar( speed, speed, speed );
+        scene.add( cube );
+        bullets.push(cube);
     }
-}
+})
+
+
 
 
 var loader = new THREE.FontLoader();
@@ -139,27 +205,9 @@ for ( var i = 0; i < 2000; i ++ ) {
 scene.add( starField );
 camera.position.z = 1900;
 
+
+
 var update = function() {
-    var frustum = new THREE.Frustum();
-    var cameraViewProjectionMatrix = new THREE.Matrix4();
-    var delta = clock.getDelta();
-
-    raycaster.setFromCamera( mouse, camera );
-
-    var intersects = raycaster.intersectObjects( scene.children);
-
-    if(intersects.length > 0) {
-        intersect = intersects[0].object;
-        if(intersect.name == "play" || intersect.name == "leave") {
-            intersect.material.color.setHex(0xffff00);
-        }
-    } else {
-        if(intersect != null && (intersect.name == "play" || intersect.name == "leave")) {
-            intersect.material.color.setHex(0xffffff);
-            intersect = null;
-        }
-    }
-
     camera.updateMatrixWorld();
     camera.matrixWorldInverse.getInverse( camera.matrixWorld );
     cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
@@ -167,29 +215,52 @@ var update = function() {
 
 
     if(spaceship != null) {
-        spaceship.position.x += 18;
-        spaceship.position.y += 5;
-        spaceship.rotation.y += 0.01;
-        isOutOfScreen(spaceship, frustum);
-        var cameraForwardDirection = new THREE.Vector3(0,0,-1).applyMatrix4(camera.matrixWorld);
-        var ray = new THREE.Raycaster(camera.position, cameraForwardDirection, camera.position, 0);
 
-        var intersects = ray.intersectObject(spaceship, true);
-        if(intersects.length>0){
-            console.log("test");
+
+
+
+
+        //console.log(direction);
+        if(keys[37]) spaceship.r += 0.05;
+        if(keys[39]) spaceship.r -= 0.05;
+        if(keys[32]) {
+
+
         }
+
+        //thrust
+        if(keys[38]){
+            spaceship.ax = -Math.cos(spaceship.r) * 0.50;
+            spaceship.ay = -Math.sin(spaceship.r) * 0.50;
+        }else{
+            spaceship.ax = spaceship.ay = 0;
+        }
+        updatePosition(spaceship);
+        spaceship.position.x = spaceship.x;
+        spaceship.position.y = spaceship.y;
+        spaceship.rotation.y = spaceship.r;
+        //spaceship.draw();
+        isOutOfScreen(spaceship, frustum);
     }
+
+    bullets.forEach(function(bullet) {
+
+
+        bullet.position.x += bullet.vector.x;
+        bullet.position.y += bullet.vector.y;
+        bullet.position.z += bullet.vector.z;
+
+    });
 
     asteroids.forEach(function(asteroid) {
 
         if(spaceship != null) {
-            var spaceshipBox = new THREE.Box3().setFromObject(spaceship);
-            var asteroidBox = new THREE.Box3().setFromObject(spaceship);
-
-            var collision = spaceshipBox.intersectionBox(asteroidBox);
-            //console.log(collision);
+            var box = new THREE.Box3().setFromObject(spaceship);
+            var asBox = new THREE.Box3().setFromObject(asteroid);
+            if(box.intersectsBox(asBox)) {
+                console.log("collision");
+            }
         }
-
 
         switch(asteroid.direction) {
             case directions.NE :
@@ -217,6 +288,8 @@ var update = function() {
     });
 
 
+
+    //console.log(matrix);
 
 
     for(var i = 0; i < starsGeometry.vertices.length; i++) {
@@ -277,10 +350,22 @@ function isOutOfScreen(object, frustum) {
             }
         } else {
             if(!frustum.containsPoint(isX)) {
-                object.position.x = -object.position.x + (object.size.x / 2);
+                if(object.position.x > 0) {
+                    object.x = -object.x + (object.size.x / 2);
+                    object.position.x = -object.position.x + (object.size.x / 2);
+                } else {
+                    object.x = -object.x - (object.size.x / 2);
+                    object.position.x = -object.position.x - (object.size.x / 2);
+                }
             }
             if(!frustum.containsPoint(isY)) {
-                object.position.y = -object.position.y + (object.size.y / 2);
+                if(object.position.y > 0) {
+                    object.y = -object.y + (object.size.y / 2);
+                    object.position.y = -object.position.y + (object.size.y / 2);
+                } else {
+                    object.y = -object.y - (object.size.y / 2);
+                    object.position.y = -object.position.y - (object.size.y / 2);
+                }
             }
         }
     }
@@ -297,6 +382,7 @@ function createAsteroids(){
         let asteroid = createRock(100,4000,4000,2000,0);
         asteroid.direction = getRandomDirection();
         asteroids.push(asteroid);
+        asteroid.geometry.computeBoundingBox();
     }
     return asteroids;
 }
