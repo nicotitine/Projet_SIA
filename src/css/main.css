@@ -16,18 +16,27 @@ canvas {
 #welcome {
     position: absolute;
     z-index: 1000;
-    top: 40%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     font-size: 120px;
     color: white;
+    justify-content: flex-start;
+    font-family: Lazer84;
+    padding-bottom: 20px;
+}
+
+#welcome div {
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    width: 33%;
+    text-align: center;
+    font-family: Lazer84;
 }
 
 #welcome a {
     color: white;
     text-decoration: none;
-    font-family: Lazer84;
     padding: 10px 40px;
 }
 
