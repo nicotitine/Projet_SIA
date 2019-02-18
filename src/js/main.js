@@ -11,7 +11,7 @@ var _gameParameters = {
     asteroidSize: 30,
     asteroidMaxWidth: 900,
     asteroidMaxHeight: 500,
-    starsNumber: 2000,
+    starsNumber: 1000,
     asteroidRotation: 0.01,
     antialias: true,
     spaceshipScale: 0.2,
@@ -62,7 +62,7 @@ var missileGeometry = [], missileTexture;
 var fontLoader = new THREE.FontLoader();
 
 light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI);
-light.position.set(0, 0, 100);
+light.position.set(0, 0, 500);
 light.target.position.set(0, 0, 0);
 
 
@@ -70,6 +70,7 @@ scene.add(ambient);
 scene.add(light);
 
 renderer.setSize(_viewport.width, _viewport.height);
+renderer.context.getShaderInfoLog = function () { return '' };
 
 document.body.appendChild(renderer.domElement);
 pseudoInputElement.class = "input";
@@ -100,12 +101,12 @@ spaceshipLoader.load('src/medias/models/spaceship.obj', function (object) {
     }
     spaceship.children.forEach(function(child) {
         child.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});
-        child,computeBoundingBox();
+        //child.computeBoundingBox();
     });
     spaceship.name = "spaceship";
     spaceship.position.z = 0;
     spaceship.scale.set(_gameParameters.spaceshipScale, _gameParameters.spaceshipScale, _gameParameters.spaceshipScale);
-    spaceship.size =  new THREE.Box3().setFromObject(spaceship).getSize();
+    spaceship.size =  new THREE.Box3().setFromObject(spaceship).getSize(spaceship.size);
     scene.add(spaceship);
 });
 
@@ -379,7 +380,7 @@ function createRock(size, spreadX, maxWidth, maxHeight, maxDepth){
     cube.r.z = 0;
     scene.add(cube);
     var box = new THREE.Box3().setFromObject(cube);
-    cube.size = box.getSize();
+    cube.size = box.getSize(cube.size);
     cube.name = "Asteroid";
     return cube;
 };
