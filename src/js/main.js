@@ -90,13 +90,8 @@ playButton.addEventListener("click", function() {
 
 
 spaceshipLoader.load('src/medias/models/spaceship.obj', function (object) {
-    object.traverse(function(child) {
-
-    });
     spaceship = object;
-    console.log(spaceship);
     spaceship.rotation.x = Math.PI / 2;
-    //spaceship.geometry.computeBoundingBox();
     spaceship.velocity = {
         x: 0, y: 50,
         vx: 0, vy: 0,
@@ -105,6 +100,7 @@ spaceshipLoader.load('src/medias/models/spaceship.obj', function (object) {
     }
     spaceship.children.forEach(function(child) {
         child.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});
+        child,computeBoundingBox();
     });
     spaceship.name = "spaceship";
     spaceship.position.z = 0;
