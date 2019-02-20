@@ -1,22 +1,6 @@
 javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='src/lib/stats.js';document.head.appendChild(script);})()
 
-var _gameParameters = {
-    friction: 0.98,
-    bulletSpeed : 4,
-    bulletScale: 0.05,
-    bulletTimestamp: 500,
-    spaceshipRotationSpeed: 0.05,
-    spaceshipSpeed: 0.1,
-    asteroidSpeed: 2,
-    asteroidSize: 30,
-    asteroidMaxWidth: 900,
-    asteroidMaxHeight: 500,
-    starsNumber: 1000,
-    asteroidRotation: 0.01,
-    antialias: true,
-    spaceshipScale: 0.2,
-    starsSpeed: 2
-}
+
 
 var timestamp = Date.now();
 
@@ -58,8 +42,9 @@ var asteroids = createAsteroids();
 var playButton;
 var spaceshipLoader = new THREE.OBJLoader();
 var missileLoader = new THREE.OBJLoader();
-var missileGeometry = [], missileTexture;
+var missile;
 var fontLoader = new THREE.FontLoader();
+var raycaster = new THREE.Raycaster();
 
 light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI);
 light.position.set(0, 0, 500);
@@ -97,7 +82,9 @@ spaceshipLoader.load('src/medias/models/spaceship.obj', function (object) {
         x: 0, y: 50,
         vx: 0, vy: 0,
         ax: 0, ay: 0,
-        r: 0
+        r: 0,
+        vrl: 0, vrr: 0,
+        arl: 0, arr: 0
     }
     spaceship.children.forEach(function(child) {
         child.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});
@@ -106,15 +93,18 @@ spaceshipLoader.load('src/medias/models/spaceship.obj', function (object) {
     spaceship.name = "spaceship";
     spaceship.position.z = 0;
     spaceship.scale.set(_gameParameters.spaceshipScale, _gameParameters.spaceshipScale, _gameParameters.spaceshipScale);
-    spaceship.size =  new THREE.Box3().setFromObject(spaceship).getSize(spaceship.size);
+    spaceship.size = new THREE.Vector3();
+    new THREE.Box3().setFromObject(spaceship).getSize(spaceship.size);
     scene.add(spaceship);
 });
 
 
 missileLoader.load('src/medias/models/missile.obj', function(object) {
+
     object.traverse(function(child) {
-        missileGeometry.push(child.geometry);
+        child.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});
     });
+    missile = object;
 });
 
 window.addEventListener('resize', function() {
@@ -146,9 +136,7 @@ document.addEventListener("keypress", function(e) {
 });
 
 function shoot() {
-    missileGeometry.forEach(function(missile) {
-        var bullet = new THREE.Mesh(missile, new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1}));
-        bullet.geometry.computeBoundingBox();
+        var bullet = missile.clone();
         var matrix = new THREE.Matrix4();
         matrix.extractRotation(spaceship.matrix);
         bullet.rotation = matrix;
@@ -161,10 +149,13 @@ function shoot() {
         bullet.rotation.x = spaceship.rotation.x;
         bullet.rotation.y = spaceship.rotation.y + Math.PI *  1.5;
         bullet.vector = bullet.direction.multiplyScalar(_gameParameters.bulletSpeed, _gameParameters.bulletSpeed, _gameParameters.bulletSpeed);
-        scene.add(bullet);
+        bullet.spawnTime = Date.now();
+        bullet.size =  new THREE.Vector3();
+        var box = new THREE.Box3().setFromObject(cube);
+        box.getSize(bullet.size);
+        bullet.name = "bullet";
+        scene.add(bullet)
         bullets.push(bullet);
-    }) ;
-
 }
 
 
@@ -185,6 +176,67 @@ fontLoader.load('src/medias/models/welcomeFont.json', function (font) {
     scene.add(welcomeText);
 });
 
+var params = {
+				color1: '#ffffff',
+				color2: '#ffa000',
+				color3: '#000000',
+				colorBias: 0.8,
+				burnRate: 0.35,
+				diffuse: 1.33,
+				viscosity: 0.25,
+				expansion: - 0.25,
+				swirl: 50.0,
+				drag: 0.35,
+				airSpeed: 12.0,
+				windX: 0.0,
+				windY: 0.75,
+				speed: 500.0,
+				massConservation: false
+			};
+
+var controller = {
+               speed       : 1.0,
+               magnitude   : 3.5,
+               lacunarity  : 0.0,
+               gain        : 0.5,
+               noiseScaleX : 1.0,
+               noiseScaleY : 2.0,
+               noiseScaleZ : 1.0,
+               wireframe   : false
+           };
+
+var clock = new THREE.Clock();
+
+var plane = new THREE.PlaneBufferGeometry( 20, 20 );
+				fireT = new THREE.Fire( plane, {
+					textureWidth: 512,
+					textureHeight: 512,
+					debug: false
+				} );
+				fireT.position.z = - 2;
+				scene.add( fireT );
+
+var fireTex = THREE.ImageUtils.loadTexture("src/medias/models/index.png");
+
+           var wireframeMat = new THREE.MeshBasicMaterial({
+               color : new THREE.Color(0xffffff),
+               wireframe : true
+           });
+
+           var fire = new THREE.Fire(fireTex);
+
+           var wireframe = new THREE.Mesh(fire.geometry, wireframeMat.clone());
+           fire.add(wireframe);
+           wireframe.visible = false;
+           fire.quaternion.x = 0;
+           fire.quaternion.y = 0;
+           fire.quaternion.z = 0;
+           fire.scale.set(10, 40, 20);
+           fire.position.z = 0;
+           scene.add(fire);
+           fire.material.uniforms.magnitude.value = controller.magnitude;
+           fire.material.uniforms.lacunarity.value = controller.lacunarity;
+
 
 
 for (var i = 0; i < _gameParameters.starsNumber; i++) {
@@ -201,10 +253,15 @@ camera.position.z = 500;
 function updatePosition() {
     spaceship.velocity.vx += spaceship.velocity.ax;
     spaceship.velocity.vy += spaceship.velocity.ay;
+    spaceship.velocity.vrl += spaceship.velocity.arl;   // velocity for rotation left at time = t
+    spaceship.velocity.vrr += spaceship.velocity.arr;   // velocity for rotation right at time = t
     spaceship.velocity.vx *= _gameParameters.friction;
     spaceship.velocity.vy *= _gameParameters.friction;
+    spaceship.velocity.vrl *= _gameParameters.rotationFriction; // each multiplied by the rotationFriction
+    spaceship.velocity.vrr *= _gameParameters.rotationFriction; //  "       "      "   "         "
     spaceship.velocity.x += spaceship.velocity.vx;
     spaceship.velocity.y += spaceship.velocity.vy;
+    spaceship.velocity.r += spaceship.velocity.vrr + spaceship.velocity.vrl;    // the sum represents the real rotation of the ship at time = t
 }
 
 var update = function() {
@@ -213,13 +270,20 @@ var update = function() {
     cameraViewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromMatrix(cameraViewProjectionMatrix);
     if(spaceship != null) {
-        if(keys[37]) spaceship.velocity.r += _gameParameters.spaceshipRotationSpeed;
-        if(keys[39]) spaceship.velocity.r -= _gameParameters.spaceshipRotationSpeed;
+        if(keys[37]) spaceship.velocity.arl = _gameParameters.spaceshipRotationSpeed; else spaceship.velocity.arl = 0;
+        if(keys[39]) spaceship.velocity.arr = -_gameParameters.spaceshipRotationSpeed; else spaceship.velocity.arr = 0;
         if(keys[38]){
             spaceship.velocity.ax = -Math.cos(spaceship.velocity.r) * _gameParameters.spaceshipSpeed;
             spaceship.velocity.ay = -Math.sin(spaceship.velocity.r) * _gameParameters.spaceshipSpeed;
+            if(fire.material.uniforms.magnitude.value > 0) {
+                fire.material.uniforms.magnitude.value -= 0.2;
+            }
+
         } else {
             spaceship.velocity.ax = spaceship.velocity.ay = 0;
+            if(fire.material.uniforms.magnitude.value < 3.5) {
+                fire.material.uniforms.magnitude.value += 0.2;
+            }
         }
         if(keys[32]) {
             if(timestamp + _gameParameters.bulletTimestamp < Date.now()) {
@@ -227,23 +291,59 @@ var update = function() {
                 shoot();
             }
         }
-        updatePosition(spaceship);
-        spaceship.position.x = spaceship.velocity.x;
-        spaceship.position.y = spaceship.velocity.y;
+        updatePosition();
+        spaceship.position.x = spaceship.velocity.x + spaceship.velocity.x;
+        spaceship.position.y = spaceship.velocity.y + spaceship.velocity.y;
         spaceship.rotation.y = spaceship.velocity.r;
         isOutOfScreen(spaceship, frustum);
     }
+    var delta = clock.getDelta();
+    var t = clock.elapsedTime * controller.speed;
+    fire.update(t);
+    fire.position.x = spaceship.position.x + spaceship.size.x * Math.cos(spaceship.rotation.y);        // just playing with numbers lol. dont know how did i get here
+    fire.position.y = spaceship.position.y + spaceship.size.x * Math.sin(spaceship.rotation.y);
 
+    fire.rotation.x = spaceship.rotation.x;
+    fire.rotation.y = spaceship.rotation.y;
+    fire.rotation.z = -Math.PI / 2;
     bullets.forEach(function(bullet) {
-        bullet.position.x += bullet.vector.x;
-        bullet.position.y += bullet.vector.y;
-        bullet.position.z += bullet.vector.z;
-
+        if(bullet != null) {
+            if(bullet.spawnTime + _gameParameters.bulletLifeTime < Date.now()) {
+                scene.remove(bullet);
+                bullets[bullets.indexOf(bullet)] = null;
+                bullets = bullets.filter(function (el) {
+                    return el != null;
+                });
+            } else {
+                bullet.position.x += bullet.vector.x;
+                bullet.position.y += bullet.vector.y;
+                bullet.position.z += bullet.vector.z;
+                isOutOfScreen(bullet, frustum);
+                box = new THREE.Box3().setFromObject(bullet);
+                asteroids.forEach(function(asteroid) {
+                    if(asteroid != null) {
+                        asteroidBox = new THREE.Box3().setFromObject(asteroid);
+                        if(box.intersectsBox(asteroidBox)) {
+                            scene.remove(bullet);
+                            bullets[bullets.indexOf(bullet)] = null;
+                            bullets = bullets.filter(function (el) {
+                                return el != null;
+                            });
+                            asteroid.collide();
+                            console.log(bullets.length, asteroids.length);
+                            if(asteroids.length == 0) {
+                                iDiv.style.display = "flex";
+                            }
+                        }
+                    }
+                });
+            }
+        }
     });
 
     asteroids.forEach(function(asteroid) {
 
-        if(spaceship != null) {
+        if(spaceship != null && asteroid != null) {
             var box = new THREE.Box3().setFromObject(spaceship);
             var asBox = new THREE.Box3().setFromObject(asteroid);
             if(box.intersectsBox(asBox)) {
@@ -251,14 +351,15 @@ var update = function() {
             }
         }
 
+        if(asteroid != null) {
+            asteroid.position.x += asteroid.vector.x;
+            asteroid.position.y += asteroid.vector.y;
 
-        asteroid.position.x += asteroid.vector.x;
-        asteroid.position.y += asteroid.vector.y;
+            asteroid.rotation.x += _gameParameters.asteroidRotation;
+            asteroid.rotation.y += _gameParameters.asteroidRotation;
 
-        asteroid.rotation.x += _gameParameters.asteroidRotation;
-        asteroid.rotation.y += _gameParameters.asteroidRotation;
-
-        isOutOfScreen(asteroid, frustum);
+            isOutOfScreen(asteroid, frustum);
+        }
     });
 
     for(var i = 0; i < starsGeometry.vertices.length; i++) {
@@ -275,7 +376,6 @@ var update = function() {
 };
 
 function isOutOfScreen(object, frustum) {
-    //console.log(object);
     if(object.name == "spaceship") {
         object.children.forEach(function(child) {
             if(!frustum.intersectsObject(child)) {
@@ -297,6 +397,28 @@ function isOutOfScreen(object, frustum) {
                         object.position.y = -object.position.y + (object.size.y / 4);
                     } else {
                         object.velocity.y = -object.velocity.y - (object.size.y / 4);
+                        object.position.y = -object.position.y - (object.size.y / 4);
+                    }
+                }
+            }
+        });
+    } else if(object.name == "bullet") {
+        object.children.forEach(function(child) {
+            if(!frustum.intersectsObject(child)) {
+                let isX = new THREE.Vector3(object.position.x, 0, object.position.z);
+                let isY = new THREE.Vector3(0, object.position.y, object.position.z);
+
+                if(!frustum.containsPoint(isX)) {
+                    if(object.position.x > 0) {
+                        object.position.x = -object.position.x + (object.size.x / 4);
+                    } else {
+                        object.position.x = -object.position.x - (object.size.x / 4);
+                    }
+                }
+                if(!frustum.containsPoint(isY)) {
+                    if(object.position.y > 0) {
+                        object.position.y = -object.position.y + (object.size.y / 4);
+                    } else {
                         object.position.y = -object.position.y - (object.size.y / 4);
                     }
                 }
@@ -337,13 +459,11 @@ function getRandom() {
 function createAsteroids(){
     var maxWidth = 1000;
     var asteroids = [];
-    for(var i = 0; i < 7; i++){
+    for(var i = 0; i < 3; i++){
         let asteroid = createRock(_gameParameters.asteroidSize, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxHeight, 0);
         //asteroid.direction = getRandomDirection();
+        asteroid.level = 3;
         asteroids.push(asteroid);
-        asteroid.geometry.computeBoundingBox();
-        asteroid.direction = new THREE.Vector3(getRandom(), getRandom(), 0);
-        asteroid.vector = asteroid.direction.multiplyScalar(_gameParameters.asteroidSpeed, _gameParameters.asteroidSpeed, 0);
     }
     return asteroids;
 }
@@ -379,9 +499,43 @@ function createRock(size, spreadX, maxWidth, maxHeight, maxDepth){
     cube.r.y = Math.random() * 0.005;
     cube.r.z = 0;
     scene.add(cube);
+    cube.size =  new THREE.Vector3();
     var box = new THREE.Box3().setFromObject(cube);
-    cube.size = box.getSize(cube.size);
+    box.getSize(cube.size);
     cube.name = "Asteroid";
+    cube.geometry.computeBoundingBox();
+    cube.direction = new THREE.Vector3(getRandom(), getRandom(), 0);
+    cube.vector = cube.direction.multiplyScalar(_gameParameters.asteroidSpeed, _gameParameters.asteroidSpeed, 0);
+    cube.collide = function() {
+        var rock, size, lastLife;
+        switch (this.level) {
+            case 3:
+                size = _gameParameters.asteroidMidleSize;
+                lastLife = false;
+            break;
+            case 2:
+                size = _gameParameters.asteroidMinSize;
+                lastLife = false;
+            break;
+            case 1:
+                lastLife = true;
+            default:
+
+        }
+        if(!lastLife) {
+            for(var i = 0; i < _gameParameters.asteroidDivideNumer; i++) {
+                rock = createRock(size, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxHeight, 0);
+                rock.level = this.level - 1;
+                rock.position.set(this.position.x, this.position.y, this.position.z);
+                asteroids.push(rock);
+            }
+        }
+        scene.remove(this);
+        asteroids[asteroids.indexOf(this)] = null;
+        asteroids = asteroids.filter(function (el) {
+            return el != null;
+        });
+    };
     return cube;
 };
 

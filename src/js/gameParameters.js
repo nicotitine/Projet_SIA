@@ -1,0 +1,22 @@
+var _gameParameters = {
+    friction: 0.98,
+    rotationFriction: 0.92,
+    bulletSpeed : 6,
+    bulletScale: 0.05,
+    bulletTimestamp: 500,
+    bulletLifeTime : 1500,
+    spaceshipRotationSpeed: 0.005,
+    spaceshipSpeed: 0.05,
+    asteroidSpeed: 2,
+    asteroidSize: 30,
+    asteroidMidleSize: 20,
+    asteroidMinSize: 10,
+    asteroidMaxWidth: 900,
+    asteroidMaxHeight: 500,
+    asteroidDivideNumer: 3,
+    starsNumber: 10000,
+    asteroidRotation: 0.01,
+    antialias: true,
+    spaceshipScale: 0.2,
+    starsSpeed: 2
+}
