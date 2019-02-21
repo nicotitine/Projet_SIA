@@ -13,6 +13,13 @@ canvas {
     height: 100%;
 }
 
+.level-up {
+    background: white;
+    position: absolute;
+    top: 50%;
+    font-size: 200px;
+}
+
 #welcome {
     position: absolute;
     z-index: 1000;
@@ -23,6 +30,20 @@ canvas {
     justify-content: flex-start;
     font-family: Lazer84;
     padding-bottom: 20px;
+}
+
+#level-up {
+    position: absolute;
+    font-size: 150px;
+    color: white;
+    display: none;
+    top: 0;
+    font-family: Lazer84;
+    text-align: center;
+}
+
+#level-up small {
+    font-size: 100px;
 }
 
 #welcome div {

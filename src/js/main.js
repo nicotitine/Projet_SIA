@@ -17,13 +17,8 @@ var userControlsSpaceship = {
     space: false
 };
 
-var bullets = [];
-var _viewport = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    ratio: window.innerWidth / window.innerHTML,
-    scale: 1
-}
+var bullets = [], explosions = [];
+
 var camera = new THREE.PerspectiveCamera(50, _viewport.width / _viewport.height, 0.1, 1000);
 var directions = {
     NE : 1,
@@ -67,12 +62,50 @@ iDiv.innerHTML += "<div>Ici c'est les fleches</div><div><a href='#' id='playButt
 document.body.appendChild(iDiv);
 iDiv.style.left = (_viewport.width / 2) - (iDiv.clientWidth / 2) + "px";
 iDiv.style.top = (_viewport.height) - (iDiv.clientHeight) + "px";
+document.body.appendChild(levelUpDiv);
 
 playButton = document.getElementById('playButton');
 playButton.addEventListener("click", function() {
     iDiv.style.display = "none";
     scene.remove(welcomeText)
+    levelUpDiv.customShow();
 });
+
+function levelUp(isCheat) {
+    if(isCheat) {
+        asteroids.forEach(function(asteroid) {
+            var explosion = new Explosion(asteroid.position.x, asteroid.position.y, asteroid.position.z);
+            explosions.push(explosion);
+            scene.remove(asteroid);
+            asteroids[asteroids.indexOf(asteroid)] = null;
+            asteroids = asteroids.filter(function (el) {
+                return el != null;
+            });
+        })
+        setTimeout(function() {
+            for(var i = 0; i < explosions.length; i++) {
+                scene.remove(explosions[i].group.mesh);
+                scene.remove(explosions[i].shockwaveGroup.mesh);
+                explosions[i] = null;
+            }
+            explosions = explosions.filter(function (el) {
+                return el != null;
+            });
+            _gameParameters.level += 1;
+            _gameParameters.asteroidSpeed *= 1.2;
+            _gameParameters.asteroidNumber += 1;
+            levelUpDiv.customShow(true);
+            asteroids = createAsteroids();
+            console.log(explosions.length, asteroids.length);
+        }, 2000);
+    } else {
+        _gameParameters.level += 1;
+        _gameParameters.asteroidSpeed *= 1.2;
+        _gameParameters.asteroidNumber += 1;
+        levelUpDiv.customShow();
+        asteroids = createAsteroids();
+    }
+}
 
 
 spaceshipLoader.load('src/medias/models/spaceship.obj', function (object) {
@@ -130,10 +163,16 @@ document.addEventListener('keyup', function(e){
     keys[e.which] = false;
 });
 document.addEventListener("keypress", function(e) {
-    if(e.which == 80) {
+    if(e.which == 112) {
         saveAsImage();
     }
+    if(e.which == 107) {
+        levelUp(true);
+    }
 });
+
+var gui = new dat.GUI();
+
 
 function shoot() {
         var bullet = missile.clone();
@@ -238,7 +277,6 @@ var fireTex = THREE.ImageUtils.loadTexture("src/medias/models/index.png");
            fire.material.uniforms.lacunarity.value = controller.lacunarity;
 
 
-
 for (var i = 0; i < _gameParameters.starsNumber; i++) {
     let star = new THREE.Vector3();
         star.x = THREE.Math.randFloatSpread(4000);
@@ -311,9 +349,6 @@ var update = function() {
             if(bullet.spawnTime + _gameParameters.bulletLifeTime < Date.now()) {
                 scene.remove(bullet);
                 bullets[bullets.indexOf(bullet)] = null;
-                bullets = bullets.filter(function (el) {
-                    return el != null;
-                });
             } else {
                 bullet.position.x += bullet.vector.x;
                 bullet.position.y += bullet.vector.y;
@@ -324,21 +359,24 @@ var update = function() {
                     if(asteroid != null) {
                         asteroidBox = new THREE.Box3().setFromObject(asteroid);
                         if(box.intersectsBox(asteroidBox)) {
+                            var explosion = new Explosion(asteroid.position.x, asteroid.position.y, asteroid.position.z);
                             scene.remove(bullet);
                             bullets[bullets.indexOf(bullet)] = null;
                             bullets = bullets.filter(function (el) {
                                 return el != null;
                             });
                             asteroid.collide();
-                            console.log(bullets.length, asteroids.length);
                             if(asteroids.length == 0) {
-                                iDiv.style.display = "flex";
+                                levelUp();
                             }
                         }
                     }
                 });
             }
         }
+    });
+    bullets = bullets.filter(function (el) {
+        return el != null;
     });
 
     asteroids.forEach(function(asteroid) {
@@ -347,7 +385,7 @@ var update = function() {
             var box = new THREE.Box3().setFromObject(spaceship);
             var asBox = new THREE.Box3().setFromObject(asteroid);
             if(box.intersectsBox(asBox)) {
-                console.log("collision");
+                //console.log("collision");
             }
         }
 
@@ -373,6 +411,7 @@ var update = function() {
         starsGeometry.vertices[i].z += _gameParameters.starsSpeed;
     }
     starsGeometry.verticesNeedUpdate = true;
+    console.log(asteroids.length);
 };
 
 function isOutOfScreen(object, frustum) {
@@ -459,7 +498,7 @@ function getRandom() {
 function createAsteroids(){
     var maxWidth = 1000;
     var asteroids = [];
-    for(var i = 0; i < 3; i++){
+    for(var i = 0; i < _gameParameters.asteroidNumber; i++){
         let asteroid = createRock(_gameParameters.asteroidSize, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxHeight, 0);
         //asteroid.direction = getRandomDirection();
         asteroid.level = 3;
