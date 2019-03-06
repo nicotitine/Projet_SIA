@@ -1,9 +1,10 @@
 "use strict";
 var isLoading = true;
 javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='src/lib/stats.js';document.head.appendChild(script);})()
+
+
 var eventHandler = new EventHandler();
 var storage = new Storage();
-
 var _viewport = new Viewport();
 var _gameParameters = new GameParameters();
 var gameUI;
@@ -11,13 +12,11 @@ var audioHandler = new AudioHandler();
 var jokers = new Jokers();
 var gui;
 var textureHandler = new TextureHandler();
-textureHandler.loadSpaceship();
-var _spaceship;
+var _spaceship = new Spaceship();
+var bulletLoader = new BulletLoader();
+//var jokerLoader = new JokerLoader();
+var starfield = new Starfield(_gameParameters.starfield.number, _gameParameters.starfield.spread);
 
-
-function initSpaceship() {
-    _spaceship = new Spaceship();
-}
 
 
 window.addEventListener('load', function() {
@@ -135,13 +134,7 @@ function levelUp(isCheat) {
     }
 }
 
-var bulletLoader = new BulletLoader();
 
-
-
-
-
-var starfield = new Starfield(_gameParameters.starfield.number, _gameParameters.starfield.spread);
 
 scene.add(starfield);
 var points = 0;
@@ -173,7 +166,7 @@ var update = function() {
     if(_spaceship != null && !_spaceship.isHitted)
         cameraHandler.update();
 
-    if(_spaceship != null)
+    if(_spaceship.isLoaded)
         _spaceship.update(eventHandler.keys);
 
     if(starfield != null)

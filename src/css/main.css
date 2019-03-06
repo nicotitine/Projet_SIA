@@ -3,7 +3,7 @@
   src: url(../medias/models/Lazer84.ttf);
 }
 
-#welcome, #help, #score, #level-up, #lives, #loose {
+#welcome, #help, #score, #level-up, #loose {
     word-spacing: 15px;
 }
 
@@ -57,6 +57,7 @@ canvas {
 
 #lives .live {
     width: 50px;
+    margin-left: 20px;
 }
 
 #welcome, #help {

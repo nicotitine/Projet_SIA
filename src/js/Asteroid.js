@@ -116,30 +116,7 @@ class Asteroid extends THREE.Mesh {
 
         // Collision detection
         if(gameUI!= null && gameUI.isGameLaunched && !spaceship.shield.isOn && spaceshipBox.intersectsBox(asteroidBox)) {
-            var explosion = new Explosion(spaceship.position.x, spaceship.position.y, spaceship.position.z);
-            audioHandler.explosionSound.play();
-            spaceship.isHitted = true;
-            spaceship.visible = false;
-            spaceship.fire.visible = false;
-            spaceship.position.z = 2000;
-            spaceship.fire.fire.position.z = 2000;
-            spaceship.lives -= 1;
-            document.getElementsByClassName('live')[spaceship.lives].src = "src/medias/images/live_empty.png";
-            if(spaceship.lives > 0) {
-                setTimeout(function() {
-                    spaceship.isHitted = false;
-                    spaceship.fire.fire.position.z = 10;
-                    spaceship.visible = true;
-                    spaceship.fire.fire.visible = true;
-                    spaceship.position.set(0, 0, 0);
-                    _spaceship.shield.activate();
-                    setTimeout(function() {
-                        _spaceship.shield.desactivate();
-                    }, 5000);
-                }, 2000);
-            } else {
-                gameUI.showLoose();
-            }
+            _spaceship.hitted();
         }
 
         let _this = this;

@@ -1,44 +1,98 @@
  class Spaceship extends THREE.Mesh {
     constructor() {
-        super(textureHandler.getSpaceship().children[0].geometry, new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1}));
-
-        this.rotation.x = Math.PI / 2;
-        this.velocity = {
-            x: 0, y: 0,
-            vx: 0, vy: 0,
-            ax: 0, ay: 0,
-            r: 0,
-            vrl: 0, vrr: 0,
-            arl: 0, arr: 0
-        };
-        this.name = "Spaceship";
-        this.position.z = 0;
-        this.scale.set(_gameParameters.spaceship.scale, _gameParameters.spaceship.scale, _gameParameters.spaceship.scale);
-        this.shield = new Shield(50, this.position)
-        this.shield.activate();
-        this.lives = 3;
-        this.fireScale = new THREE.Vector3(10, 40, 20);
-        this.fire = new Fire(scene, this.fireScale, function(fire) {
-            scene.add(fire)
-        });
+        super();
         this.bullets = [];
         this.isHitted = false;
         this.needToReload = false;
         this.reloadSoundPlayed = false;
-        this.size = new THREE.Vector3();
-        new THREE.Box3().setFromObject(this).getSize(this.size);
+        this.isLoaded = false;
+        this.textureLoader = new THREE.OBJLoader().load('src/medias/models/spaceship.obj', geometry => {
+            this.geometry = geometry.children[0].geometry;
+            this.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});
+            this.rotation.x = Math.PI / 2;
+            this.velocity = {
+                x: 0, y: 0,
+                vx: 0, vy: 0,
+                ax: 0, ay: 0,
+                r: 0,
+                vrl: 0, vrr: 0,
+                arl: 0, arr: 0
+            };
+            this.name = "Spaceship";
+            this.position.z = 0;
+            this.scale.set(_gameParameters.spaceship.scale, _gameParameters.spaceship.scale, _gameParameters.spaceship.scale);
+            this.shield = new Shield(50, this.position)
+            this.shield.activate();
+            this.lives = 3;
+            this.fireScale = new THREE.Vector3(10, 40, 20);
+            this.fire = new Fire(this.fireScale);
+            this.size = new THREE.Vector3();
+            new THREE.Box3().setFromObject(this).getSize(this.size);
+            this.isLoaded = true;
 
-        scene.add(this);
-        scene.add(this.shield);
+            scene.add(this);
+            scene.add(this.shield);
+        });
     }
 
-    shoot() {
-        var bullet = new Bullet(bulletLoader.getNewBullet(), _spaceship, _gameParameters.bullet.scale, _gameParameters.bullet.speed);
-        this.bullets.push(bullet)
-        scene.add(bullet);
-        audioHandler.fireSound.play();
-        this.needToReload = true;
-        this.reloadSoundPlayed = false;
+    shoot(isBonus) {
+        if(isBonus) {
+
+        } else {
+            var bullet = new Bullet(bulletLoader.getNewBullet(), _spaceship, _gameParameters.bullet.scale, _gameParameters.bullet.speed);
+            this.bullets.push(bullet)
+            scene.add(bullet);
+            audioHandler.fireSound.play();
+            this.needToReload = true;
+            this.reloadSoundPlayed = false;
+        }
+    }
+
+    addLife() {
+        if(this.lives < 10) {
+            this.lives += 1;
+            gameUI.editLives(this.lives, true)
+        }
+    }
+
+
+    hitted() {
+        var explosion = new Explosion(this.position.x, this.position.y, this.position.z);
+        audioHandler.explosionSound.play();
+        this.isHitted = true;
+        this.visible = false;
+        this.fire.visible = false;
+        this.position.z = 2000;
+        this.fire.fire.position.z = 2000;
+        gameUI.editLives(this.lives, false)
+        this.lives -= 1;
+
+
+        if(this.lives > 0) {
+            var _this = this;
+            setTimeout(function() {
+                _this.isHitted = false;
+                _this.fire.fire.position.z = 10;
+                _this.visible = true;
+                _this.fire.fire.visible = true;
+                _this.position.set(0, 0, 0);
+                _this.shield.activate();
+                _this.rotation.x = Math.PI / 2;
+                _this.velocity = {
+                    x: 0, y: 0,
+                    vx: 0, vy: 0,
+                    ax: 0, ay: 0,
+                    r: 0,
+                    vrl: 0, vrr: 0,
+                    arl: 0, arr: 0
+                };
+                setTimeout(function() {
+                    _this.shield.desactivate();
+                }, 5000);
+            }, 2000);
+        } else {
+            gameUI.showLoose();
+        }
     }
 
     update(keys, frustum) {
@@ -59,7 +113,7 @@
             }
         }
         if(keys[32] && !this.needToReload) {
-            this.shoot();
+            this.shoot(false);
             timestamp = Date.now();
         }
 
@@ -71,9 +125,6 @@
         if(timestamp + _gameParameters.bullet.timestamp < Date.now() && this.needToReload) {
             this.needToReload = false;
         }
-
-
-
 
         // Movements handling
         if(gameUI != null && !gameUI.isPaused) {
@@ -109,9 +160,6 @@
 
         if(this.fire != null && this.position != null)
             this.fire.update(this.position, this.size, this.rotation);
-
-
-
 
         // Bullet updating
         var bullets = this.bullets;

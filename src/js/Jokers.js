@@ -7,8 +7,15 @@ class Jokers {
         this.types = {
             SHIELD: 1,
             LIFE: 2,
-            DEMATERIALIZE: 3,
-            RAPID_FIRE: 4,
+            RAPID_FIRE: 3,
+            DEMATERIALIZE: 4
+        }
+        this.textures = {
+            shield: new THREE.TextureLoader().load("src/medias/models/shield-icon.png"),
+            life: new THREE.TextureLoader().load('src/medias/models/life-icon.png'),
+            fire: new THREE.TextureLoader().load('src/medias/models/fire-icon.png'),
+            dematerialize: new THREE.TextureLoader().load('src/medias/models/through-icon.png'),
+            length: 4
         }
     }
 
@@ -18,19 +25,19 @@ class Jokers {
         var texture;
         var joker = new THREE.Mesh();
 
-        joker.type = THREE.Math.randInt(1, 5);
+        joker.type = THREE.Math.randInt(1, this.textures.length);
         switch (joker.type) {
             case this.types.SHIELD:
-                texture = new THREE.TextureLoader().load("src/medias/models/shield-icon.png");
+                texture = this.textures.shield;
             break;
             case this.types.LIFE:
-                texture = new THREE.TextureLoader().load('src/medias/models/life-icon.png');
+                texture = this.textures.life;
             break;
             case this.types.RAPID_FIRE :
-                texture = new THREE.TextureLoader().load('src/medias/models/fire-icon.png');
+                texture = this.textures.fire;
             break;
             case this.types.DEMATERIALIZE :
-                texture = new THREE.TextureLoader().load('src/medias/models/through-icon.png');
+                texture = this.textures.dematerialize;
             break;
             default:
         }
@@ -64,11 +71,31 @@ class Jokers {
         } else if(!gameUI.isGameLaunched || gameUI.isPaused) {
             this.timestamp = Date.now();
         }
+        var _this = this;
         this.jokers.forEach(function(joker) {
             var jokerBox = new THREE.Box3().setFromObject(joker);
-
             if(jokerBox.intersectsBox(spaceshipBox)) {
-                console.log("joker taken !");
+                switch (joker.type) {
+                    case 1:
+                        _spaceship.shield.activate(10, true);
+                    break;
+                    case 2:
+                        _spaceship.addLife();
+                    break;
+                    case 3:
+                        console.log("fire");
+                    break;
+                    case 4:
+                        _spaceship.shield.activate(10);
+                    break;
+                    default:
+
+                }
+                scene.remove(joker);
+                _this.jokers[_this.jokers.indexOf(joker)] = null;
+                _this.jokers = _this.jokers.filter(function (el) {
+                    return el != null;
+                });
             }
 
             if(cameraHandler.cameraType == cameraHandler.cameraTypes.PURSUIT) {

@@ -1,27 +1,24 @@
 class Fire {
-    constructor(scene, scale, callback) {
-        var _this = this;
-        this.clock = new THREE.Clock();
-        var fireLoader = new THREE.TextureLoader().load("src/medias/models/index.png", function(fireTex) {
+    constructor(scale) {
+        this.textureLoader = new THREE.TextureLoader().load('src/medias/models/index.png', firetex => {
             var wireframeMat = new THREE.MeshBasicMaterial({
                 color : new THREE.Color(0xffffff),
                 wireframe : true
             });
-            _this.fire = new THREE.Fire(fireTex);
-            _this.fire.geometry.computeBoundingBox();
-            _this.fire.scale.copy(scale);
-            _this.fire.position.z = 10;
-            _this.fire.material.uniforms.magnitude.value = 3.5;
-            _this.fire.material.uniforms.lacunarity.value = 0.0;
-            _this.fire.size = new THREE.Vector3();
-            new THREE.Box3().setFromObject(_this.fire).getSize(_this.fire.size);
-            _this.fire.name = "Fire";
-            _this.fire.rotation.z = -Math.PI / 2;
-            _this.clock = new THREE.Clock();
-            console.log(_this.fire);
-            callback(_this.fire);
-
-        });
+            this.fire = new THREE.Fire(firetex);
+            this.fire.geometry.computeBoundingBox();
+            this.fire.scale.copy(scale);
+            this.fire.position.z = 10;
+            this.fire.material.uniforms.magnitude.value = 3.5;
+            this.fire.material.uniforms.lacunarity.value = 0.0;
+            this.fire.size = new THREE.Vector3();
+            new THREE.Box3().setFromObject(this.fire).getSize(this.fire.size);
+            this.fire.name = "Fire";
+            this.fire.rotation.z = -Math.PI / 2;
+            this.clock = new THREE.Clock();
+            scene.add(this.fire);
+        })
+        this.clock = new THREE.Clock();
     }
 
     update(position, size, rotation) {

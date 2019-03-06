@@ -27,4 +27,8 @@ class Bullet extends THREE.Object3D {
             this.position.y = -this.position.y;
         }
     }
+
+    spawn() {
+
+    }
 }

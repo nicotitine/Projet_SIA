@@ -136,6 +136,26 @@ class GameUI {
         // });
     }
 
+    editLives(livesnb, win) {
+        console.log(livesnb);
+        if(livesnb >= 4) {
+            if(win) {
+                this.livesDiv[0].innerHTML += '<img src="src/medias/images/live_full.png" class="live"/>';
+            } else {
+                console.log(this.livesDiv[0].children);
+                this.livesDiv[0].children[livesnb - 1].remove();
+            }
+        } else {
+            if(win) {
+                console.log(this.lives);
+                this.lives[livesnb -1 ].src = 'src/medias/images/live_full.png';
+            } else {
+                this.lives[livesnb - 1].src = 'src/medias/images/live_empty.png';
+            }
+        }
+        this.lives = document.getElementsByClassName('live');
+    }
+
     startGame() {
         for(var i = 0; i < this.lives.length; i++) {
             this.lives[i].src = "src/medias/images/live_full.png";

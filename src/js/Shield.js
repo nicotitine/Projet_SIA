@@ -19,9 +19,18 @@ class Shield extends THREE.Mesh {
         this.position.copy(position);
     }
 
-    activate() {
-        this.visible = true;
-        this.isOn = true;
+    activate(time, isBounce) {
+        if(time != null) {
+            var _this = this;
+            this.visible = true;
+            this.isOn = true;
+            setTimeout(function() {
+                _this.desactivate();
+            }, time * 1000);
+        } else {
+            this.visible = true;
+            this.isOn = true;
+        }
     }
 
     desactivate() {
