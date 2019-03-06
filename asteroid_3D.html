@@ -5,7 +5,9 @@
         <title>Asteroid 3D</title>
         <link rel="stylesheet" href="src/css/main.css">
         <link rel="stylesheet" href="src/css/dat.gui.css">
+        <link rel="icon" type="image/png" href="src/medias/images/icon.png">
 
+        <script type="text/javascript" src="src/lib/jquery.js"></script>
         <script type="text/javascript" src="src/lib/three.js"></script>
         <script type="text/javascript" src="src/lib/orbitControl.js"></script>
         <script type="text/javascript" src="src/lib/flyControls.js"></script>
@@ -17,12 +19,125 @@
         <script type="text/javascript" src="src/lib/tween.js"></script>
         <script type="text/javascript" src="src/lib/ShaderExtras.js"></script>
         <script type="text/javascript" src="src/lib/SP.js"></script>
+        <script type="text/javascript" src="src/lib/howler.min.js"></script>
 
-    </head>
-    <body>
-        <script type="text/javascript" src="src/js/gameParameters.js"></script>
+        <script type="text/javascript" src="src/js/TextureHandler.js"></script>
+        <script type="text/javascript" src="src/js/EventHandler.js"></script>
+        <script type="text/javascript" src="src/js/Viewport.js"></script>
+        <script type="text/javascript" src="src/js/GameParameters.js"></script>
+        <script type="text/javascript" src="src/js/CameraHandler.js"></script>
+        <script type="text/javascript" src="src/js/AudioHandler.js"></script>
+        <script type="text/javascript" src="src/js/Jokers.js"></script>
+        <script type="text/javascript" src="src/js/GameUI.js"></script>
+        <script type="text/javascript" src="src/js/Storage.js"></script>
+        <script type="text/javascript" src="src/js/Score.js"></script>
+        <script type="text/javascript" src="src/js/Shield.js"></script>
+        <script type="text/javascript" src="src/js/Fire.js"></script>
+        <script type="text/javascript" src="src/js/BulletLoader.js"></script>
+        <script type="text/javascript" src="src/js/Bullet.js"></script>
+        <script type="text/javascript" src="src/js/Spaceship.js"></script>
+        <script type="text/javascript" src="src/js/Asteroid.js"></script>
+        <script type="text/javascript" src="src/js/Starfield.js"></script>
         <script type="text/javascript" src="src/js/main.js"></script>
         <script type="text/javascript" src="src/js/explode.js"></script>
         <script type="text/javascript" src="src/js/dat.js"></script>
+
+    </head>
+    <body>
+        <div id="preLoader">
+            <div class="lds-css ng-scope"><div style="width:100%;height:100%" class="lds-pacman"><div><div></div><div></div><div></div></div><div><div></div><div></div></div></div></div>
+            <div id="loading">Loading</div>
+        </div>
+        <div id="title">
+            SPACE RUNNER
+        </div>
+        <div id='welcome'>
+            <div id="mainButtons">
+                <a href='#' class='custom-link' data-hover="PLAY" id='playButton'>Play</a>
+                <a href='#' class='custom-link' data-hover="Best scores" id='scoresButton'>Best scores</a>
+                <a href='#' class='custom-link' data-hover="Options" id='optionsButton'>Options</a>
+            </div>
+        </div>
+        <div id="help">
+            <div class='controls'>
+                <img class='arrows keys' src='src/medias/images/keys/arrows.png'/><br/>
+                Move spaceship<br/>
+                <img class='keys space' src='src/medias/images/keys/space.png'/><br/>
+                Shoot<br/>
+                <img class='keys camera' src='src/medias/images/keys/camera.png'/><br/>
+                Change camera
+            </div>
+            <div class='controls'>
+                <img class='keys help' src='src/medias/images/keys/help.png'/><br/>
+                Display - hide help
+                <img class='keys window' src='src/medias/images/keys/window.png'/><br/>
+                Fullscreen - Print
+                <img class='keys cheat' src='src/medias/images/keys/cheat.png'/><br/>
+                Cheat keys
+            </div>
+        </div>
+        <div id="level-up">
+        </div>
+        <div id="lives">
+            Lives :
+            <img class='live' src="src/medias/images/live_full.png"/>
+            <img class='live' src="src/medias/images/live_full.png"/>
+            <img class='live' src="src/medias/images/live_full.png"/>
+        </div>
+        <div id="loose">
+            You loose<br/>
+            <small>You scored <span id="finalScore"></span> points</small>
+            <div id="newrecord">
+                <small>New record !</small>
+                <div id="inputContainer">
+                    <input type="text" id="pseudoInput" placeholder="Enter a pseudo..."><a href="#" id="submitNewRecord" class="custom-link" data-hover="Save it">Save it</a>
+                </div>
+            </div>
+            <div class="return">
+                <small><a href="#" id="returnLoose" class="custom-link" data-hover="Return" >Return</a></small>
+            </div>
+        </div>
+        <div id="score">
+            Score : <span id="scoreValue">0</span>
+        </div>
+
+        <div id="options">
+            <div class='title'>
+                Options
+            </div>
+            <div id="music" class="option">
+                <div><label for="sliderMusic" class="sliderLabel">Music volume</label></div>
+                <div><input type="range" min="0" max="100" value="100" step="10" class="slider" id="sliderMusic"/></div>
+                <div><label for="sliderMusic" class="sliderLabelValue" id="valueSliderMusic">100</label>%</div>
+            </div>
+            <div id="sounds" class="option">
+                <div><label for="sliderSound" class="sliderLabel">Sounds volume</label></div>
+                <div><input type="range" min="0" max="100" value="100" step="10" class="slider" id="sliderSound"/></div>
+                <div><label for="sliderSound" class="sliderLabelValue" id="valueSliderSound">100</label>%</div>
+            </div>
+            <div class="return">
+                <a href="#" id="returnOptions" class="custom-link" data-hover="Return">Return</a>
+            </div>
+        </div>
+
+        <div id="escape">
+            <div class='title'>
+                PAUSED
+            </div>
+            <div class='buttons'>
+                <a href="#" class="custom-link" data-hover="Resume game" id="resumeButton">Resume game</a>
+                <a href="#" class="custom-link" data-hover="Exit game" id="endButton">Exit game</a>
+            </div>
+        </div>
+        <div id="scores">
+            <div class="title">
+                Best scores
+            </div>
+            <div id="scoresContainer">
+            </div>
+            <div class="return">
+                <a href="#" class="custom-link" data-hover="Return" id="returnScores">Return</a>
+            </div>
+        </div>
     </body>
 </html>

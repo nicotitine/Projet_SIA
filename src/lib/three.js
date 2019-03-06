@@ -20076,7 +20076,7 @@
 					var context = canvas.getContext( '2d' );
 					context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-					console.warn( 'THREE.WebGLRenderer: Texture has been resized from (' + image.width + 'x' + image.height + ') to (' + canvas.width + 'x' + canvas.height + ').' );
+					//console.warn( 'THREE.WebGLRenderer: Texture has been resized from (' + image.width + 'x' + image.height + ') to (' + canvas.width + 'x' + canvas.height + ').' );
 
 					return canvas;
 
@@ -20084,7 +20084,7 @@
 
 					if ( 'data' in image ) {
 
-						console.warn( 'THREE.WebGLRenderer: Image in DataTexture is too big (' + image.width + 'x' + image.height + ').' );
+						//console.warn( 'THREE.WebGLRenderer: Image in DataTexture is too big (' + image.width + 'x' + image.height + ').' );
 
 					}
 

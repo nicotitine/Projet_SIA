@@ -3,6 +3,10 @@
   src: url(../medias/models/Lazer84.ttf);
 }
 
+#welcome, #help, #score, #level-up, #lives, #loose {
+    word-spacing: 15px;
+}
+
 body, html {
     margin: 0;
     padding: 0;
@@ -13,6 +17,26 @@ canvas {
     height: 100%;
 }
 
+#title {
+    color: white;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-family: Lazer84;
+    font-size: 150px;
+    word-spacing: 30px;
+    top: 20px;
+    letter-spacing: 5px;
+}
+
+.title {
+    color: white;
+    font-size: 100px;
+    font-family: Lazer84;
+    height: 150px;
+    margin-top: 50px;
+}
+
 .level-up {
     background: white;
     position: absolute;
@@ -20,47 +44,502 @@ canvas {
     font-size: 200px;
 }
 
-#welcome {
+#lives, #score {
     position: absolute;
-    z-index: 1000;
-    display: flex;
-    flex-direction: row;
-    font-size: 120px;
+    bottom: 0;
+    left: 20;
     color: white;
-    justify-content: flex-start;
     font-family: Lazer84;
-    padding-bottom: 20px;
+    font-size: 75px;
+    display: none;
 }
 
-#level-up {
+
+#lives .live {
+    width: 50px;
+}
+
+#welcome, #help {
+    position: absolute;
+    flex-direction: row;
+    font-size: 80px;
+    color: white;
+    justify-content: center;
+    font-family: Lazer84;
+    padding-bottom: 20px;
+    align-items: flex-end;
+    display: none;
+}
+#welcome, #help {
+    width: 100%;
+    height: 100%;
+    bottom: 20px;
+}
+
+#lives {
+    left: 20px;
+}
+
+#score {
+    right: 20px;
+}
+
+#help {
+    justify-content: space-between;
+    width: 100%;
+}
+#loading {
+    color: white;
+    font-family: Lazer84;
+    font-size: 50px;
+}
+
+#loose {
+    display: none;
+}
+
+#loose .return {
+    justify-content: center;
+}
+
+#level-up, #loose {
     position: absolute;
     font-size: 150px;
     color: white;
-    display: none;
     top: 0;
     font-family: Lazer84;
     text-align: center;
+    width: 100%;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#loose small {
+    font-size: 50px;
 }
 
 #level-up small {
     font-size: 100px;
 }
 
-#welcome div {
+#welcome div, #help div {
     display: flex;
     flex-direction: column;
+    flex: 1
+    font-family: Lazer84;
     align-items: center;
-    width: 33%;
     text-align: center;
+}
+
+#welcome {
+    z-index: 10;
+}
+
+#mainButtons {
+    flex: 2;
+}
+
+.controls {
+    font-size: 40px;
+    width: 25%;
+}
+
+.controls .keys {
+    width: 40%;
+}
+
+.controls .space, .controls .camera, .controls .window, .controls .cheat {
+    display: block;
+    margin-top: 50px;
+}
+
+
+.custom-link {
+	position: relative;
+	display: inline-block;
+	color: #fff;
+    padding: 0px 20px;
+    text-decoration: none;
+}
+
+.custom-link:hover,
+.custom-link:focus {
+	outline: none;
+}
+
+
+/* Effect 11: text fill based on Lea Verou's animation http://dabblet.com/gist/6046779 */
+.custom-link {
+	text-shadow: none;
+    white-space: nowrap;
+    text-shadow: 0px 0px 1px #888888;
+}
+
+.custom-link::before {
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	max-width: 0;
+
+	content: attr(data-hover);
+	-webkit-transition: max-width 0.5s;
+	-moz-transition: max-width 0.5s;
+	transition: max-width 0.5s;
+    padding: 0px 20px;
+}
+
+.custom-link:hover::before,
+.custom-link:focus::before {
+    color: #888888;
+	max-width: 100%;
+}
+#options {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    text-align:center;
+    color: white;
+    display: none;
+}
+
+#options .option, .return {
+    display: flex;
+    font-family: Lazer84;
+    font-size: 50px;
+    word-spacing: 30px;
+    text-align: center;
+    width: 80%;
+    margin: 40px auto 0px auto;
+}
+
+.return a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin-top: 80px;
+}
+
+#submitNewrecord {
+    font-size: 30px;
+}
+
+#newrecord {
+    margin-top: 50px;
+    font-size: 30px;
+    display: none;
+}
+
+#inputContainer {
+    margin-top: 30px;
+    word-spacing: 15px;
+}
+
+#pseudoInput {
+    padding: 20px 30px;
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    font-size: 20px;
     font-family: Lazer84;
 }
 
-#welcome a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 40px;
+
+#options .option div {
+    flex: 1;
 }
 
-#welcome a:hover {
-    color: #888888;
+#options .slider::-webkit-slider-thumb {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 15px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#options .slider {
+    -webkit-appearance: none;
+    width: 50%;
+    height: 15px;
+    border-radius: 5px;
+    background: white;
+    outline: none;
+}
+input[type=range]::-moz-focus-outer {
+    border: 0;
+}
+
+#options .slider::-moz-range-thumb {
+    -webkit-appearance: none;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 15px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px;
+    background-color: white;
+}
+
+#options .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 15px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px;
+    background-color: white;
+}
+
+input[type="range"].max::-moz-range-thumb {
+    background-image: url('../medias/images/sound_max.png');
+}
+input[type="range"].max::-webkit-slider-thumb {
+   background-image: url('../medias/images/sound_max.png');
+}
+
+input[type="range"].mid::-moz-range-thumb {
+    background-image: url('../medias/images/sound_mid.png');
+}
+input[type="range"].mid::-webkit-slider-thumb {
+    background-image: url('../medias/images/sound_mid.png');
+}
+
+input[type="range"].min::-moz-range-thumb {
+    background-image: url('../medias/images/sound_min.png');
+}
+input[type="range"].min::-webkit-slider-thumb {
+    background-image: url('../medias/images/sound_min.png');
+}
+
+input[type="range"].muted::-moz-range-thumb {
+    background-image: url('../medias/images/sound_muted.png');
+}
+input[type="range"].muted::-webkit-slider-thumb {
+   background-image: url('../medias/images/sound_muted.png');
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    font-size: 50px;
+    align-items: center;
+    font-family: Lazer84;
+    font-size: 50px;
+}
+
+.buttons a {
+    margin-top: 40px;
+}
+
+
+
+#escape {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    display: none;
+}
+
+#scores {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    display: none;
+}
+
+.score {
+    color: white;
+    display: flex;
+    width: 100%;
+    margin-bottom: 20px;
+    font-family: Lazer84;
+    font-size: 50px;
+}
+
+.left {
+    flex: 1;
+    text-align: left;
+    margin-left: 20px;
+}
+.right {
+    margin-right: 20px;
+    flex: 1;
+    text-align: right;
+}
+
+@media screen and (max-width: 1600px) {
+    #welcome {
+        font-size: 50px;
+        text-align: center;
+    }
+
+    #welcome .controls {
+        font-size: 30px;
+    }
+
+    #title {
+        font-size: 100px;
+    }
+}
+
+#preLoader {
+    background: black;
+    width: 100%;
+    position: absolute;
+    align-items: center;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+}
+
+
+
+
+
+@keyframes lds-pacman-1 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  50% {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+@-webkit-keyframes lds-pacman-1 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  50% {
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+@keyframes lds-pacman-2 {
+  0% {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+  50% {
+    -webkit-transform: rotate(225deg);
+    transform: rotate(225deg);
+  }
+  100% {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+}
+@-webkit-keyframes lds-pacman-2 {
+  0% {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+  50% {
+    -webkit-transform: rotate(225deg);
+    transform: rotate(225deg);
+  }
+  100% {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+}
+@keyframes lds-pacman-3 {
+  0% {
+    -webkit-transform: translate(190px, 0);
+    transform: translate(190px, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translate(70px, 0);
+    transform: translate(70px, 0);
+    opacity: 1;
+  }
+}
+@-webkit-keyframes lds-pacman-3 {
+  0% {
+    -webkit-transform: translate(190px, 0);
+    transform: translate(190px, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: translate(70px, 0);
+    transform: translate(70px, 0);
+    opacity: 1;
+  }
+}
+.lds-pacman {
+  position: relative;
+}
+.lds-pacman > div:nth-child(2) div {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 120px;
+  height: 60px;
+  border-radius: 120px 120px 0 0;
+  background: #ffffff;
+  -webkit-animation: lds-pacman-1 1s linear infinite;
+  animation: lds-pacman-1 1s linear infinite;
+  -webkit-transform-origin: 60px 60px;
+  transform-origin: 60px 60px;
+}
+.lds-pacman > div:nth-child(2) div:nth-child(2) {
+  -webkit-animation: lds-pacman-2 1s linear infinite;
+  animation: lds-pacman-2 1s linear infinite;
+}
+.lds-pacman > div:nth-child(1) div {
+  position: absolute;
+  top: 92px;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #d9534f;
+  -webkit-animation: lds-pacman-3 1s linear infinite;
+  animation: lds-pacman-3 1s linear infinite;
+}
+.lds-pacman > div:nth-child(1) div:nth-child(1) {
+  -webkit-animation-delay: -0.67s;
+  animation-delay: -0.67s;
+}
+.lds-pacman > div:nth-child(1) div:nth-child(2) {
+  -webkit-animation-delay: -0.33s;
+  animation-delay: -0.33s;
+}
+.lds-pacman > div:nth-child(1) div:nth-child(3) {
+  -webkit-animation-delay: 0s;
+  animation-delay: 0s;
+}
+.lds-pacman {
+  width: 200px !important;
+  height: 200px !important;
+  -webkit-transform: translate(-100px, -100px) scale(1) translate(100px, 100px);
+  transform: translate(-100px, -100px) scale(1) translate(100px, 100px);
 }
