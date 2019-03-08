@@ -2,7 +2,7 @@ class Jokers {
     constructor() {
         this.jokers = [];
         this.lifetime = 10000;
-        this.spawntime = 1000;
+        this.spawntime = 20000;
         this.timestamp = Date.now();
         this.types = {
             SHIELD: 1,

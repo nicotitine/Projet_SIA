@@ -70,6 +70,8 @@ class Asteroid extends THREE.Mesh {
         this.direction = new THREE.Vector3(GameParameters.getRandom(1), GameParameters.getRandom(1), 0);
         this.vector = this.direction.multiplyScalar(_gameParameters.asteroidSpeed, _gameParameters.asteroidSpeed, 0);
 
+        this.timestamp = Date.now();
+
         scene.add(this)
     }
 
@@ -119,9 +121,21 @@ class Asteroid extends THREE.Mesh {
             _spaceship.hitted();
         }
 
+        //if(gameUI != null && gameUI.isGameLaunched && spaceship.shield.isOn && )
+
+
+
+
+            this.checkBullets(spaceship, asteroidBox);
+        
+    }
+
+
+    checkBullets(spaceship, asteroidBox) {
         let _this = this;
         spaceship.bullets.forEach(function(bullet) {
-            bulletBox = new THREE.Box3().setFromObject(bullet);
+            _this.timestamp = Date.now();
+            var bulletBox = new THREE.Box3().setFromObject(bullet);
             if(gameUI.isGameLaunched && bulletBox.intersectsBox(asteroidBox)) {
                 scene.remove(bullet);
                 spaceship.bullets[spaceship.bullets.indexOf(bullet)] = null;
@@ -157,8 +171,11 @@ class Asteroid extends THREE.Mesh {
                 asteroids = asteroids.filter(function (el) {
                     return el != null;
                 });
+                console.log(asteroids);
+                if(asteroids.length == 0) {
+                    levelUp(false);
+                }
             }
-        })
-
+        });
     }
 }

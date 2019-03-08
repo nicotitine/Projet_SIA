@@ -41,6 +41,7 @@ class EventHandler {
             }
             if(e.key == "p" || e.key == "P") {
                 saveAsImage();
+                gameUI.showEscape();
             }
             if((e.key == "k" || e.key == "K") && !gameUI.isLevelingUp && !gameUI.isPaused) {
                 levelUp(true);

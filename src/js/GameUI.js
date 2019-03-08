@@ -219,11 +219,10 @@ class GameUI {
     }
 
     showHelp() {
-        if(!this.isHelpDisplayed && !this.isOptionsDisplayed) {
+        if(!this.isHelpDisplayed) {
             this.isHelpDisplayed = true;
             this.helpDiv.fadeIn(500);
             this.helpDiv.css('display', 'flex');
-            this.size(this.width, this.height, new Array(this.helpDiv));
             if(this.isGameLaunched)
                 this.isPaused = true;
         } else if(this.isHelpDisplayed) {
