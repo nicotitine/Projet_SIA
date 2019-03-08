@@ -170,7 +170,6 @@ class Asteroid extends THREE.Mesh {
                 asteroids = asteroids.filter(function (el) {
                     return el != null;
                 });
-                console.log(asteroids);
                 if(asteroids.length == 0) {
                     levelUp(false);
                 }

@@ -19,6 +19,9 @@ var starfield = new Starfield(_gameParameters.starfield.number, _gameParameters.
 
 
 
+
+
+
 window.addEventListener('load', function() {
     storage.load()
     gameUI = new GameUI(_viewport.width / 2, _viewport.height / 2);
@@ -29,6 +32,8 @@ window.addEventListener('load', function() {
         gameUI.displayFromStorage();
         gameUI.showWelcome();
     }, 1000);
+
+    renderer.setPixelRatio(0.7);
     document.body.appendChild(renderer.domElement);
     gui = new dat.GUI({hideable: false});
     changeSlider($("#valueSliderMusic"), $("#sliderMusic"));

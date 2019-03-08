@@ -18,7 +18,6 @@ class BulletLoader {
     loaded(object, _this) {
         object.traverse(function(child) {
             if(child.type == "Mesh")
-            console.log(child);
                 child.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});
         });
         _this.skin = object;

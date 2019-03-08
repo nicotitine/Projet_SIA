@@ -75,7 +75,6 @@ class GameUI {
             else
                 pseudo = $('#pseudoInput').val();
 
-            //console.log(this.);
             storage.addNewRecord(new Score(pseudo, _this.score), _this.recordIndex);
             _this.endGame();
             _this.hideLoose();
@@ -137,17 +136,14 @@ class GameUI {
     }
 
     editLives(livesnb, win) {
-        console.log(livesnb);
         if(livesnb >= 4) {
             if(win) {
                 this.livesDiv[0].innerHTML += '<img src="src/medias/images/live_full.png" class="live"/>';
             } else {
-                console.log(this.livesDiv[0].children);
                 this.livesDiv[0].children[livesnb - 1].remove();
             }
         } else {
             if(win) {
-                console.log(this.lives);
                 this.lives[livesnb -1 ].src = 'src/medias/images/live_full.png';
             } else {
                 this.lives[livesnb - 1].src = 'src/medias/images/live_empty.png';
@@ -234,7 +230,6 @@ class GameUI {
             this.showTitle();
         }
         if(this.isGameLaunched) {
-            console.log(this.livesDiv);
             this.helpDiv.css('bottom', this.livesDiv.height() + 30 + "px");
         }
     }
