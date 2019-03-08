@@ -21,7 +21,7 @@ var starfield = new Starfield(_gameParameters.starfield.number, _gameParameters.
 
 window.addEventListener('load', function() {
     storage.load()
-    gameUI = new GameUI(_viewport.width, _viewport.height);
+    gameUI = new GameUI(_viewport.width / 2, _viewport.height / 2);
     setTimeout(function() {
         $("#preLoader").fadeOut(1000, function() {
             isLoading = false;
@@ -160,20 +160,19 @@ var update = function() {
         }
         $("#loading").text("Loading" + pointsString);
         timestampPoints = Date.now();
-    } else {
-
     }
+
     if(_spaceship != null && !_spaceship.isHitted)
         cameraHandler.update();
 
     if(_spaceship.isLoaded)
-        _spaceship.update(eventHandler.keys);
+        _spaceship.update();
 
     if(starfield != null)
         starfield.update(cameraHandler.frustum, _gameParameters.starfield.speed, _gameParameters.starfield.spread);
 
     asteroids.forEach(function(asteroid) {
-        asteroid.update(_spaceship);
+        asteroid.update();
     });
 
     if(gameUI != null && gameUI.isGameLaunched) {

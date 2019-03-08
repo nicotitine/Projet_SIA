@@ -12,12 +12,14 @@ class Bullet extends THREE.Object3D {
         this.rotation.set(spaceship.rotation.x, spaceship.rotation.y, spaceship.rotation.z);
         this.vector = this.direction.multiplyScalar(speed, speed, speed);
         this.size = new THREE.Vector3();
-        new THREE.Box3().setFromObject(this).getSize(this.size);
+        this.intersectBox = new THREE.Box3().setFromObject(this);
+        this.intersectBox.getSize(this.size);
         this.spawnTime = Date.now();
         this.name = "Bullet";
     }
 
     update() {
+        this.intersectBox = new THREE.Box3().setFromObject(this);
         this.position.x += this.vector.x;
         this.position.y += this.vector.y;
         if(Math.abs(this.position.x) > cameraHandler.size.x / 2) {
@@ -30,5 +32,9 @@ class Bullet extends THREE.Object3D {
 
     spawn() {
 
+    }
+
+    getBox() {
+        return this.intersectBox;
     }
 }

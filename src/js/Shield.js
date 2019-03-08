@@ -6,7 +6,7 @@ class Shield extends THREE.Mesh {
         texture.repeat.set( 4, 4 );
         var geometry = new THREE.SphereGeometry( radius, 32, 32 );
         var material = new THREE.MeshLambertMaterial( {map: texture, transparent: true, depthWrite: false, depthTest: true} );
-        material.opacity = 0.1;
+        material.opacity = 0.5;
         super(geometry, material);
         this.position.copy(position);
         this.isOn = false;
@@ -16,7 +16,7 @@ class Shield extends THREE.Mesh {
 
     update(position) {
         this.rotation.y += 0.02;
-        this.position.copy(position);
+        this.position.copy(_spaceship.position);
     }
 
     activate(time, isBounce) {

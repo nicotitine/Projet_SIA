@@ -61,16 +61,18 @@ class Asteroid extends THREE.Mesh {
         this.r.z = Math.random() * 0.005;
 
         this.size =  new THREE.Vector3();
-        var box = new THREE.Box3().setFromObject(this);
-        box.getSize(this.size);
+        this.box = new THREE.Box3().setFromObject(this);
+        this.box.getSize(this.size);
 
         this.name = "Asteroid";
-        this.geometry.computeBoundingBox();
 
         this.direction = new THREE.Vector3(GameParameters.getRandom(1), GameParameters.getRandom(1), 0);
         this.vector = this.direction.multiplyScalar(_gameParameters.asteroidSpeed, _gameParameters.asteroidSpeed, 0);
 
         this.timestamp = Date.now();
+        this.geometry.computeBoundingBox();
+
+        this.intersectBox = new THREE.Box3().setFromObject(this);
 
         scene.add(this)
     }
@@ -94,10 +96,8 @@ class Asteroid extends THREE.Mesh {
 
     }
 
-    update(spaceship) {
-        var asteroidBox = new THREE.Box3().setFromObject(this);
-        var spaceshipBox = new THREE.Box3().setFromObject(spaceship);
-        var bulletBox;
+    update() {
+        this.intersectBox = new THREE.Box3().setFromObject(this);
 
         // Update position
         if(gameUI != null && (!gameUI.isPaused || gameUI.isWelcomeDisplayed)) {
@@ -117,7 +117,7 @@ class Asteroid extends THREE.Mesh {
         }
 
         // Collision detection
-        if(gameUI!= null && gameUI.isGameLaunched && !spaceship.shield.isOn && spaceshipBox.intersectsBox(asteroidBox)) {
+        if(gameUI!= null && gameUI.isGameLaunched && !_spaceship.shield.isOn && this.intersectBox.intersectsBox(_spaceship.getBox())) {
             _spaceship.hitted();
         }
 
@@ -126,20 +126,19 @@ class Asteroid extends THREE.Mesh {
 
 
 
-            this.checkBullets(spaceship, asteroidBox);
-        
+        this.checkBullets();
+
     }
 
 
-    checkBullets(spaceship, asteroidBox) {
+    checkBullets() {
         let _this = this;
-        spaceship.bullets.forEach(function(bullet) {
+        _spaceship.bullets.forEach(function(bullet) {
             _this.timestamp = Date.now();
-            var bulletBox = new THREE.Box3().setFromObject(bullet);
-            if(gameUI.isGameLaunched && bulletBox.intersectsBox(asteroidBox)) {
+            if(gameUI.isGameLaunched && _this.intersectBox.intersectsBox(bullet.getBox())) {
                 scene.remove(bullet);
-                spaceship.bullets[spaceship.bullets.indexOf(bullet)] = null;
-                spaceship.bullets = spaceship.bullets.filter(function (el) {
+                _spaceship.bullets[_spaceship.bullets.indexOf(bullet)] = null;
+                _spaceship.bullets = _spaceship.bullets.filter(function (el) {
                     return el != null;
                 });
                 var rock, size, lastLife;

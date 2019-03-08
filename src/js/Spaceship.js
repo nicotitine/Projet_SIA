@@ -28,6 +28,7 @@
             this.fire = new Fire(this.fireScale);
             this.size = new THREE.Vector3();
             new THREE.Box3().setFromObject(this).getSize(this.size);
+            this.intersectBox = new THREE.Box3().setFromObject(this);
             this.isLoaded = true;
 
             scene.add(this);
@@ -95,11 +96,12 @@
         }
     }
 
-    update(keys, frustum) {
+    update() {
+        this.intersectBox = new THREE.Box3().setFromObject(this);
         // Keys event handling
-        if(keys[37]) this.velocity.arl = _gameParameters.spaceship.rotationSpeed; else this.velocity.arl = 0;
-        if(keys[39]) this.velocity.arr = -_gameParameters.spaceship.rotationSpeed; else this.velocity.arr = 0;
-        if(gameUI != null && !gameUI.isPaused && keys[38]){
+        if(eventHandler.keys[37]) this.velocity.arl = _gameParameters.spaceship.rotationSpeed; else this.velocity.arl = 0;
+        if(eventHandler.keys[39]) this.velocity.arr = -_gameParameters.spaceship.rotationSpeed; else this.velocity.arr = 0;
+        if(gameUI != null && !gameUI.isPaused && eventHandler.keys[38]){
             this.velocity.ax = -Math.cos(this.velocity.r) * _gameParameters.spaceship.speed;
             this.velocity.ay = -Math.sin(this.velocity.r) * _gameParameters.spaceship.speed;
             if(this.fire.fire.material.uniforms.magnitude.value > 0) {
@@ -112,7 +114,7 @@
                 this.fire.fire.material.uniforms.magnitude.value += 0.2;
             }
         }
-        if(keys[32] && !this.needToReload) {
+        if(eventHandler.keys[32] && !this.needToReload) {
             this.shoot(false);
             timestamp = Date.now();
         }
@@ -172,9 +174,13 @@
                     return el != null;
                 });
             } else {
-                bullet.update(frustum);
+                bullet.update();
             }
         });
         this.bullets = bullets;
+    }
+
+    getBox() {
+        return this.intersectBox;
     }
 }
