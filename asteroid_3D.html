@@ -9,19 +9,15 @@
 
         <script type="text/javascript" src="src/lib/jquery.js"></script>
         <script type="text/javascript" src="src/lib/three.js"></script>
-        <script type="text/javascript" src="src/lib/orbitControl.js"></script>
-        <script type="text/javascript" src="src/lib/flyControls.js"></script>
         <script type="text/javascript" src="src/lib/MTLLoader.js"></script>
         <script type="text/javascript" src="src/lib/OBJLoader.js"></script>
-        <script type="text/javascript" src="src/lib/Fire.js"></script>
         <script type="text/javascript" src="src/lib/FireShader.js"></script>
         <script type="text/javascript" src="src/lib/dat.gui.min.js"></script>
-        <script type="text/javascript" src="src/lib/tween.js"></script>
         <script type="text/javascript" src="src/lib/ShaderExtras.js"></script>
-        <script type="text/javascript" src="src/lib/SP.js"></script>
-        <script type="text/javascript" src="src/lib/howler.min.js"></script>
+        <script type="text/javascript" src="src/lib/SPE.js"></script>
+        <script type="text/javascript" src="src/lib/Howler.min.js"></script>
 
-        <script type="text/javascript" src="src/js/TextureHandler.js"></script>
+        <script type="text/javascript" src="src/js/ResizableObject.js"></script>
         <script type="text/javascript" src="src/js/EventHandler.js"></script>
         <script type="text/javascript" src="src/js/Viewport.js"></script>
         <script type="text/javascript" src="src/js/GameParameters.js"></script>
@@ -29,18 +25,20 @@
         <script type="text/javascript" src="src/js/AudioHandler.js"></script>
         <script type="text/javascript" src="src/js/Jokers.js"></script>
         <script type="text/javascript" src="src/js/GameUI.js"></script>
+        <script type="text/javascript" src="src/js/GameCore.js"></script>
         <script type="text/javascript" src="src/js/Storage.js"></script>
         <script type="text/javascript" src="src/js/Score.js"></script>
         <script type="text/javascript" src="src/js/Shield.js"></script>
         <script type="text/javascript" src="src/js/Fire.js"></script>
-        <script type="text/javascript" src="src/js/BulletLoader.js"></script>
+        <script type="text/javascript" src="src/js/TextureLoader.js"></script>
         <script type="text/javascript" src="src/js/Bullet.js"></script>
         <script type="text/javascript" src="src/js/Spaceship.js"></script>
         <script type="text/javascript" src="src/js/Asteroid.js"></script>
         <script type="text/javascript" src="src/js/Starfield.js"></script>
         <script type="text/javascript" src="src/js/main.js"></script>
-        <script type="text/javascript" src="src/js/explode.js"></script>
+        <script type="text/javascript" src="src/js/Explosion.js"></script>
         <script type="text/javascript" src="src/js/dat.js"></script>
+        <script type="text/javascript" src="src/js/Spaceman.js"></script>
 
     </head>
     <body>
@@ -83,7 +81,7 @@
             <img class='live' src="src/medias/images/live_full.png"/><img class='live' src="src/medias/images/live_full.png"/><img class='live' src="src/medias/images/live_full.png"/></div>
 
         <div id="loose">
-            You loose<br/>
+            Game over<br/>
             <small>You scored <span id="finalScore"></span> points</small>
             <div id="newrecord">
                 <small>New record !</small>

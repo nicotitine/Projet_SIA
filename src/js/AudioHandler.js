@@ -1,7 +1,7 @@
 class AudioHandler {
     constructor() {
         this.backgroundMusic = new Howl({
-            src: ['src/medias/sounds/sanstitre.wav']
+            src: ['src/medias/sounds/background-music.wav']
         });
 
         this.fireSound = new Howl({

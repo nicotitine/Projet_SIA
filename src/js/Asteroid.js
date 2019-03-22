@@ -1,5 +1,6 @@
-class Asteroid extends THREE.Mesh {
-    constructor(spreadX, maxWidth, maxHeight, maxDepth, position, level) {
+class Asteroid extends ResizableObject {
+    constructor(position, level) {
+        // ADD ASTEROID MODELS !!!
         var geometry;
         var color = '#ffffff';
         var texture;
@@ -8,16 +9,16 @@ class Asteroid extends THREE.Mesh {
 
         switch (level) {
             case 1:
-                size = _gameParameters.asteroidMinSize;
+                size = gameParameters.asteroid.size.min;
             break;
             case 2:
-                size = _gameParameters.asteroidMidleSize;
+                size = gameParameters.asteroid.size.middle;
             break;
             case 3:
-                size = _gameParameters.asteroidMaxSize;
+                size = gameParameters.asteroid.size.max;
             break;
             default:
-                size = _gameParameters.asteroidMaxSize;
+                size = gameParameters.asteroid.size.max;
         }
 
         geometry = new THREE.DodecahedronGeometry(size, 1);
@@ -44,9 +45,9 @@ class Asteroid extends THREE.Mesh {
         this.scale.set(1, 1, 1);
         this.level = level;
 
-        var x = spreadX / 2 - Math.random() * spreadX;
-        var centeredness = 1 - (Math.abs(x) / (maxWidth / 2));
-        var y = (maxHeight / 2 - Math.random() * maxHeight) * centeredness;
+        var x = gameParameters.asteroid.spawnRadius.width / 2 - Math.random() * gameParameters.asteroid.spawnRadius.width;
+        var centeredness = 1 - (Math.abs(x) / (gameParameters.asteroid.spawnRadius.width / 2));
+        var y = (gameParameters.asteroid.spawnRadius.height / 2 - Math.random() * gameParameters.asteroid.spawnRadius.height) * centeredness;
         var z = 0;
 
         if(position == null) {
@@ -55,26 +56,14 @@ class Asteroid extends THREE.Mesh {
             this.position.copy(position);
         }
 
-        this.r = {};
-        this.r.x = Math.random() * 0.005;
-        this.r.y = Math.random() * 0.005;
-        this.r.z = Math.random() * 0.005;
-
         this.size =  new THREE.Vector3();
         this.box = new THREE.Box3().setFromObject(this);
         this.box.getSize(this.size);
 
         this.name = "Asteroid";
-
         this.direction = new THREE.Vector3(GameParameters.getRandom(1), GameParameters.getRandom(1), 0);
-        this.vector = this.direction.multiplyScalar(_gameParameters.asteroidSpeed, _gameParameters.asteroidSpeed, 0);
-
-        this.timestamp = Date.now();
+        this.vector = this.direction.multiplyScalar(gameParameters.asteroid.speed, gameParameters.asteroid.speed, 0);
         this.geometry.computeBoundingBox();
-
-        this.intersectBox = new THREE.Box3().setFromObject(this);
-
-        scene.add(this)
     }
 
     colorLuminance(hex, lum) {
@@ -92,88 +81,46 @@ class Asteroid extends THREE.Mesh {
         return rgb;
     }
 
-    collide(position) {
-
-    }
-
     update() {
-        this.intersectBox = new THREE.Box3().setFromObject(this);
-
         // Update position
         if(gameUI != null && (!gameUI.isPaused || gameUI.isWelcomeDisplayed)) {
             this.position.x += this.vector.x;
             this.position.y += this.vector.y;
         }
 
-        this.rotation.x += _gameParameters.asteroidRotation;
-        this.rotation.y += _gameParameters.asteroidRotation;
+        this.rotation.x += gameParameters.asteroid.rotation;
+        this.rotation.y += gameParameters.asteroid.rotation;
 
         // Check if out of screen
-        if(Math.abs(this.position.x) > cameraHandler.size.x / 2) {
+        if(Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
             this.position.x = -this.position.x;
         }
-        if(Math.abs(this.position.y) > cameraHandler.size.y / 2) {
+        if(Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
             this.position.y = -this.position.y;
         }
-
-        // Collision detection
-        if(gameUI!= null && gameUI.isGameLaunched && !_spaceship.shield.isOn && this.intersectBox.intersectsBox(_spaceship.getBox())) {
-            _spaceship.hitted();
-        }
-
-        //if(gameUI != null && gameUI.isGameLaunched && spaceship.shield.isOn && )
-
-
-
-
-        this.checkBullets();
-
     }
 
-
-    checkBullets() {
-        let _this = this;
-        _spaceship.bullets.forEach(function(bullet) {
-            _this.timestamp = Date.now();
-            if(gameUI.isGameLaunched && _this.intersectBox.intersectsBox(bullet.getBox())) {
-                scene.remove(bullet);
-                _spaceship.bullets[_spaceship.bullets.indexOf(bullet)] = null;
-                _spaceship.bullets = _spaceship.bullets.filter(function (el) {
-                    return el != null;
-                });
-                var rock, size, lastLife;
-                switch (_this.level) {
-                    case 3:
-                        size = _gameParameters.asteroidMidleSize;
-                        lastLife = false;
-                    break;
-                    case 2:
-                        size = _gameParameters.asteroidMinSize;
-                        lastLife = false;
-                    break;
-                    case 1:
-                        lastLife = true;
-                    default:
-
-                }
-                if(!lastLife) {
-                    for(var i = 0; i < _gameParameters.asteroidDivideNumer; i++) {
-                        rock = new Asteroid(_gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxWidth, _gameParameters.asteroidMaxHeight, 0, _this.position, _this.level - 1);
-                        asteroids.push(rock);
-                    }
-                }
-                gameUI.scored(10);
-                new Explosion(_this.position.x, _this.position.y, _this.position.z)
-                audioHandler.explosionSound.play();
-                scene.remove(_this);
-                asteroids[asteroids.indexOf(_this)] = null;
-                asteroids = asteroids.filter(function (el) {
-                    return el != null;
-                });
-                if(asteroids.length == 0) {
-                    levelUp(false);
-                }
+    collide() {
+        var rock, size, lastLife, newAsteroids = [];
+        switch (this.level) {
+            case 3:
+                size = gameParameters.asteroidMidleSize;
+                lastLife = false;
+            break;
+            case 2:
+                size = gameParameters.asteroidMinSize;
+                lastLife = false;
+            break;
+            case 1:
+                lastLife = true;
+            default:
+        }
+        if(!lastLife) {
+            for(var i = 0; i < gameParameters.asteroid.divideNumber; i++) {
+                newAsteroids.push(new Asteroid(this.position, this.level - 1));
             }
-        });
+        }
+        gameUI.scored(10);
+        return newAsteroids;
     }
 }

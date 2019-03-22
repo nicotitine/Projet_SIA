@@ -7,108 +7,72 @@ class Jokers {
         this.types = {
             SHIELD: 1,
             LIFE: 2,
-            RAPID_FIRE: 3,
-            DEMATERIALIZE: 4
-        }
-        this.textures = {
-            shield: new THREE.TextureLoader().load("src/medias/models/shield-icon.png"),
-            life: new THREE.TextureLoader().load('src/medias/models/life-icon.png'),
-            fire: new THREE.TextureLoader().load('src/medias/models/fire-icon.png'),
-            dematerialize: new THREE.TextureLoader().load('src/medias/models/through-icon.png'),
-            length: 4
+            RAPID_FIRE: 0,
         }
     }
 
     spawn() {
+        var joker = new Spaceman(THREE.Math.randInt(0, 2));
         this.timestamp = Date.now();
-        var geometry = new THREE.CircleGeometry( 10, 32 );
-        var texture;
-        var joker = new THREE.Mesh();
-
-        joker.type = THREE.Math.randInt(1, this.textures.length);
-        switch (joker.type) {
-            case this.types.SHIELD:
-                texture = this.textures.shield;
-            break;
-            case this.types.LIFE:
-                texture = this.textures.life;
-            break;
-            case this.types.RAPID_FIRE :
-                texture = this.textures.fire;
-            break;
-            case this.types.DEMATERIALIZE :
-                texture = this.textures.dematerialize;
-            break;
-            default:
-        }
-
-        var material = new THREE.MeshBasicMaterial({map: texture});
-        joker.geometry = geometry;
-        joker.material = material;
-        joker.spawntime = Date.now();
-        joker.position.set(GameParameters.getRandom(cameraHandler.size.x), GameParameters.getRandom(cameraHandler.size.y), 0);
-        joker.lookAt(cameraHandler.camera.position);
-        if(cameraHandler.cameraType == cameraHandler.cameraTypes.PURSUIT)
+        joker.position.set(GameParameters.getRandom(gameCore.cameraHandler.size.x), GameParameters.getRandom(gameCore.cameraHandler.size.y), 0);
+        if(gameCore.cameraHandler.cameraType == gameCore.cameraHandler.cameraTypes.PURSUIT)
             joker.rotation.z = -Math.PI/2;
 
         this.jokers.push(joker);
-        scene.add(joker);
-        var _this = this;
-        setTimeout(function() {
-            scene.remove(joker);
-            _this.jokers[_this.jokers.indexOf(joker)] = null;
-            _this.jokers = _this.jokers.filter(function (el) {
+        gameCore.scene.add(joker);
+        setTimeout(() => {
+            gameCore.scene.remove(joker);
+            this.jokers[this.jokers.indexOf(joker)] = null;
+            this.jokers = this.jokers.filter(function (el) {
                 return el != null;
             });
-        },this.lifetime);
+        }, this.lifetime);
     }
 
     update() {
-        var spaceshipBox = new THREE.Box3().setFromObject(_spaceship);
+        //var spaceshipBox = new THREE.Box3().setFromObject(gameCore.spaceship);
 
         if(this.timestamp + this.spawntime < Date.now() && gameUI.isGameLaunched && !gameUI.isPaused) {
             this.spawn();
         } else if(!gameUI.isGameLaunched || gameUI.isPaused) {
             this.timestamp = Date.now();
         }
-        var _this = this;
         this.jokers.forEach(function(joker) {
-            var jokerBox = new THREE.Box3().setFromObject(joker);
-            if(jokerBox.intersectsBox(spaceshipBox)) {
+            joker.update();
+            if(joker.boxPosition.distanceTo(gameCore.spaceship.position) < gameCore.spaceship.size.x) {
                 switch (joker.type) {
                     case 1:
-                        _spaceship.shield.activate(10, true);
+                        gameCore.spaceship.shield.activate(10, true);
+                        gameCore.spaceship.displayBonusTimer(this.lifetime);
                     break;
                     case 2:
-                        _spaceship.addLife();
+                        gameCore.spaceship.addLife();
                     break;
-                    case 3:
-                        console.log("fire");
+                    case 0:
+                        gameCore.spaceship.shoot(true);
+                        gameCore.spaceship.displayBonusTimer(this.lifetime);
+                        gameCore.spaceship.isRapidFireActivated = true;
+                        setTimeout(() => {
+                            gameCore.spaceship.isRapidFireActivated = false;
+                        }, this.lifetime);
                     break;
-                    case 4:
-                        _spaceship.shield.activate(10);
-                    break;
-                    default:
 
                 }
-                scene.remove(joker);
-                _this.jokers[_this.jokers.indexOf(joker)] = null;
-                _this.jokers = _this.jokers.filter(function (el) {
+                gameCore.scene.remove(joker);
+                this.jokers[this.jokers.indexOf(joker)] = null;
+                this.jokers = this.jokers.filter(function (el) {
                     return el != null;
                 });
             }
 
-            if(cameraHandler.cameraType == cameraHandler.cameraTypes.PURSUIT) {
-                joker.lookAt(cameraHandler.camera.position.x, cameraHandler.camera.position.y, 0);
+            if(gameCore.cameraHandler.cameraType == gameCore.cameraHandler.cameraTypes.PURSUIT) {
+                joker.lookAt(gameCore.cameraHandler.camera.position.x, gameCore.cameraHandler.camera.position.y, 0);
                 if(joker.rotation.x < 0)
                     joker.rotation.z = Math.PI;
                 else
                     joker.rotation.z = 0;
 
-
-            } else {
-                joker.lookAt(cameraHandler.camera.position)
             }
-        })
+        }, this);
     }
 }

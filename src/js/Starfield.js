@@ -19,8 +19,7 @@ class Starfield extends THREE.Points {
                 this.geometry.vertices[i].y = GameParameters.getRandom(spread.y)
                 this.geometry.vertices[i].z = GameParameters.getRandom(spread.z);
             }
-            if(cameraHandler.cameraType != cameraHandler.cameraTypes.PURSUIT)
-                this.geometry.vertices[i].z += speed;
+            this.geometry.vertices[i].z += speed;
         }
         this.geometry.verticesNeedUpdate = true;
     }

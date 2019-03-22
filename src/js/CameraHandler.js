@@ -8,7 +8,7 @@ class CameraHandler {
         this.cameraType = this.cameraTypes.FIXED;
         this.frustum = new THREE.Frustum();
         this.cameraViewProjectionMatrix = new THREE.Matrix4();
-        this.camera = new THREE.PerspectiveCamera(50, _viewport.width / _viewport.height, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(50, _viewport.ratio, 0.1, 1000);
         this.ambient = new THREE.AmbientLight(0xffffff);
         this.light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI);
         this.light.position.set(0, 0, 500);
@@ -20,11 +20,7 @@ class CameraHandler {
             y: 0
         }
 
-        scene.add(this.ambient);
-        scene.add(this.light);
-        scene.add(this.camera);
-
-        this.getCameraSize(500);
+        this.getCameraSize();
     }
 
     update() {
@@ -37,8 +33,8 @@ class CameraHandler {
             case this.cameraTypes.FIXED:
             break;
             case this.cameraTypes.MOVING:
-                this.camera.position.x = _spaceship.position.x;
-                this.camera.position.y = _spaceship.position.y;
+                this.camera.position.x = gameCore.spaceship.position.x;
+                this.camera.position.y = gameCore.spaceship.position.y;
             break;
             case this.cameraTypes.PURSUIT:
                 this.light.target.position.copy(this.camera.position);
@@ -46,15 +42,15 @@ class CameraHandler {
                 this.camera.updateProjectionMatrix();
 
                 var matrix = new THREE.Matrix4();
-                matrix.extractRotation( _spaceship.matrix );
+                matrix.extractRotation( gameCore.spaceship.matrix );
 
                 var direction = new THREE.Vector3( -1, 0, 0 );
                 direction = direction.applyMatrix4( matrix );
-                this.camera.rotation.y = _spaceship.rotation.y + Math.PI / 2;
+                this.camera.rotation.y = gameCore.spaceship.rotation.y + Math.PI / 2;
 
                 // ####### MAY WORK ######
                 this.camera.rotation.x = Math.PI/2;
-                this.camera.position.set(_spaceship.position.x + direction.x * (-200), _spaceship.position.y + direction.y * (-200), 50);
+                this.camera.position.set(gameCore.spaceship.position.x + direction.x * (-200), gameCore.spaceship.position.y + direction.y * (-200), 50);
                 // #######################
             break;
             default:
@@ -70,27 +66,29 @@ class CameraHandler {
     changeToFixed() {
         this.camera.position.set(0, 0, 500);
         this.camera.rotation.set(0, 0, 0);
+        gameCore.spaceship.shield.rotation.x = 0;
     }
 
     changeToMoving() {
-        this.camera.position.set(_spaceship.position.x, _spaceship.position.y, 500);
+        gameCore.spaceship.shield.rotation.x = 0;
+        this.camera.position.set(gameCore.spaceship.position.x, gameCore.spaceship.position.y, 500);
         this.camera.rotation.set(0, 0, 0);
     }
 
     changeToPursuit() {
-        _spaceship.shield.rotation.x = Math.PI/2;
+        gameCore.spaceship.shield.rotation.x = Math.PI/2;
         this.cameraType = this.cameraTypes.PURSUIT;
-        jokers.jokers.forEach(function(joker) {
+        gameCore.jokers.jokers.forEach(function(joker) {
             joker.rotation.x = Math.PI/2;
         });
     }
 
     getCameraSize() {
+        // Set up the width and height of the camera fov at z = 0
         this.size.y = Math.tan(this.camera.fov * Math.PI / 180 * 0.5) * this.camera.position.z * 2;
         this.size.x = this.size.y * _viewport.ratio;
         var geometry = new THREE.BoxBufferGeometry(this.size.x, this.size.y, 50);
         var edges = new THREE.EdgesGeometry( geometry );
-        var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
-        scene.add( line );
+        this.limitLines = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
     }
 }

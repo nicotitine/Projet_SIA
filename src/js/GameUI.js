@@ -46,27 +46,25 @@ class GameUI {
 
         this.recordIndex = 0;
 
-        var _this = this;
-
         this.playButton.addEventListener("click", function() {
-            _this.startGame();
-        });
+            this.startGame();
+        }.bind(this));
 
         this.optionsButton.addEventListener('click', function() {
-            _this.showOptions();
-        });
+            this.showOptions();
+        }.bind(this));
 
         this.returnOptions.addEventListener('click', function(e) {
-            _this.hideOptions();
-        });
+            this.hideOptions();
+        }.bind(this));
 
         this.scoresButton.addEventListener('click', function() {
-            _this.showScores();
-        });
+            this.showScores();
+        }.bind(this));
 
         this.returnScores.addEventListener('click', function() {
-            _this.hideScores();
-        });
+            this.hideScores();
+        }.bind(this));
 
         this.submitNewRecordButton.addEventListener('click', function() {
             let pseudo;
@@ -75,22 +73,22 @@ class GameUI {
             else
                 pseudo = $('#pseudoInput').val();
 
-            storage.addNewRecord(new Score(pseudo, _this.score), _this.recordIndex);
-            _this.endGame();
-            _this.hideLoose();
-        });
+            storage.addNewRecord(new Score(pseudo, this.score), this.recordIndex);
+            this.endGame();
+            this.hideLoose();
+        }.bind(this));
         this.returnLoose.addEventListener('click', function() {
-            _this.endGame();
-            _this.hideLoose();
-        });
+            this.endGame();
+            this.hideLoose();
+        }.bind(this));
 
         this.resumeButton.addEventListener('click', function() {
-            _this.hideEscape(true);
-        });
+            this.hideEscape(true);
+        }.bind(this));
 
         this.endButton.addEventListener('click', function() {
-            _this.hideEscape(false);
-        })
+            this.hideEscape(false);
+        }.bind(this))
 
         // this.fullScreenElements.push(this.welcomeDiv);
         // this.fullScreenElements.push(this.levelUpDiv);
@@ -100,15 +98,58 @@ class GameUI {
         // this.fullScreenElements.push(this.scoreDiv);
 
         this.dataFromStorage = storage.getData();
+
+        this.changeSlider($("#valueSliderMusic"), $("#sliderMusic"));
+        this.changeSlider($("#valueSliderSound"), $("#sliderSound"));
+        gameCore.audioHandler.changeMusicVolume(Number($("#sliderMusic").val()) / 100);
+        gameCore.audioHandler.changeSoundVolume(Number($("#sliderSound").val()) / 100);
+        $("#sliderMusic").on('input change', function(e) {
+            this.changeSlider($("#valueSliderMusic"), $("#sliderMusic"));
+            gameCore.audioHandler.changeMusicVolume(Number($("#sliderMusic").val()) / 100);
+            storage.save();
+        }.bind(this));
+        $('#sliderSound').on('input change', function() {
+            this.changeSlider($('#valueSliderSound'), $('#sliderSound'));
+            gameCore.audioHandler.changeSoundVolume(Number($("#sliderSound").val()) / 100);
+            storage.save();
+        }.bind(this));
     }
 
     displayFromStorage() {
         if(this.dataFromStorage != null) {
-            var _this = this;
             this.scoresContainer.innerHTML = "";
             this.dataFromStorage.scores.forEach(function(score) {
-                _this.scoresContainer.innerHTML += '<div class="score"><div class="right">' + score.pseudo + '</div><div class="left">' + score.score + '</div></div>';
-            });
+                this.scoresContainer.innerHTML += '<div class="score"><div class="right">' + score.pseudo + '</div><div class="left">' + score.score + '</div></div>';
+            }, this);
+        }
+    }
+
+    changeSlider($label, $slider) {
+        var newValue = $slider.val();
+        $label.text(newValue);
+
+        if(newValue > 66) {
+            $slider.addClass("max");
+        } else {
+            $slider.removeClass("max");
+        }
+
+        if(newValue > 32 && newValue < 67) {
+            $slider.addClass('mid');
+        } else {
+            $slider.removeClass('mid');
+        }
+
+        if(newValue < 33) {
+            $slider.addClass('min');
+        } else {
+            $slider.removeClass('min');
+        }
+
+        if(newValue == 0) {
+            $slider.addClass('muted');
+        } else {
+            $slider.removeClass('muted');
         }
     }
 
@@ -162,8 +203,7 @@ class GameUI {
         this.showLevelUp(false);
         this.showLives();
         this.showScore();
-        rebuildGame();
-        jokers.timestamp = Date.now();
+        gameCore.launchGame()
         this.isGameLaunched = true;
     }
 
@@ -176,7 +216,6 @@ class GameUI {
     }
 
     showWelcome() {
-        _spaceship.shield.activate();
         this.isLevelingUp = true;
         this.isWelcomeDisplayed = true;
         this.welcomeDiv.fadeIn(500);
@@ -194,7 +233,6 @@ class GameUI {
         this.isWelcomeDisplayed = false;
     }
     showLevelUp(isCheat) {
-        _spaceship.shield.activate();
         this.isLevelingUp = true;;
         this.level += 1;
         this.levelUpDiv.text("Level " + this.level);
@@ -204,14 +242,11 @@ class GameUI {
         this.levelUpDiv.fadeIn(500);
         this.levelUpDiv.css('display', 'flex');
         this.size(this.width, this.height, new Array(this.levelUpDiv));
-        setTimeout(function(_this) {
-            _this.size(_this.width, _this.height, new Array(_this.levelUpDiv));
-            _this.levelUpDiv.fadeOut(500);
-            _this.isLevelingUp = false;
-            setTimeout(function() {
-                _spaceship.shield.desactivate();
-            }, 1000);
-        }, 2500, this);
+        setTimeout(() => {
+            this.size(this.width, this.height, new Array(this.levelUpDiv));
+            this.levelUpDiv.fadeOut(500);
+            this.isLevelingUp = false;
+        }, 2500);
     }
 
     showHelp() {
@@ -219,8 +254,9 @@ class GameUI {
             this.isHelpDisplayed = true;
             this.helpDiv.fadeIn(500);
             this.helpDiv.css('display', 'flex');
-            if(this.isGameLaunched)
+            if(this.isGameLaunched) {
                 this.isPaused = true;
+            }
         } else if(this.isHelpDisplayed) {
             this.hideHelp();
         }
@@ -232,13 +268,14 @@ class GameUI {
         if(this.isGameLaunched) {
             this.helpDiv.css('bottom', this.livesDiv.height() + 30 + "px");
         }
+        gameCore.setIsPaused(this.isPaused);
     }
     hideHelp() {
-        var _this = this;
         this.isHelpDisplayed = false;
         this.helpDiv.fadeOut(500, function() {
-            _this.isPaused = false;
-        });
+            this.isPaused = false;
+            gameCore.setIsPaused(this.isPaused);
+        }.bind(this));
         if(!this.isWelcomeDisplayed || (!this.isWelcomeDisplayed && !this.isHelpDisplayed)) {
             this.hideTitle();
         }
@@ -303,13 +340,13 @@ class GameUI {
         } else if(this.isEscapeDisplayed) {
             this.hideEscape(true);
         }
-
+        gameCore.setIsPaused(this.isPaused);
     }
     hideEscape(continu) {
-        var _this = this;
         this.escapeDiv.fadeOut(500, function() {
-            _this.isPaused = false;
-        });
+            this.isPaused = false;
+            gameCore.setIsPaused(this.isPaused);
+        }.bind(this));
         this.isEscapeDisplayed = false;
         if(!continu) {
             this.endGame();
@@ -330,8 +367,8 @@ class GameUI {
     }
 
     endGame() {
-        _gameParameters.level = 1;
-        _gameParameters.asteroidNumber = 3;
+        gameParameters.level = 1;
+        gameParameters.asteroid.number = 3;
         this.level = 0;
         this.score = 0;
         this.scoreValue.innerHTML = "0";
@@ -340,6 +377,7 @@ class GameUI {
         this.hideLives();
         this.isPaused = false;
         this.isGameLaunched = false;
-        rebuildGame();
+        gameCore.endGame();
+        gameCore.setIsPaused(this.isPaused);
     }
 }
