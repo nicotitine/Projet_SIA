@@ -6,22 +6,23 @@ class GameCore {
         this.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
         this.cameraHandler = new CameraHandler();
         this.audioHandler = new AudioHandler();
-        this.worldWrapper = new WorldWrapper(this.cameraHandler.size, this.scene, this.cameraHandler.camera);
+
         this.bullets = [];
         this.explosions = [];
         this.asteroids = [];
-
+        this.createAsteroids();
+        this.worldWrapper = new WorldWrapper(this.cameraHandler.size, this.scene, this.cameraHandler.camera, this.asteroids);
         this.scene.add(this.cameraHandler.ambient);
         this.scene.add(this.cameraHandler.light);
         this.scene.add(this.cameraHandler.camera);
         this.scene.add(this.starfield);
-        this.scene.add(this.worldWrapper);
+        //this.scene.add(this.worldWrapper);
 
         this.isPaused = false;
 
 
 
-        this.createAsteroids();
+
 
         this.showSpaceship();
 

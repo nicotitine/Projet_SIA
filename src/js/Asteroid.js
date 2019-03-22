@@ -88,8 +88,8 @@ class Asteroid extends ResizableObject {
             this.position.y += this.vector.y;
         }
 
-        this.rotation.x += gameParameters.asteroid.rotation;
-        this.rotation.y += gameParameters.asteroid.rotation;
+        // this.rotation.x += gameParameters.asteroid.rotation;
+        // this.rotation.y += gameParameters.asteroid.rotation;
 
         // Check if out of screen
         if(Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {

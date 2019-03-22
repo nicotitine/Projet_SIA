@@ -12,7 +12,7 @@ class GameParameters {
             size: {
                 min: 10,
                 middle: 20,
-                max: 30
+                max: 100
             },
             spawnRadius: {
                 width: 900,

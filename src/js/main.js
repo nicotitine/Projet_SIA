@@ -49,15 +49,8 @@ var timestamp = Date.now();
 
 
 var renderer = new THREE.WebGLRenderer({antialias: gameParameters.antialias, preserveDrawingBuffer: true});
-
-
-
-
-
-//var asteroid = new Asteroid(gameParameters.asteroidMaxWidth, gameParameters.asteroidMaxWidth, gameParameters.asteroidMaxHeight, 0, null, 3);
-
+renderer.autoClear = false;
 renderer.setSize(_viewport.width, _viewport.height);
-//renderer.context.getShaderInfoLog = function () { return '' };
 
 
 
