@@ -6,7 +6,7 @@ class GameCore {
         this.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
         this.cameraHandler = new CameraHandler();
         this.audioHandler = new AudioHandler();
-        this.worldWrapper = new WorldWrapper(this.cameraHandler.size);
+        this.worldWrapper = new WorldWrapper(this.cameraHandler.size, this.scene, this.cameraHandler.camera);
         this.bullets = [];
         this.explosions = [];
         this.asteroids = [];
@@ -39,11 +39,10 @@ class GameCore {
         this.scene.add(this.spaceship.bonusTimer);
     }
 
-    fireLoaded() {
-        this.scene.add(this.spaceship.fire.fire);
-    }
 
     update() {
+
+        this.worldWrapper.update();
 
         //console.log(this.bullets.length, this.scene.children.length);
         this.scene.children.forEach(function(child) {

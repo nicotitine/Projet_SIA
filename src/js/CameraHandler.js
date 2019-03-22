@@ -81,6 +81,7 @@ class CameraHandler {
         gameCore.jokers.jokers.forEach(function(joker) {
             joker.rotation.x = Math.PI/2;
         });
+        gameCore.spaceship.bonusTimer.rotation.copy(gameCore.spaceship.rotation)
     }
 
     getCameraSize() {

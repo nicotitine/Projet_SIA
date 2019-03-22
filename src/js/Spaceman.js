@@ -45,11 +45,15 @@ class Spaceman extends THREE.Group {
             this.rotation.z = new THREE.Vector2(this.direction.x, this.direction.y).angle() + Math.PI;
         }
 
+        var oldDirection = this.direction.clone();
+
         this.speedMaxVector = this.direction.multiplyScalar(gameParameters.jokers.spaceman.speedMax, gameParameters.jokers.spaceman.speedMax, 0);
-        this.speedMinVector = this.direction.multiplyScalar(gameParameters.jokers.spaceman.speedMin, gameParameters.jokers.spaceman.speedMin, 0);
+        this.speedMinVector = oldDirection.multiplyScalar(gameParameters.jokers.spaceman.speedMin, gameParameters.jokers.spaceman.speedMin, 0);
 
         this.add(this.spaceman);
         this.add(this.spacemanBox);
+
+        console.log(this.speedMaxVector, this.speedMinVector);
     }
 
     update() {
@@ -60,11 +64,11 @@ class Spaceman extends THREE.Group {
         this.index = (this.index + 1) % (this.texture.length - 1);
         // Front face texture is change for the next image
         this.spaceman.material[4].map = this.texture[this.index];
-        if(this.index > 0 && this.index < 10) {
+        if(this.index > 18 && this.index < 31) {
             this.position.x += this.speedMaxVector.x;
             this.position.y += this.speedMaxVector.y;
-        }
-        else {
+        } else {
+            console.log("elsej");
             this.position.x += this.speedMinVector.x;
             this.position.y += this.speedMinVector.y;
         }

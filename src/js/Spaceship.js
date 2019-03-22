@@ -115,7 +115,7 @@
         if(this.lives > 0) {
             setTimeout(() => {
                 this.isHitted = false;
-                this.fire.position.z = 10;
+                this.fire.position.z = 0;
                 this.visible = true;
                 this.fire.visible = true;
                 this.position.set(0, 0, 0);
@@ -231,8 +231,14 @@
             // Bonus timer updating
             if(this.isBonusTimerDisplayed && this.bonusTimer.scale.x > 1) {
                 let tick = (Date.now() - this.bonusTimer.spawntime) / this.bonusTimer.lifetime * 100;
-                this.bonusTimer.position.set(this.position.x, this.position.y - this.size.y, 0);
-                this.bonusTimer.scale.set(100 - tick, 2, 1);
+                if(gameCore.cameraHandler.cameraType == gameCore.cameraHandler.cameraTypes.PURSUIT) {
+                    this.bonusTimer.rotation.set(0, 0, this.rotation.y + Math.PI/2)
+                    this.bonusTimer.position.set(this.fire.position.x, this.fire.position.y, -15);
+                } else {
+                    this.bonusTimer.position.set(this.position.x, this.position.y - this.size.y, 0);
+                    this.bonusTimer.rotation.set(0, 0, 0);
+                }
+                this.bonusTimer.scale.set(100- tick, 2, 1);
                 if(this.bonusTimer.scale.x < 25) {
                     this.bonusTimer.material.color.setHex(0xff0000);
                 } else if(this.bonusTimer.scale.x < 50) {

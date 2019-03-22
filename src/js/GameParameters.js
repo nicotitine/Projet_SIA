@@ -47,8 +47,8 @@ class GameParameters {
 
         this.jokers = {
             spaceman : {
-                speedMax: 4,
-                speedMin: 1
+                speedMax: 5,
+                speedMin: 2
             }
         }
 
@@ -57,6 +57,10 @@ class GameParameters {
             speed: 2,
             spread: new THREE.Vector3(3000, 3000, 1500)
         };
+
+        this.worldWrapper = {
+            speed: 0.005
+        }
     }
 
     static getRandom(x) {

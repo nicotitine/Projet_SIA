@@ -78,10 +78,14 @@ class TextureLoader {
             texture: []
         }
 
-        this.worldWrapper = {
-            path : 'src/medias/models/plasma.png',
+        this.worldWrapperSide = {
+            path : 'src/medias/models/plasmaSide.png',
             texture: null
-        }
+        };
+        this.worldWrapperFront = {
+            path : 'src/medias/models/plasmaFront.png',
+            texture: null
+        };
 
         this.load();
     }
@@ -114,8 +118,11 @@ class TextureLoader {
                 this.spacemanBox.texture[i] = texture;
             });
         }, this);
-        this.textureLoader.load(this.worldWrapper.path, texture => {
-            this.worldWrapper.texture = texture;
+        this.textureLoader.load(this.worldWrapperSide.path, texture => {
+            this.worldWrapperSide.texture = texture;
+        });
+        this.textureLoader.load(this.worldWrapperFront.path, texture => {
+            this.worldWrapperFront.texture = texture;
         });
     }
 
@@ -147,7 +154,11 @@ class TextureLoader {
         return this.spacemanBox;
     }
 
-    getWorldWrapper() {
-        return this.worldWrapper;
+    getWorldWrapperSide() {
+        return this.worldWrapperSide;
+    }
+
+    getWorldWrapperFront() {
+        return this.worldWrapperFront;
     }
 }

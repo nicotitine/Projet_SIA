@@ -24,7 +24,6 @@ class Fire extends ResizableObject {
 
             this.geometry.computeBoundingBox();
             this.scale.set(scale.x, scale.y, scale.z);
-            this.position.z = 10;
             this.material.uniforms.magnitude.value = 3.5;
             this.material.uniforms.lacunarity.value = 0.0;
             this.size = new THREE.Vector3();

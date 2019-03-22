@@ -37,7 +37,7 @@ class Asteroid extends ResizableObject {
             color: color,
             flatShading: true,
             roughness: 0.8,
-            metalness: 1
+            metalness: 1,depthTest: true, depthWrite: true, opacity: 1
         });
 
         this.castShadow = true;

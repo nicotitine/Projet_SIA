@@ -66,11 +66,10 @@ class Jokers {
             }
 
             if(gameCore.cameraHandler.cameraType == gameCore.cameraHandler.cameraTypes.PURSUIT) {
-                joker.lookAt(gameCore.cameraHandler.camera.position.x, gameCore.cameraHandler.camera.position.y, 0);
-                if(joker.rotation.x < 0)
-                    joker.rotation.z = Math.PI;
-                else
-                    joker.rotation.z = 0;
+                //joker.lookAt(gameCore.cameraHandler.camera.position.x, gameCore.cameraHandler.camera.position.y, 0);
+                joker.rotation.x = Math.PI / 2;
+                joker.rotation.z = 0;
+
 
             }
         }, this);
