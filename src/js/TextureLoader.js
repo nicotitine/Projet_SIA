@@ -78,6 +78,11 @@ class TextureLoader {
             texture: []
         }
 
+        this.worldWrapper = {
+            path : 'src/medias/models/plasma.png',
+            texture: null;
+        }
+
         this.load();
     }
 
@@ -109,6 +114,9 @@ class TextureLoader {
                 this.spacemanBox.texture[i] = texture;
             });
         }, this);
+        this.textureLoader.load(this.worldWrapper.path, texture => {
+            this.worldWrapper.texture = texture;
+        });
     }
 
     getBullet() {
@@ -137,5 +145,9 @@ class TextureLoader {
 
     getSpacemanBox() {
         return this.spacemanBox;
+    }
+    
+    getWorldWrapper() {
+        return this.worldWrapper;
     }
 }
