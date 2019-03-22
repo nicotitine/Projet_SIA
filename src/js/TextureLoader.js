@@ -3,7 +3,12 @@ class TextureLoader {
         this.loader = new THREE.OBJLoader();
         this.loader.crossOrigin = '';
         this.textureLoader = new THREE.TextureLoader();
-        this.material = new THREE.MeshStandardMaterial({color: "#ffffff", flatShading: true, /*  shininess: 0.5 */ roughness: 0.8, metalness: 1});;
+        this.material = new THREE.MeshStandardMaterial({
+            color: "#ffffff",
+            flatShading: true,
+            /*  shininess: 0.5 */ roughness: 0.8,
+            metalness: 1
+        });;
 
         this.bullet = {
             path: "src/medias/models/missile-2.obj",
@@ -79,11 +84,11 @@ class TextureLoader {
         }
 
         this.worldWrapperSide = {
-            path : 'src/medias/models/plasmaSide.png',
+            path: 'src/medias/models/plasmaSide.png',
             texture: null
         };
         this.worldWrapperFront = {
-            path : 'src/medias/models/plasmaFront.png',
+            path: 'src/medias/models/plasmaFront.png',
             texture: null
         };
 

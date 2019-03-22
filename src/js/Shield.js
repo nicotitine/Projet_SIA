@@ -3,9 +3,14 @@ class Shield extends ResizableObject {
         var texture = textureLoader.getShield().texture;
         texture.wrapS = THREE.RepeatWrapping;
         texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set( 4, 4 );
-        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-        var material = new THREE.MeshLambertMaterial( {map: texture, transparent: true, depthWrite: false, depthTest: true} );
+        texture.repeat.set(4, 4);
+        var geometry = new THREE.SphereGeometry(1, 32, 32);
+        var material = new THREE.MeshLambertMaterial({
+            map: texture,
+            transparent: true,
+            depthWrite: false,
+            depthTest: true
+        });
         material.opacity = 0.2;
         super(geometry, material);
         this.position.copy(position);
@@ -23,18 +28,18 @@ class Shield extends ResizableObject {
         this.rotation.z = gameCore.spaceship.rotation.z;
         this.position.copy(position);
 
-        if(isSpaceshipInvincible && !this.isActivated) {
+        if (isSpaceshipInvincible && !this.isActivated) {
             this.activate(null, false);
         }
 
-        if(this.shieldRequested && !isSpaceshipInvincible && this.timestamp + this.activationTime < Date.now()) {
+        if (this.shieldRequested && !isSpaceshipInvincible && this.timestamp + this.activationTime < Date.now()) {
             this.shieldRequested = false;
             this.desactivate();
         }
     }
 
     activate(time, isBounce) {
-        if(time != null) {
+        if (time != null) {
             this.timestamp = Date.now();
             this.activationTime = time * 1000;
             this.shieldRequested = true;

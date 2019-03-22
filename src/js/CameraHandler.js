@@ -31,30 +31,28 @@ class CameraHandler {
         this.light.position.copy(this.camera.position)
         switch (this.cameraType) {
             case this.cameraTypes.FIXED:
-            break;
+                break;
             case this.cameraTypes.MOVING:
                 this.camera.position.x = gameCore.spaceship.position.x;
                 this.camera.position.y = gameCore.spaceship.position.y;
-            break;
+                break;
             case this.cameraTypes.PURSUIT:
                 this.light.target.position.copy(this.camera.position);
                 this.camera.far = 10000;
                 this.camera.updateProjectionMatrix();
 
                 var matrix = new THREE.Matrix4();
-                matrix.extractRotation( gameCore.spaceship.matrix );
+                matrix.extractRotation(gameCore.spaceship.matrix);
 
-                var direction = new THREE.Vector3( -1, 0, 0 );
-                direction = direction.applyMatrix4( matrix );
+                var direction = new THREE.Vector3(-1, 0, 0);
+                direction = direction.applyMatrix4(matrix);
                 this.camera.rotation.y = gameCore.spaceship.rotation.y + Math.PI / 2;
 
                 // ####### MAY WORK ######
-                this.camera.rotation.x = Math.PI/2;
+                this.camera.rotation.x = Math.PI / 2;
                 this.camera.position.set(gameCore.spaceship.position.x + direction.x * (-200), gameCore.spaceship.position.y + direction.y * (-200), 50);
                 // #######################
-            break;
-            default:
-
+                break;
         }
     }
 
@@ -76,10 +74,10 @@ class CameraHandler {
     }
 
     changeToPursuit() {
-        gameCore.spaceship.shield.rotation.x = Math.PI/2;
+        gameCore.spaceship.shield.rotation.x = Math.PI / 2;
         this.cameraType = this.cameraTypes.PURSUIT;
         gameCore.jokers.jokers.forEach(function(joker) {
-            joker.rotation.x = Math.PI/2;
+            joker.rotation.x = Math.PI / 2;
         });
         gameCore.spaceship.bonusTimer.rotation.copy(gameCore.spaceship.rotation)
     }
@@ -89,7 +87,9 @@ class CameraHandler {
         this.size.y = Math.tan(this.camera.fov * Math.PI / 180 * 0.5) * this.camera.position.z * 2;
         this.size.x = this.size.y * _viewport.ratio;
         var geometry = new THREE.BoxBufferGeometry(this.size.x, this.size.y, 50);
-        var edges = new THREE.EdgesGeometry( geometry );
-        this.limitLines = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+        var edges = new THREE.EdgesGeometry(geometry);
+        this.limitLines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({
+            color: 0xffffff
+        }));
     }
 }

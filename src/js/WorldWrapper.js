@@ -81,8 +81,6 @@ class WorldWrapper extends ResizableObject {
         this.material = material;
         this.needsUpdate = true;
 
-        renderer.autoClear = false;
-
         this.composer = new THREE.EffectComposer(renderer);
         this.composer.reset();
     }

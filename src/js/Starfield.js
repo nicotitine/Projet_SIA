@@ -1,9 +1,11 @@
 class Starfield extends THREE.Points {
     constructor(number, spread) {
         var geometry = new THREE.Geometry();
-        var material = new THREE.PointsMaterial({color: 0xffffff});
+        var material = new THREE.PointsMaterial({
+            color: 0xffffff
+        });
         super(geometry, material);
-        for(var i = 0; i < number; i++) {
+        for (var i = 0; i < number; i++) {
             let star = new THREE.Vector3();
             star.x = GameParameters.getRandom(spread.x);
             star.y = GameParameters.getRandom(spread.y);
@@ -13,8 +15,8 @@ class Starfield extends THREE.Points {
     }
 
     update(frustum, speed, spread) {
-        for(var i = 0; i < this.geometry.vertices.length; i++) {
-            if(!frustum.containsPoint(this.geometry.vertices[i])) {
+        for (var i = 0; i < this.geometry.vertices.length; i++) {
+            if (!frustum.containsPoint(this.geometry.vertices[i])) {
                 this.geometry.vertices[i].x = GameParameters.getRandom(spread.x);
                 this.geometry.vertices[i].y = GameParameters.getRandom(spread.y)
                 this.geometry.vertices[i].z = GameParameters.getRandom(spread.z);

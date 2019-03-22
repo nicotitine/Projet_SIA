@@ -6,12 +6,12 @@ class GameCore {
         this.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
         this.cameraHandler = new CameraHandler();
         this.audioHandler = new AudioHandler();
-
         this.bullets = [];
         this.explosions = [];
         this.asteroids = [];
         this.createAsteroids();
         this.worldWrapper = new WorldWrapper(this.cameraHandler.size, this.scene, this.cameraHandler.camera, this.asteroids);
+
         this.scene.add(this.cameraHandler.ambient);
         this.scene.add(this.cameraHandler.light);
         this.scene.add(this.cameraHandler.camera);
@@ -20,12 +20,7 @@ class GameCore {
 
         this.isPaused = false;
 
-
-
-
-
         this.showSpaceship();
-
     }
 
     setIsPaused(bool) {
@@ -48,29 +43,29 @@ class GameCore {
         //console.log(this.bullets.length, this.scene.children.length);
         this.scene.children.forEach(function(child) {
             //if(child.name == "Bullet")
-                //console.log("bullet");
+            //console.log("bullet");
         })
-        if(this.spaceman != null) {
+        if (this.spaceman != null) {
             this.spaceman.update();
         }
 
-        if(this.spaceship != null && !this.spaceship.isHitted)
+        if (this.spaceship != null && !this.spaceship.isHitted)
             this.cameraHandler.update();
 
-        if(this.spaceship.isLoaded && !this.isPaused)
+        if (this.spaceship.isLoaded && !this.isPaused)
             this.spaceship.update();
 
 
-        if(this.starfield != null)
+        if (this.starfield != null)
             this.starfield.update(this.cameraHandler.frustum, gameParameters.starfield.speed, gameParameters.starfield.spread);
 
-        if(!this.isPaused) {
+        if (!this.isPaused) {
             this.asteroids.forEach(function(asteroid) {
                 asteroid.update();
 
-                for(var i = 0; i < this.bullets.length; i++) {
+                for (var i = 0; i < this.bullets.length; i++) {
                     let distanceToAsteroid = this.bullets[i].position.distanceTo(asteroid.position);
-                    if(gameUI.isGameLaunched && asteroid.geometry.boundingSphere != null && distanceToAsteroid < (asteroid.geometry.boundingSphere.radius + (this.bullets[i].size.x + this.bullets[i].size.y) / 2)) {
+                    if (gameUI.isGameLaunched && asteroid.geometry.boundingSphere != null && distanceToAsteroid < (asteroid.geometry.boundingSphere.radius + (this.bullets[i].size.x + this.bullets[i].size.y) / 2)) {
                         let newAsteroids = asteroid.collide();
                         this.explosions.push(new Explosion(asteroid.position))
                         this.bullets[i].geometry.dispose();
@@ -88,27 +83,27 @@ class GameCore {
 
                         this.asteroids[this.asteroids.indexOf(asteroid)] = null;
                         this.filterArrays();
-                        if(this.asteroids.length == 0) {
+                        if (this.asteroids.length == 0) {
                             this.levelUp(false);
                         }
                     }
                 }
 
                 let distanceToSpacehip = asteroid.position.distanceTo(this.spaceship.position);
-                if(gameUI.isGameLaunched && !this.spaceship.shield.isActivated && distanceToSpacehip < asteroid.size.x) {
+                if (gameUI.isGameLaunched && !this.spaceship.shield.isActivated && distanceToSpacehip < asteroid.size.x) {
                     this.spaceship.hitted();
                     this.audioHandler.explosionSound.play();
                 }
             }, this);
         }
 
-        if(gameUI != null && gameUI.isGameLaunched && !this.isPaused)
+        if (gameUI != null && gameUI.isGameLaunched && !this.isPaused)
             this.jokers.update();
 
         // Bullet updating
-        if(!this.isPaused) {
-            for(var i = 0; i < this.bullets.length; i++) {
-                if(this.bullets[i].spawnTime + gameParameters.bullet.lifetime < Date.now()) {
+        if (!this.isPaused) {
+            for (var i = 0; i < this.bullets.length; i++) {
+                if (this.bullets[i].spawnTime + gameParameters.bullet.lifetime < Date.now()) {
                     //console.log(bullet);
                     this.scene.remove(this.bullets[i]);
                     this.bullets[i] = null;
@@ -126,8 +121,8 @@ class GameCore {
             this.bullets[i] = null;
         }, this);
         this.filterArrays();
-        if(!gameUI.isLevelingUp) {
-            if(isCheat) {
+        if (!gameUI.isLevelingUp) {
+            if (isCheat) {
                 this.asteroids.forEach(function(asteroid, i) {
                     var explosion = new Explosion(asteroid.position);
                     this.audioHandler.explosionSound.play();
@@ -149,8 +144,8 @@ class GameCore {
         gameUI.isLevelingUp = true;
     }
 
-    createAsteroids(){
-        for(var i = 0; i < gameParameters.asteroid.number; i++){
+    createAsteroids() {
+        for (var i = 0; i < gameParameters.asteroid.number; i++) {
             let asteroid = new Asteroid(null, 3);
             this.asteroids.push(asteroid);
             this.scene.add(asteroid);
@@ -194,10 +189,10 @@ class GameCore {
 
     filterArrays() {
         //console.log("filtering");
-        this.asteroids = this.asteroids.filter(function (el) {
+        this.asteroids = this.asteroids.filter(function(el) {
             return el != null;
         });
-        this.bullets = this.bullets.filter(function (el) {
+        this.bullets = this.bullets.filter(function(el) {
             return el != null;
         });
     }

@@ -46,7 +46,7 @@ class GameParameters {
         };
 
         this.jokers = {
-            spaceman : {
+            spaceman: {
                 speedMax: 5,
                 speedMin: 2
             }

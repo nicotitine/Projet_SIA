@@ -68,7 +68,7 @@ class GameUI {
 
         this.submitNewRecordButton.addEventListener('click', function() {
             let pseudo;
-            if($("#pseudoInput").val() == "")
+            if ($("#pseudoInput").val() == "")
                 pseudo = "Anonymous";
             else
                 pseudo = $('#pseudoInput').val();
@@ -116,7 +116,7 @@ class GameUI {
     }
 
     displayFromStorage() {
-        if(this.dataFromStorage != null) {
+        if (this.dataFromStorage != null) {
             this.scoresContainer.innerHTML = "";
             this.dataFromStorage.scores.forEach(function(score) {
                 this.scoresContainer.innerHTML += '<div class="score"><div class="right">' + score.pseudo + '</div><div class="left">' + score.score + '</div></div>';
@@ -128,25 +128,25 @@ class GameUI {
         var newValue = $slider.val();
         $label.text(newValue);
 
-        if(newValue > 66) {
+        if (newValue > 66) {
             $slider.addClass("max");
         } else {
             $slider.removeClass("max");
         }
 
-        if(newValue > 32 && newValue < 67) {
+        if (newValue > 32 && newValue < 67) {
             $slider.addClass('mid');
         } else {
             $slider.removeClass('mid');
         }
 
-        if(newValue < 33) {
+        if (newValue < 33) {
             $slider.addClass('min');
         } else {
             $slider.removeClass('min');
         }
 
-        if(newValue == 0) {
+        if (newValue == 0) {
             $slider.addClass('muted');
         } else {
             $slider.removeClass('muted');
@@ -177,15 +177,15 @@ class GameUI {
     }
 
     editLives(livesnb, win) {
-        if(livesnb >= 4) {
-            if(win) {
+        if (livesnb >= 4) {
+            if (win) {
                 this.livesDiv[0].innerHTML += '<img src="src/medias/images/live_full.png" class="live"/>';
             } else {
                 this.livesDiv[0].children[livesnb - 1].remove();
             }
         } else {
-            if(win) {
-                this.lives[livesnb -1 ].src = 'src/medias/images/live_full.png';
+            if (win) {
+                this.lives[livesnb - 1].src = 'src/medias/images/live_full.png';
             } else {
                 this.lives[livesnb - 1].src = 'src/medias/images/live_empty.png';
             }
@@ -194,7 +194,7 @@ class GameUI {
     }
 
     startGame() {
-        for(var i = 0; i < this.lives.length; i++) {
+        for (var i = 0; i < this.lives.length; i++) {
             this.lives[i].src = "src/medias/images/live_full.png";
         }
         this.hideTitle();
@@ -236,7 +236,7 @@ class GameUI {
         this.isLevelingUp = true;;
         this.level += 1;
         this.levelUpDiv.text("Level " + this.level);
-        if(isCheat) {
+        if (isCheat) {
             this.levelUpDiv[0].innerHTML += "<br/><small>(cheater !!!)</small>";
         }
         this.levelUpDiv.fadeIn(500);
@@ -250,22 +250,22 @@ class GameUI {
     }
 
     showHelp() {
-        if(!this.isHelpDisplayed) {
+        if (!this.isHelpDisplayed) {
             this.isHelpDisplayed = true;
             this.helpDiv.fadeIn(500);
             this.helpDiv.css('display', 'flex');
-            if(this.isGameLaunched) {
+            if (this.isGameLaunched) {
                 this.isPaused = true;
             }
-        } else if(this.isHelpDisplayed) {
+        } else if (this.isHelpDisplayed) {
             this.hideHelp();
         }
-        if(!this.isWelcomeDisplayed && this.isHelpDisplayed) {
+        if (!this.isWelcomeDisplayed && this.isHelpDisplayed) {
             this.titleDiv.text('PAUSED');
             this.titleDiv.css('font-size', '100px');
             this.showTitle();
         }
-        if(this.isGameLaunched) {
+        if (this.isGameLaunched) {
             this.helpDiv.css('bottom', this.livesDiv.height() + 30 + "px");
         }
         gameCore.setIsPaused(this.isPaused);
@@ -276,7 +276,7 @@ class GameUI {
             this.isPaused = false;
             gameCore.setIsPaused(this.isPaused);
         }.bind(this));
-        if(!this.isWelcomeDisplayed || (!this.isWelcomeDisplayed && !this.isHelpDisplayed)) {
+        if (!this.isWelcomeDisplayed || (!this.isWelcomeDisplayed && !this.isHelpDisplayed)) {
             this.hideTitle();
         }
     }
@@ -296,7 +296,7 @@ class GameUI {
         this.size(this.width, this.height, new Array(this.looseDiv));
         this.isGameLaunched = false;
         let isNewRecord = storage.isNewRecord(this.score);
-        if(isNewRecord[0]){
+        if (isNewRecord[0]) {
             this.recordIndex = isNewRecord[1];
             this.newrecordDiv.fadeIn(500);
         } else {
@@ -333,11 +333,11 @@ class GameUI {
     }
 
     showEscape() {
-        if(this.isGameLaunched && !this.isEscapeDisplayed) {
+        if (this.isGameLaunched && !this.isEscapeDisplayed) {
             this.escapeDiv.fadeIn(500);
             this.isPaused = true;
             this.isEscapeDisplayed = true;
-        } else if(this.isEscapeDisplayed) {
+        } else if (this.isEscapeDisplayed) {
             this.hideEscape(true);
         }
         gameCore.setIsPaused(this.isPaused);
@@ -348,7 +348,7 @@ class GameUI {
             gameCore.setIsPaused(this.isPaused);
         }.bind(this));
         this.isEscapeDisplayed = false;
-        if(!continu) {
+        if (!continu) {
             this.endGame();
         }
     }

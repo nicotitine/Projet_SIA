@@ -12,7 +12,7 @@ class Storage {
 
     load() {
         var storageData = localStorage.getItem('playerData');
-        if(storageData != null)
+        if (storageData != null)
             this.data = JSON.parse(storageData);
 
         $("#sliderMusic").val(this.data.options.musicVolume);
@@ -34,10 +34,10 @@ class Storage {
     isNewRecord(newValue) {
         var position = 0;
         var found = false;
-        if(this.data.scores.length == 0)
+        if (this.data.scores.length == 0)
             return new Array(true, 0);
-        for(var i = 0; i < this.data.scores.length; i++) {
-            if(this.data.scores[i].score <= newValue) {
+        for (var i = 0; i < this.data.scores.length; i++) {
+            if (this.data.scores[i].score <= newValue) {
                 position = i;
                 found = true;
                 return new Array(found, position);
@@ -48,7 +48,7 @@ class Storage {
 
     addNewRecord(score, index) {
         this.data.scores.splice(index, 0, score);
-        if(this.data.scores.length > 5)
+        if (this.data.scores.length > 5)
             this.data.scores.pop();
 
         this.save();

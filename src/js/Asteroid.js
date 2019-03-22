@@ -6,26 +6,25 @@ class Asteroid extends ResizableObject {
         var texture;
         var size = 0;
 
-
         switch (level) {
             case 1:
                 size = gameParameters.asteroid.size.min;
-            break;
+                break;
             case 2:
                 size = gameParameters.asteroid.size.middle;
-            break;
+                break;
             case 3:
                 size = gameParameters.asteroid.size.max;
-            break;
+                break;
             default:
                 size = gameParameters.asteroid.size.max;
         }
 
         geometry = new THREE.DodecahedronGeometry(size, 1);
         geometry.vertices.forEach(function(v) {
-            v.x += (0 - Math.random() * (size/4));
-            v.y += (0 - Math.random() * (size/4));
-            v.z += (0 - Math.random() * (size/4));
+            v.x += (0 - Math.random() * (size / 4));
+            v.y += (0 - Math.random() * (size / 4));
+            v.z += (0 - Math.random() * (size / 4));
         });
 
         texture = new THREE.MeshStandardMaterial();
@@ -37,7 +36,10 @@ class Asteroid extends ResizableObject {
             color: color,
             flatShading: true,
             roughness: 0.8,
-            metalness: 1,depthTest: true, depthWrite: true, opacity: 1
+            metalness: 1,
+            depthTest: true,
+            depthWrite: true,
+            opacity: 1
         });
 
         this.castShadow = true;
@@ -50,13 +52,13 @@ class Asteroid extends ResizableObject {
         var y = (gameParameters.asteroid.spawnRadius.height / 2 - Math.random() * gameParameters.asteroid.spawnRadius.height) * centeredness;
         var z = 0;
 
-        if(position == null) {
+        if (position == null) {
             this.position.set(x, y, z);
         } else {
             this.position.copy(position);
         }
 
-        this.size =  new THREE.Vector3();
+        this.size = new THREE.Vector3();
         this.box = new THREE.Box3().setFromObject(this);
         this.box.getSize(this.size);
 
@@ -72,7 +74,8 @@ class Asteroid extends ResizableObject {
             hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
         }
         lum = lum || 0;
-        var rgb = "#", c, i;
+        var rgb = "#",
+            c, i;
         for (var i = 0; i < 3; i++) {
             c = parseInt(hex.substr(i * 2, 2), 16);
             c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
@@ -83,7 +86,7 @@ class Asteroid extends ResizableObject {
 
     update() {
         // Update position
-        if(gameUI != null && (!gameUI.isPaused || gameUI.isWelcomeDisplayed)) {
+        if (gameUI != null && (!gameUI.isPaused || gameUI.isWelcomeDisplayed)) {
             this.position.x += this.vector.x;
             this.position.y += this.vector.y;
         }
@@ -92,10 +95,10 @@ class Asteroid extends ResizableObject {
         // this.rotation.y += gameParameters.asteroid.rotation;
 
         // Check if out of screen
-        if(Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
+        if (Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
             this.position.x = -this.position.x;
         }
-        if(Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
+        if (Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
             this.position.y = -this.position.y;
         }
     }
@@ -106,17 +109,17 @@ class Asteroid extends ResizableObject {
             case 3:
                 size = gameParameters.asteroidMidleSize;
                 lastLife = false;
-            break;
+                break;
             case 2:
                 size = gameParameters.asteroidMinSize;
                 lastLife = false;
-            break;
+                break;
             case 1:
                 lastLife = true;
             default:
         }
-        if(!lastLife) {
-            for(var i = 0; i < gameParameters.asteroid.divideNumber; i++) {
+        if (!lastLife) {
+            for (var i = 0; i < gameParameters.asteroid.divideNumber; i++) {
                 newAsteroids.push(new Asteroid(this.position, this.level - 1));
             }
         }

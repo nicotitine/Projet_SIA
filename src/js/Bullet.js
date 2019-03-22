@@ -30,10 +30,10 @@ class Bullet extends ResizableObject {
         this.position.y += this.vector.y;
 
         // Check if out of screen
-        if(Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
+        if (Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
             this.position.x = -this.position.x;
         }
-        if(Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
+        if (Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
             this.position.y = -this.position.y;
         }
     }
