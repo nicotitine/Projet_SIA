@@ -80,7 +80,7 @@ class TextureLoader {
 
         this.worldWrapper = {
             path : 'src/medias/models/plasma.png',
-            texture: null;
+            texture: null
         }
 
         this.load();
@@ -146,7 +146,7 @@ class TextureLoader {
     getSpacemanBox() {
         return this.spacemanBox;
     }
-    
+
     getWorldWrapper() {
         return this.worldWrapper;
     }
