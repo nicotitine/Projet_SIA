@@ -97,7 +97,7 @@
      }
 
      hitted() {
-         var explosion = new Explosion(this.position);
+         var explosion = new Explosion(this.position, 2);
 
          this.isHitted = true;
          this.visible = false;

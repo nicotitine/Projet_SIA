@@ -1,14 +1,29 @@
 class TextureLoader {
     constructor() {
+        this.start = Date.now();
         this.loader = new THREE.OBJLoader();
         this.loader.crossOrigin = '';
         this.textureLoader = new THREE.TextureLoader();
         this.material = new THREE.MeshStandardMaterial({
             color: "#ffffff",
             flatShading: true,
-            /*  shininess: 0.5 */ roughness: 0.8,
+            roughness: 0.8,
             metalness: 1
         });;
+
+        /* ######## GEOMETRY AND MODEL INSTANCING ########
+            Les trois géométries sont créées une seule fois ici, en fonction de la taille des asteroids voulue
+            materiel est null car pas encore chargé (voir fonction load en dessous) */
+            this.asteroid = {
+                path: 'src/medias/models/explosion0.png',
+                geometry: [
+                    new THREE.IcosahedronBufferGeometry(gameParameters.asteroid.size.min, 5),
+                    new THREE.IcosahedronBufferGeometry(gameParameters.asteroid.size.middle, 5),
+                    new THREE.IcosahedronBufferGeometry(gameParameters.asteroid.size.max, 5)
+                ],
+                material: null
+            }
+        /* ############################################### */
 
         this.bullet = {
             path: "src/medias/models/missile-2.obj",
@@ -102,6 +117,42 @@ class TextureLoader {
         this.loader.load(this.bullet.path, object => {
             this.bullet.geometry = object.children[0].geometry;
         });
+
+        /* ######## MODEL LOADING ########
+            On charge la texture et on créé le matériel avec dans la foulée */
+            this.textureLoader.load(this.asteroid.path, texture => {
+                this.asteroid.material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        tExplosion: {
+                            type: "t",
+                            value: texture
+                        },
+                        time: {
+                            type: "f",
+                            value: 0.0
+                        },
+                        weight: {
+                            type: "f",
+                            value: 5.0
+                        }
+                    },
+                    vertexShader: document.getElementById('vertexShader').textContent,
+                    fragmentShader: document.getElementById('fragmentShader').textContent
+
+                });
+                // A EVITER ABSOLUMENT :
+                //      Appliquer n'importe quelle fonction sur la géométrie dans Asteroid.js
+                // A FAIRE ABSOLUMENT :
+                //      Appliquer les fonctions liées à la géométrie ici, une seule fois par géométrie
+                this.asteroid.geometry.forEach(function(geometry) {
+                    // Utile pour avoir le rayon de l'asteroid, pour la collision
+                    // Utilisation : geometry.boundingSphere.radius
+                    geometry.computeBoundingSphere();
+                })
+            });
+        /* #################### */
+
+
         this.textureLoader.load(this.shield.path, texture => {
             this.shield.texture = texture;
         });
@@ -131,12 +182,22 @@ class TextureLoader {
         });
     }
 
+    update() {
+        /* ######## MATERIAL UPDATE ######## */
+            this.asteroid.material.uniforms['time'].value = .00010 * (Date.now() - this.start);
+        /* ################################# */
+    }
+
     getBullet() {
         return this.bullet;
     }
 
     getSpaceship() {
         return this.spaceship;
+    }
+
+    getAsteroid() {
+        return this.asteroid;
     }
 
     getShield() {

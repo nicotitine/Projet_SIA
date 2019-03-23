@@ -17,10 +17,9 @@ class GameCore {
         this.scene.add(this.cameraHandler.camera);
         this.scene.add(this.starfield);
         //this.scene.add(this.worldWrapper);
+        this.scene.add(this.cameraHandler.limitLines);
 
         this.isPaused = false;
-
-        this.showSpaceship();
     }
 
     setIsPaused(bool) {
@@ -31,7 +30,6 @@ class GameCore {
         this.scene.add(this.spaceship);
         this.scene.add(this.spaceship.shield);
         this.scene.add(this.spaceship.fire)
-        //this.scene.add(this.cameraHandler.limitLines);
         this.scene.add(this.spaceship.bonusTimer);
     }
 
@@ -39,6 +37,8 @@ class GameCore {
     update() {
 
         this.worldWrapper.update();
+
+        textureLoader.update();
 
         //console.log(this.bullets.length, this.scene.children.length);
         this.scene.children.forEach(function(child) {
@@ -67,9 +67,7 @@ class GameCore {
                     let distanceToAsteroid = this.bullets[i].position.distanceTo(asteroid.position);
                     if (gameUI.isGameLaunched && asteroid.geometry.boundingSphere != null && distanceToAsteroid < (asteroid.geometry.boundingSphere.radius + (this.bullets[i].size.x + this.bullets[i].size.y) / 2)) {
                         let newAsteroids = asteroid.collide();
-                        this.explosions.push(new Explosion(asteroid.position))
-                        this.bullets[i].geometry.dispose();
-                        this.bullets[i].material.dispose();
+                        this.explosions.push(new Explosion(asteroid.position, asteroid.level))
                         this.scene.remove(this.bullets[i]);
                         this.scene.remove(asteroid);
                         this.bullets[i] = null;
@@ -90,7 +88,7 @@ class GameCore {
                 }
 
                 let distanceToSpacehip = asteroid.position.distanceTo(this.spaceship.position);
-                if (gameUI.isGameLaunched && !this.spaceship.shield.isActivated && distanceToSpacehip < asteroid.size.x) {
+                if (gameUI.isGameLaunched && !this.spaceship.shield.isActivated && distanceToSpacehip < this.spaceship.size.x) {
                     this.spaceship.hitted();
                     this.audioHandler.explosionSound.play();
                 }
@@ -124,7 +122,7 @@ class GameCore {
         if (!gameUI.isLevelingUp) {
             if (isCheat) {
                 this.asteroids.forEach(function(asteroid, i) {
-                    var explosion = new Explosion(asteroid.position);
+                    var explosion = new Explosion(asteroid.position, 2);
                     this.audioHandler.explosionSound.play();
                     this.scene.remove(asteroid);
                     this.asteroids[i] = null;

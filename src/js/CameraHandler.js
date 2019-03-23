@@ -80,6 +80,9 @@ class CameraHandler {
             joker.rotation.x = Math.PI / 2;
         });
         gameCore.spaceship.bonusTimer.rotation.copy(gameCore.spaceship.rotation)
+        gameCore.scene.remove(gameCore.starfield);
+        gameCore.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
+        gameCore.scene.add(gameCore.starfield);
     }
 
     getCameraSize() {

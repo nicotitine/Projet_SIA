@@ -16,12 +16,14 @@ class Starfield extends THREE.Points {
 
     update(frustum, speed, spread) {
         for (var i = 0; i < this.geometry.vertices.length; i++) {
-            if (!frustum.containsPoint(this.geometry.vertices[i])) {
-                this.geometry.vertices[i].x = GameParameters.getRandom(spread.x);
-                this.geometry.vertices[i].y = GameParameters.getRandom(spread.y)
-                this.geometry.vertices[i].z = GameParameters.getRandom(spread.z);
+            if(gameCore.cameraHandler.cameraType != gameCore.cameraHandler.cameraTypes.PURSUIT) {
+                if (!frustum.containsPoint(this.geometry.vertices[i])) {
+                    this.geometry.vertices[i].x = GameParameters.getRandom(spread.x);
+                    this.geometry.vertices[i].y = GameParameters.getRandom(spread.y)
+                    this.geometry.vertices[i].z = GameParameters.getRandom(spread.z);
+                }
+                this.geometry.vertices[i].z += speed;
             }
-            this.geometry.vertices[i].z += speed;
         }
         this.geometry.verticesNeedUpdate = true;
     }

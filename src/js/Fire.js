@@ -8,7 +8,7 @@ class Fire extends ResizableObject {
             fragmentShader: THREE.FireShader.fragmentShader,
             transparent: true,
             depthWrite: true,
-            depthTest: true
+            depthTest: false
         });
 
         fireTex.magFilter = fireTex.minFilter = THREE.LinearFilter;

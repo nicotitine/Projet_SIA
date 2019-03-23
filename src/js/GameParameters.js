@@ -10,9 +10,9 @@ class GameParameters {
             speed: 1,
             number: 3,
             size: {
-                min: 10,
-                middle: 20,
-                max: 100
+                min: 15,
+                middle: 30,
+                max: 50
             },
             spawnRadius: {
                 width: 900,
