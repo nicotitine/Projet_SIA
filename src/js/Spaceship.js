@@ -12,6 +12,7 @@ class Spaceship extends ResizableObject {
 
          this.rotation.x = Math.PI / 2;
          this.rotation.y = Math.PI/2
+         this.rotation.z = 0.2;
          this.velocity = {
              distanceToAddX: 0,
              distanceToAddY: 0,
@@ -148,6 +149,18 @@ class Spaceship extends ResizableObject {
          this.bonusTimer.visible = false;
      }
 
+     incline() {
+         if(this.rotation.z < 0.2) {
+             this.rotation.z += 0.01;
+         }
+     }
+
+     decline() {
+         if(this.rotation.z >= 0) {
+             this.rotation.z -= 0.01;
+         }
+     }
+
      update() {
          ////////// Keys event handling //////////
          // left arrow key : eventHandler.keys[37]
@@ -161,9 +174,11 @@ class Spaceship extends ResizableObject {
              this.velocity.forwardX = -Math.cos(this.rotation.y) * gameParameters.spaceship.speed;
              this.velocity.forwardY = -Math.sin(this.rotation.y) * gameParameters.spaceship.speed;
              this.fire.increase(0.2);
+             this.incline();
          } else {
              this.velocity.forwardX = this.velocity.forwardY = 0;
              this.fire.decrease(0.2);
+             this.decline();
          }
 
 

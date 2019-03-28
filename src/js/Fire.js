@@ -47,8 +47,10 @@ class Fire extends ResizableObject {
 
         this.position.x = position.x + ((size.x + this.size.y) / 2 * Math.cos(rotation.y));
         this.position.y = position.y + ((size.x + this.size.y) / 2 * Math.sin(rotation.y));
+        this.position.z = position.z + ((size.x + this.size.x) / 2 * Math.sin(rotation.z));
         this.rotation.x = rotation.x;
         this.rotation.y = rotation.y;
+        this.rotation.z = rotation.z - Math.PI/2;
     }
 
     // magnitude works upside down. Low magnitude for large fire
