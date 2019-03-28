@@ -20,6 +20,8 @@ class GameCore {
         this.scene.add(this.cameraHandler.limitLines);
 
         this.isPaused = false;
+
+        this.showSpaceship();
     }
 
     setIsPaused(bool) {
@@ -130,6 +132,8 @@ class GameCore {
                 this.filterArrays();
             }
             setTimeout(() => {
+                // TO DO : speed and number are sent to createAsteroids
+                // Do not modify gameParameters.asteroid.* values
                 gameParameters.level += 1;
                 gameParameters.asteroid.speed *= 1.2;
                 gameParameters.asteroid.number += 1;

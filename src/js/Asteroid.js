@@ -9,7 +9,7 @@ class Asteroid extends ResizableObject {
 
         /* ######### RANDOMNESS #########
             Pour donner un aspect "random" au materiel, car le materiel est unique, donc l'animation aussi */
-            this.rotation.y = GameParameters.getRandom(Math.PI);
+            this.rotation.set(GameParameters.getRandom(Math.PI), GameParameters.getRandom(Math.PI), GameParameters.getRandom(Math.PI));
         /* ############################## */
 
         var x = gameParameters.asteroid.spawnRadius.width / 2 - Math.random() * gameParameters.asteroid.spawnRadius.width;

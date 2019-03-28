@@ -1,4 +1,4 @@
- class Spaceship extends ResizableObject {
+class Spaceship extends ResizableObject {
      constructor() {
          var model = textureLoader.getSpaceship();
 
@@ -11,6 +11,7 @@
          this.isLoaded = false;
 
          this.rotation.x = Math.PI / 2;
+         this.rotation.y = Math.PI/2
          this.velocity = {
              distanceToAddX: 0,
              distanceToAddY: 0,

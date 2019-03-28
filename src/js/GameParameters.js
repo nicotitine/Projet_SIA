@@ -39,7 +39,7 @@ class GameParameters {
         }
 
         this.bullet = {
-            speed: 8,
+            speed: 5,
             scale: 1,
             timestamp: 800,
             lifetime: 1500

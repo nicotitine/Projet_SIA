@@ -33,8 +33,10 @@ class TextureLoader {
 
         this.spaceship = {
             path: 'src/medias/models/spaceship.obj',
+            pathTexture: 'src/medias/models/spaceshipTexture.jpg',
             geometry: null,
-            material: this.material
+            material: null,
+            texture: null
         };
 
         this.shield = {
@@ -113,6 +115,10 @@ class TextureLoader {
     load() {
         this.loader.load(this.spaceship.path, object => {
             this.spaceship.geometry = new THREE.Geometry().fromBufferGeometry(object.children[0].geometry);
+            this.textureLoader.load(this.spaceship.pathTexture, texture => {
+                this.spaceship.texture = texture;
+                this.spaceship.material = this.material
+            })
         });
         this.loader.load(this.bullet.path, object => {
             this.bullet.geometry = object.children[0].geometry;
