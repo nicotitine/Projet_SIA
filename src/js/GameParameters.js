@@ -25,7 +25,7 @@ class GameParameters {
             rotationFriction: 0.92,
             rotationSpeed: 0.005,
             speed: 0.10,
-            scale: 0.2,
+            scale: 0.08,
             fire: {
                 scale: {
                     x: 10,
@@ -34,15 +34,32 @@ class GameParameters {
                 }
             },
             shield: {
-                ratio: 1.3
+                ratio: 0.9
             }
         }
 
-        this.bullet = {
-            speed: 5,
-            scale: 1,
-            timestamp: 800,
-            lifetime: 1500
+        this.enemy = {
+            shotTimespawn: 3000,
+            speed: 2,
+            spawntime: 20000
+        };
+
+        this.laser = {
+            spaceship: {
+                speed: 10,
+                scale: 1,
+                timestamp: 500,
+                lifetime: 1500
+            },
+            enemy :{
+                speed: 1,
+                lifetime: 5000
+            },
+            types: {
+                SPACESHIP: 1,
+                ENEMY: 2
+            },
+
         };
 
         this.jokers = {
@@ -63,11 +80,11 @@ class GameParameters {
         }
     }
 
-    static getRandom(x) {
-        return THREE.Math.randFloatSpread(x)
+    static getRandom(_x) {
+        return THREE.Math.randFloatSpread(_x)
     }
 
-    static getRandomInt(min, max) {
-        return THREE.Math.randInt(min, max)
+    static getRandomInt(_min, _max) {
+        return THREE.Math.randInt(_min, _max)
     }
 };

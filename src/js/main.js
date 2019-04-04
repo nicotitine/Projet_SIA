@@ -23,12 +23,29 @@ var gameUI;
 var gui;
 var textureLoader = new TextureLoader();
 var gameCore;
-
+var composer, renderScene, bloomPass;
+var skydome;
 
 window.addEventListener('load', function() {
+    skydome = {
+        scene: new THREE.Scene(),
+        camera: new THREE.PerspectiveCamera(50, _viewport.ratio, 0.1, 1000 )
+    };
+    var worldWrapper = new WorldWrapper(textureLoader.skybox.geometry, textureLoader.skybox.material);
+
+    skydome.scene.add(worldWrapper);
     gameCore = new GameCore();
     storage.load()
     gameUI = new GameUI(_viewport.width / 2, _viewport.height / 2);
+    renderScene = new THREE.RenderPass( gameCore.scene, gameCore.cameraHandler.camera );
+
+    bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1, 0, -1. )
+    bloomPass.renderToScreen = true;
+    composer = new THREE.EffectComposer( renderer )
+    composer.setSize( window.innerWidth, window.innerHeight )
+    composer.addPass( renderScene )
+    composer.addPass( bloomPass )
+
     setTimeout(function() {
         $("#preLoader").fadeOut(1000, function() {
             isLoading = false;
@@ -37,21 +54,20 @@ window.addEventListener('load', function() {
         gameUI.showWelcome();
     }, 1000);
 
-    //renderer.setPixelRatio(0.7);
     document.body.appendChild(renderer.domElement);
     gui = new dat.GUI({
         hideable: false
     });
-
 });
 
 var timestamp = Date.now();
-var renderer = new THREE.WebGLRenderer({
-    antialias: gameParameters.antialias,
-    preserveDrawingBuffer: true
-});
+
+var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.context.disable(renderer.context.DEPTH_TEST);
+renderer.sortObjects = false;
+renderer.gammaOutput = true;
 renderer.autoClear = false;
-renderer.setSize(_viewport.width, _viewport.height);
 
 var points = 0;
 var pointsString = "";
@@ -78,22 +94,21 @@ var update = function() {
     if (gameCore != null) {
         gameCore.update();
     }
-    renderer.renderLists.dispose();
 };
 
-function getBigger(numbers) {
+function getBigger(_numbers) {
     var bigger = 0;
-    numbers.forEach(function(number) {
-        if (number > bigger) {
-            bigger = number;
+    _numbers.forEach(function(_number) {
+        if (_number > bigger) {
+            bigger = _number;
         }
     });
     return bigger;
 }
 
-function addZeroToDate(x) {
+function addZeroToDate(_x) {
     if (x < 10)
-        return "0" + x;
+        return "0" + _x;
     return x;
 }
 
@@ -111,12 +126,12 @@ function saveAsImage() {
     }
 };
 
-var saveFile = function(strData, filename) {
+var saveFile = function(_strData, _filename) {
     var link = document.createElement('a');
     if (typeof link.download === 'string') {
         document.body.appendChild(link);
-        link.download = filename;
-        link.href = strData;
+        link.download = _filename;
+        link.href = _strData;
         link.click();
         document.body.removeChild(link);
     } else {
@@ -125,13 +140,23 @@ var saveFile = function(strData, filename) {
 };
 
 var render = function() {
-    if (gameCore != null)
+    requestAnimationFrame(render);
+
+    if (gameCore != null) {
+        renderer.clearDepth();
+
+        renderScene.camera.layers.set(1);
+        update();
+        composer.render();
+
+        renderer.clearDepth();
+        renderScene.camera.layers.set(0);
         renderer.render(gameCore.scene, gameCore.cameraHandler.camera);
+        //renderer.render(skydome.scene, skydome.camera)
+    }
 };
 
 var GameLoop = function() {
-    requestAnimationFrame(GameLoop);
-    update();
     render();
 }
-GameLoop();
+render();

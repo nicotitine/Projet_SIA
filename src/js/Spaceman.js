@@ -1,32 +1,40 @@
 class Spaceman extends THREE.Group {
-    constructor(type) {
+    constructor(_type, _cameraSize) {
 
         super();
 
-        this.type = type;
+        this.type = _type;
 
-        var spacemanModel = textureLoader.getSpaceman().texture;
-        var spacemanBoxModel = textureLoader.getSpacemanBox().texture;
+        var spacemanModel = textureLoader.spaceman.texture;
+        var spacemanBoxModel = textureLoader.spacemanBox.texture;
 
-        var spacemanGeometry = new THREE.BoxGeometry(84, 48, 19);
-        var spacemanBoxGeometry = new THREE.BoxGeometry(26, 26, 20);
+        var spacemanGeometry = new THREE.BoxGeometry(84, 48, 0);
+        var spacemanBoxGeometry = new THREE.BoxGeometry(20, 20, 20);
 
         var spacemanMaterials = [
             new THREE.MeshBasicMaterial({
                 visible: false,
-                transparent: true
+                transparent: true,
+                depthTest: false,
+                depthWrite: false
             }),
             new THREE.MeshBasicMaterial({
                 visible: false,
-                transparent: true
+                transparent: true,
+                depthTest: false,
+                depthWrite: false
             }),
             new THREE.MeshBasicMaterial({
                 visible: false,
-                transparent: true
+                transparent: true,
+                depthTest: false,
+                depthWrite: false
             }),
             new THREE.MeshBasicMaterial({
                 visible: false,
-                transparent: true
+                transparent: true,
+                depthTest: false,
+                depthWrite: false
             }),
             new THREE.MeshBasicMaterial({
                 map: spacemanModel[0],
@@ -35,36 +43,65 @@ class Spaceman extends THREE.Group {
             }),
             new THREE.MeshBasicMaterial({
                 visible: false,
-                transparent: true
+                transparent: false,
+                depthTest: false,
+                depthWrite: false
             })
         ];
 
         var spacemanBoxMaterials = [
             new THREE.MeshBasicMaterial({
-                visible: false
-            }),
-            new THREE.MeshBasicMaterial({
-                visible: false
-            }),
-            new THREE.MeshBasicMaterial({
-                visible: false
-            }),
-            new THREE.MeshBasicMaterial({
-                visible: false
-            }),
-            new THREE.MeshBasicMaterial({
-                map: spacemanBoxModel[type],
-                transparent: true,
+                map: spacemanBoxModel[_type],
                 side: THREE.DoubleSide
             }),
             new THREE.MeshBasicMaterial({
-                visible: false
+                map: spacemanBoxModel[_type],
+                side: THREE.DoubleSide
+            }),
+            new THREE.MeshBasicMaterial({
+                map: spacemanBoxModel[3],
+                side: THREE.DoubleSide
+            }),
+            new THREE.MeshBasicMaterial({
+                map: spacemanBoxModel[3],
+                side: THREE.DoubleSide
+            }),
+            new THREE.MeshBasicMaterial({
+                map: spacemanBoxModel[_type],
+                side: THREE.DoubleSide
+            }),
+            new THREE.MeshBasicMaterial({
+                map: spacemanBoxModel[_type],
+                side: THREE.DoubleSide
             })
         ];
 
         this.spaceman = new THREE.Mesh(spacemanGeometry, spacemanMaterials);
         this.spacemanBox = new THREE.Mesh(spacemanBoxGeometry, spacemanBoxMaterials);
         this.spacemanBox.position.y += 28;
+
+        this.borders = {
+            TOP: 1,
+            RIGHT: 2,
+            BOTTOM: 3,
+            LEFT: 4
+        }
+
+        this.borderToSpawn = GameParameters.getRandomInt(this.borders.TOP, this.borders.LEFT)
+        switch (this.borderToSpawn) {
+            case this.borders.TOP:
+                this.position.set(GameParameters.getRandom(_cameraSize.x/2), _cameraSize.y/2, 0)
+                break;
+            case this.borders.RIGHT:
+                this.position.set(_cameraSize.x/2, GameParameters.getRandom(_cameraSize.y/2), 0)
+                break;
+            case this.borders.BOTTOM:
+            this.position.set(GameParameters.getRandom(_cameraSize.x/2), -_cameraSize.y/2, 0)
+            break;
+            case this.borders.LEFT:
+                this.position.set(-_cameraSize.x/2, GameParameters.getRandom(_cameraSize.y/2), 0)
+                break;
+        }
 
         this.index = 0;
         this.texture = spacemanModel;
@@ -83,16 +120,19 @@ class Spaceman extends THREE.Group {
         this.speedMaxVector = this.direction.multiplyScalar(gameParameters.jokers.spaceman.speedMax, gameParameters.jokers.spaceman.speedMax, 0);
         this.speedMinVector = oldDirection.multiplyScalar(gameParameters.jokers.spaceman.speedMin, gameParameters.jokers.spaceman.speedMin, 0);
 
+        this.spaceman.layers.set(0);
+        this.spacemanBox.layers.set(0);
+        this.layers.set(0);
+        
         this.add(this.spaceman);
         this.add(this.spacemanBox);
-
-        console.log(this.speedMaxVector, this.speedMinVector);
     }
 
     update() {
         this.updateMatrixWorld();
         this.boxPosition = new THREE.Vector3();
         this.boxPosition.setFromMatrixPosition(this.spacemanBox.matrixWorld);
+        this.spacemanBox.rotation.y += 0.05;
 
         this.index = (this.index + 1) % (this.texture.length - 1);
         // Front face texture is change for the next image

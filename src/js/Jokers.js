@@ -12,9 +12,8 @@ class Jokers {
     }
 
     spawn() {
-        var joker = new Spaceman(THREE.Math.randInt(0, 2));
+        var joker = new Spaceman(THREE.Math.randInt(0, 2), gameCore.cameraHandler.size);
         this.timestamp = Date.now();
-        joker.position.set(GameParameters.getRandom(gameCore.cameraHandler.size.x), GameParameters.getRandom(gameCore.cameraHandler.size.y), 0);
         if (gameCore.cameraHandler.cameraType == gameCore.cameraHandler.cameraTypes.PURSUIT)
             joker.rotation.z = -Math.PI / 2;
 

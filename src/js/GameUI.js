@@ -1,7 +1,7 @@
 class GameUI {
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;
+    constructor(_width, _height) {
+        this.width = _width;
+        this.height = _height;
         this.level = 0;
         this.score = 0;
         this.fullScreenElements = [];
@@ -54,7 +54,7 @@ class GameUI {
             this.showOptions();
         }.bind(this));
 
-        this.returnOptions.addEventListener('click', function(e) {
+        this.returnOptions.addEventListener('click', function() {
             this.hideOptions();
         }.bind(this));
 
@@ -77,6 +77,7 @@ class GameUI {
             this.endGame();
             this.hideLoose();
         }.bind(this));
+
         this.returnLoose.addEventListener('click', function() {
             this.endGame();
             this.hideLoose();
@@ -90,29 +91,35 @@ class GameUI {
             this.hideEscape(false);
         }.bind(this))
 
-        // this.fullScreenElements.push(this.welcomeDiv);
-        // this.fullScreenElements.push(this.levelUpDiv);
-        // this.fullScreenElements.push(this.helpDiv);
-        // this.fullScreenElements.push(this.livesDiv);
-        // this.fullScreenElements.push(this.looseDiv);
-        // this.fullScreenElements.push(this.scoreDiv);
-
         this.dataFromStorage = storage.getData();
 
         this.changeSlider($("#valueSliderMusic"), $("#sliderMusic"));
         this.changeSlider($("#valueSliderSound"), $("#sliderSound"));
         gameCore.audioHandler.changeMusicVolume(Number($("#sliderMusic").val()) / 100);
         gameCore.audioHandler.changeSoundVolume(Number($("#sliderSound").val()) / 100);
-        $("#sliderMusic").on('input change', function(e) {
+
+        $("#sliderMusic").on('input change', function() {
             this.changeSlider($("#valueSliderMusic"), $("#sliderMusic"));
             gameCore.audioHandler.changeMusicVolume(Number($("#sliderMusic").val()) / 100);
             storage.save();
         }.bind(this));
+
         $('#sliderSound').on('input change', function() {
             this.changeSlider($('#valueSliderSound'), $('#sliderSound'));
             gameCore.audioHandler.changeSoundVolume(Number($("#sliderSound").val()) / 100);
             storage.save();
         }.bind(this));
+
+        $('#glowEffectCheckbox').on('click', function() {
+            storage.save();
+            if(!storage.data.options.glowingEffect) {
+                $('#glowEffect .value').html('Desactivated');
+                gameCore.setGlowLayers(0);
+            } else {
+                $('#glowEffect .value').html('Activated');
+                gameCore.setGlowLayers(1);
+            }
+        })
     }
 
     displayFromStorage() {
@@ -124,32 +131,32 @@ class GameUI {
         }
     }
 
-    changeSlider($label, $slider) {
-        var newValue = $slider.val();
-        $label.text(newValue);
+    changeSlider(_label, _slider) {
+        var newValue = _slider.val();
+        _label.text(newValue);
 
         if (newValue > 66) {
-            $slider.addClass("max");
+            _slider.addClass("max");
         } else {
-            $slider.removeClass("max");
+            _slider.removeClass("max");
         }
 
         if (newValue > 32 && newValue < 67) {
-            $slider.addClass('mid');
+            _slider.addClass('mid');
         } else {
-            $slider.removeClass('mid');
+            _slider.removeClass('mid');
         }
 
         if (newValue < 33) {
-            $slider.addClass('min');
+            _slider.addClass('min');
         } else {
-            $slider.removeClass('min');
+            _slider.removeClass('min');
         }
 
         if (newValue == 0) {
-            $slider.addClass('muted');
+            _slider.addClass('muted');
         } else {
-            $slider.removeClass('muted');
+            _slider.removeClass('muted');
         }
     }
 
@@ -176,18 +183,18 @@ class GameUI {
         // });
     }
 
-    editLives(livesnb, win) {
-        if (livesnb >= 4) {
-            if (win) {
+    editLives(_livesnb, _win) {
+        if (_livesnb >= 4) {
+            if (_win) {
                 this.livesDiv[0].innerHTML += '<img src="src/medias/images/live_full.png" class="live"/>';
             } else {
-                this.livesDiv[0].children[livesnb - 1].remove();
+                this.livesDiv[0].children[_livesnb - 1].remove();
             }
         } else {
-            if (win) {
-                this.lives[livesnb - 1].src = 'src/medias/images/live_full.png';
+            if (_win) {
+                this.lives[_livesnb - 1].src = 'src/medias/images/live_full.png';
             } else {
-                this.lives[livesnb - 1].src = 'src/medias/images/live_empty.png';
+                this.lives[_livesnb - 1].src = 'src/medias/images/live_empty.png';
             }
         }
         this.lives = document.getElementsByClassName('live');
@@ -232,11 +239,11 @@ class GameUI {
         this.welcomeDiv.fadeOut(500);
         this.isWelcomeDisplayed = false;
     }
-    showLevelUp(isCheat) {
+    showLevelUp(_isCheat) {
         this.isLevelingUp = true;;
         this.level += 1;
         this.levelUpDiv.text("Level " + this.level);
-        if (isCheat) {
+        if (_isCheat) {
             this.levelUpDiv[0].innerHTML += "<br/><small>(cheater !!!)</small>";
         }
         this.levelUpDiv.fadeIn(500);
@@ -314,10 +321,10 @@ class GameUI {
     hideScore() {
         this.scoreDiv.fadeOut(500);
     }
-    scored(points) {
+    scored(_points) {
         var actualValue = Number(this.scoreValue.innerText);
-        this.scoreValue.innerHTML = actualValue + points;
-        this.score += points;
+        this.scoreValue.innerHTML = actualValue + _points;
+        this.score += _points;
     }
 
     showOptions() {
@@ -342,13 +349,13 @@ class GameUI {
         }
         gameCore.setIsPaused(this.isPaused);
     }
-    hideEscape(continu) {
+    hideEscape(_continu) {
         this.escapeDiv.fadeOut(500, function() {
             this.isPaused = false;
             gameCore.setIsPaused(this.isPaused);
         }.bind(this));
         this.isEscapeDisplayed = false;
-        if (!continu) {
+        if (!_continu) {
             this.endGame();
         }
     }

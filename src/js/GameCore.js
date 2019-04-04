@@ -1,27 +1,65 @@
 class GameCore {
     constructor() {
+
+        this.glowingMesh = [];
+
         this.scene = new THREE.Scene();
-        this.spaceship = new Spaceship();
+        this.spaceship = new Spaceship(textureLoader.spaceship.geometry, textureLoader.spaceship.material);
         this.jokers = new Jokers();
         this.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
         this.cameraHandler = new CameraHandler();
         this.audioHandler = new AudioHandler();
-        this.bullets = [];
-        this.explosions = [];
-        this.asteroids = [];
-        this.createAsteroids();
-        this.worldWrapper = new WorldWrapper(this.cameraHandler.size, this.scene, this.cameraHandler.camera, this.asteroids);
+        this.enemyHandler = new EnemyHandler();
 
-        this.scene.add(this.cameraHandler.ambient);
+        this.enemyCount = 0;
+        this.difficulty = {
+            level: 0,
+            asteroidNumber: gameParameters.asteroid.number,
+            asteroidSpeed: gameParameters.asteroid.speed
+        };
+        this.isPaused = false;
+
+        this.collidableMeshesToSpaceship = [];
+        this.collidableMeshesFromSpaceship = [];
+
+
+
+        this.createAsteroids();
+
         this.scene.add(this.cameraHandler.light);
         this.scene.add(this.cameraHandler.camera);
         this.scene.add(this.starfield);
-        //this.scene.add(this.worldWrapper);
         this.scene.add(this.cameraHandler.limitLines);
 
-        this.isPaused = false;
-
         this.showSpaceship();
+        this.initGlowingMeshes();
+    }
+
+    addEnemyLaser(_laser) {
+        this.scene.add(_laser);
+        this.collidableMeshesToSpaceship.push(_laser)
+    }
+
+    addSpaceshipLaser(_laser) {
+        this.scene.add(_laser);
+        this.collidableMeshesFromSpaceship.push(_laser);
+    }
+
+    removeMesh(_mesh) {
+        this.scene.remove(_mesh);
+        var indexTo = this.collidableMeshesToSpaceship.indexOf(_mesh);
+        var indexFrom = this.collidableMeshesFromSpaceship.indexOf(_mesh)
+        if(indexTo != -1) {
+            this.collidableMeshesToSpaceship[indexTo] = null;
+        }
+        if(indexFrom != -1) {
+            this.collidableMeshesFromSpaceship[indexFrom] = null;
+        }
+        console.log(_mesh);
+        if(_mesh.name == "Enemy") {
+            this.enemyHandler.remove(_mesh)
+        }
+        this.filterArrays();
     }
 
     setIsPaused(bool) {
@@ -31,22 +69,32 @@ class GameCore {
     showSpaceship() {
         this.scene.add(this.spaceship);
         this.scene.add(this.spaceship.shield);
-        this.scene.add(this.spaceship.fire)
         this.scene.add(this.spaceship.bonusTimer);
+    }
+
+    initGlowingMeshes() {
+        this.glowingMesh.push(this.starfield);
+        this.glowingMesh.push(this.spaceship.shield);
+    }
+
+    setGlowLayers(_value) {
+        this.glowingMesh.forEach(function(_mesh) {
+            if(_value == 0) {
+                _mesh.layers.set(_value)
+                this.spaceship.shield.material.opacity = 0.4;
+            } else {
+                _mesh.layers.enable(_value)
+                this.spaceship.shield.material.opacity = 0.2;
+            }
+        }, this)
     }
 
 
     update() {
-
-        this.worldWrapper.update();
+        this.enemyHandler.update(gameUI.isGameLaunched);
 
         textureLoader.update();
 
-        //console.log(this.bullets.length, this.scene.children.length);
-        this.scene.children.forEach(function(child) {
-            //if(child.name == "Bullet")
-            //console.log("bullet");
-        })
         if (this.spaceman != null) {
             this.spaceman.update();
         }
@@ -54,90 +102,75 @@ class GameCore {
         if (this.spaceship != null && !this.spaceship.isHitted)
             this.cameraHandler.update();
 
-        if (this.spaceship.isLoaded && !this.isPaused)
+        if (!this.isPaused)
             this.spaceship.update();
 
 
         if (this.starfield != null)
             this.starfield.update(this.cameraHandler.frustum, gameParameters.starfield.speed, gameParameters.starfield.spread);
 
-        if (!this.isPaused) {
-            this.asteroids.forEach(function(asteroid) {
-                asteroid.update();
-
-                for (var i = 0; i < this.bullets.length; i++) {
-                    let distanceToAsteroid = this.bullets[i].position.distanceTo(asteroid.position);
-                    if (gameUI.isGameLaunched && asteroid.geometry.boundingSphere != null && distanceToAsteroid < (asteroid.geometry.boundingSphere.radius + (this.bullets[i].size.x + this.bullets[i].size.y) / 2)) {
-                        let newAsteroids = asteroid.collide();
-                        this.explosions.push(new Explosion(asteroid.position, asteroid.level))
-                        this.scene.remove(this.bullets[i]);
-                        this.scene.remove(asteroid);
-                        this.bullets[i] = null;
-
-                        this.audioHandler.explosionSound.play();
-
-                        newAsteroids.forEach(function(newAsteroid) {
-                            this.scene.add(newAsteroid);
-                            this.asteroids.push(newAsteroid);
-                        }, this);
-
-                        this.asteroids[this.asteroids.indexOf(asteroid)] = null;
-                        this.filterArrays();
-                        if (this.asteroids.length == 0) {
-                            this.levelUp(false);
-                        }
-                    }
-                }
-
-                let distanceToSpacehip = asteroid.position.distanceTo(this.spaceship.position);
-                if (gameUI.isGameLaunched && !this.spaceship.shield.isActivated && distanceToSpacehip < this.spaceship.size.x) {
-                    this.spaceship.hitted();
-                    this.audioHandler.explosionSound.play();
-                }
-            }, this);
-        }
+        this.collidableMeshesToSpaceship.forEach(function(collidableMesh) {
+            collidableMesh.update();
+        })
+        this.collidableMeshesFromSpaceship.forEach(function(collidableMesh) {
+            collidableMesh.update();
+        })
 
         if (gameUI != null && gameUI.isGameLaunched && !this.isPaused)
             this.jokers.update();
 
-        // Bullet updating
-        if (!this.isPaused) {
-            for (var i = 0; i < this.bullets.length; i++) {
-                if (this.bullets[i].spawnTime + gameParameters.bullet.lifetime < Date.now()) {
-                    //console.log(bullet);
-                    this.scene.remove(this.bullets[i]);
-                    this.bullets[i] = null;
-                    this.filterArrays();
-                } else {
-                    this.bullets[i].update();
+        if(gameUI.isGameLaunched) {
+
+            for(var i = 0; i < this.collidableMeshesToSpaceship.length; i++) {
+                for(var j = 0; j < this.collidableMeshesFromSpaceship.length; j++) {
+                    if(this.collidableMeshesToSpaceship[i] != null && this.collidableMeshesToSpaceship[i].name != "Laser" && this.collidableMeshesToSpaceship[i].checkCollide(this.collidableMeshesFromSpaceship[j])) {
+                        this.collidableMeshesToSpaceship[i].explode();
+
+                        if(this.collidableMeshesToSpaceship[i].name == "Asteroid") {
+                            this.enemyCount -= 1;
+                            this.collidableMeshesToSpaceship[i].collide(this.difficulty.asteroidSpeed).forEach(function(_mesh) {
+                                this.enemyCount += 1;
+                                this.scene.add(_mesh);
+                                this.collidableMeshesToSpaceship.push(_mesh);
+                                this.glowingMesh.push(_mesh);
+                            }, this);
+                        }
+                        this.removeMesh(this.collidableMeshesToSpaceship[i]);
+                        this.removeMesh(this.collidableMeshesFromSpaceship[j]);
+
+                        gameUI.scored(10);
+                        if(this.enemyCount === 0) {
+                            this.levelUp(false);
+                        }
+                    }
+                }
+                if(this.collidableMeshesToSpaceship[i] != null && !this.spaceship.shield.isActivated && this.collidableMeshesToSpaceship[i].checkCollide(this.spaceship)) {
+                    if(this.spaceship.shield)
+                    this.spaceship.explode();
+                    this.spaceship.hitted();
                 }
             }
         }
+
     }
 
-    levelUp(isCheat) {
-        this.bullets.forEach(function(bullet, i) {
-            this.scene.remove(bullet);
-            this.bullets[i] = null;
-        }, this);
-        this.filterArrays();
+    levelUp(_isCheat) {
+        this.enemyHandler.levelUp();
         if (!gameUI.isLevelingUp) {
-            if (isCheat) {
-                this.asteroids.forEach(function(asteroid, i) {
-                    var explosion = new Explosion(asteroid.position, 2);
-                    this.audioHandler.explosionSound.play();
-                    this.scene.remove(asteroid);
-                    this.asteroids[i] = null;
+            if (_isCheat) {
+                this.collidableMeshesToSpaceship.forEach(function(_collidableMesh) {
+                    if(_collidableMesh.name == "Asteroid") {
+                        _collidableMesh.explode();
+                        this.removeMesh(_collidableMesh);
+                        this.enemyCount -= 1;
+                    }
                 }, this);
-                this.filterArrays();
             }
             setTimeout(() => {
-                // TO DO : speed and number are sent to createAsteroids
-                // Do not modify gameParameters.asteroid.* values
-                gameParameters.level += 1;
-                gameParameters.asteroid.speed *= 1.2;
-                gameParameters.asteroid.number += 1;
-                gameUI.showLevelUp(isCheat);
+                this.difficulty.level += 1;
+                this.difficulty.asteroidSpeed *= 1.2;
+                this.difficulty.asteroidNumber += 1;
+                gameUI.showLevelUp(_isCheat);
                 this.createAsteroids();
                 this.spaceship.shield.activate(3, false);
                 this.spaceship.displayBonusTimer(3000);
@@ -147,10 +180,12 @@ class GameCore {
     }
 
     createAsteroids() {
-        for (var i = 0; i < gameParameters.asteroid.number; i++) {
-            let asteroid = new Asteroid(null, 3);
-            this.asteroids.push(asteroid);
+        for (var i = 0; i < this.difficulty.asteroidNumber; i++) {
+            let asteroid = new Asteroid(null, 3, this.difficulty.asteroidSpeed);
+            this.enemyCount += 1;
+            this.collidableMeshesToSpaceship.push(asteroid);
             this.scene.add(asteroid);
+            this.glowingMesh.push(asteroid);
         }
     }
 
@@ -159,6 +194,7 @@ class GameCore {
         this.spaceship.isInvincible = false;
         this.spaceship.shield.activate(4, false);
         this.spaceship.displayBonusTimer(4000);
+        this.enemyHandler.launch();
     }
 
     endGame() {
@@ -168,34 +204,40 @@ class GameCore {
 
     rebuildGame() {
         // Remove all objects from de scene
+        this.enemyCount = 0;
+        this.difficulty = {
+            level: 0,
+            asteroidNumber: gameParameters.asteroid.number,
+            asteroidSpeed: gameParameters.asteroid.speed
+        }
         this.scene.remove(this.spaceship);
         this.scene.remove(this.spaceship.shield);
         this.scene.remove(this.spaceship.fire);
         this.scene.remove(this.spaceship.bonusTimer)
-        this.asteroids.forEach(function(asteroid, i) {
-            this.scene.remove(asteroid);
-            this.asteroids[i] = null;
+        this.collidableMeshesToSpaceship.forEach(function(_mesh) {
+            this.removeMesh(_mesh)
         }, this);
-        this.bullets.forEach(function(bullet, i) {
-            this.scene.remove(bullet);
-            this.bullets[i] = null;
+        this.collidableMeshesFromSpaceship.forEach(function(_mesh) {
+            this.removeMesh(_mesh)
         }, this);
         this.filterArrays();
+        this.glowingMesh = [];
 
         // Add the new objects
-        this.spaceship = new Spaceship();
+        this.spaceship = new Spaceship(textureLoader.spaceship.geometry, textureLoader.spaceship.material);
         this.createAsteroids();
         this.jokers.timestamp = Date.now();
         this.showSpaceship();
+        this.initGlowingMeshes();
     }
 
     filterArrays() {
-        //console.log("filtering");
-        this.asteroids = this.asteroids.filter(function(el) {
+        this.collidableMeshesToSpaceship = this.collidableMeshesToSpaceship.filter(function(el) {
             return el != null;
-        });
-        this.bullets = this.bullets.filter(function(el) {
+        })
+
+        this.collidableMeshesFromSpaceship = this.collidableMeshesFromSpaceship.filter(function(el) {
             return el != null;
-        });
+        })
     }
 }

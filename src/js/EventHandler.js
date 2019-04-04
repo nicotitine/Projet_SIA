@@ -8,57 +8,60 @@ class EventHandler {
             _viewport.width = window.innerWidth;
             _viewport.height = window.innerHeight;
             _viewport.ratio = _viewport.width / _viewport.height;
+            gameCore.cameraHandler.resize(_viewport.ratio);
 
             renderer.setSize(_viewport.width, _viewport.height);
-            gameCore.cameraHandler.resize();
-            gameUI.size(_viewport.width, _viewport.height, gameUI.fullScreenElements);
+            composer.setSize(_viewport.width, _viewport.height);
+            bloomPass.setSize(_viewport.width, _viewport.height);
         }.bind(this));
 
-        document.addEventListener('keydown', function(e) {
-            this.keys[e.which] = true;
-            if (e.key == "Escape") {
+        document.addEventListener('keydown', function(_e) {
+            this.keys[_e.which] = true;
+            if (_e.key == "Escape") {
                 gameUI.showEscape();
             }
         }.bind(this), false);
 
-        document.addEventListener('keyup', function(e) {
-            this.keys[e.which] = false;
+        document.addEventListener('keyup', function(_e) {
+            this.keys[_e.which] = false;
         }.bind(this), false);
 
-        document.addEventListener("keypress", function(e) {
-            if (e.key == "0") {
+        document.addEventListener("keypress", function(_e) {
+            if (_e.key == "0") {
                 gameCore.cameraHandler.cameraType = gameCore.cameraHandler.cameraTypes.FIXED;
             }
-            if (e.key == "1") {
+            if (_e.key == "1") {
                 gameCore.cameraHandler.cameraType = gameCore.cameraHandler.cameraTypes.MOVING;
             }
-            if (e.key == "0") {
+            if (_e.key == "0") {
                 gameCore.cameraHandler.changeToFixed();
             }
-            if (e.key == "1") {
+            if (_e.key == "1") {
                 gameCore.cameraHandler.changeToMoving();
             }
-            if (e.key == "2") {
+            if (_e.key == "2") {
                 gameCore.cameraHandler.changeToPursuit();
             }
-            if (e.key == "p" || e.key == "P") {
+            if (_e.key == "p" || _e.key == "P") {
                 saveAsImage();
                 gameUI.showEscape();
             }
-            if ((e.key == "k" || e.key == "K") && !gameUI.isLevelingUp && !gameUI.isPaused) {
+            if ((_e.key == "k" || _e.key == "K") && !gameUI.isLevelingUp && !gameUI.isPaused) {
                 gameCore.levelUp(true);
             }
-            if (e.key == "h" || e.key == "H") {
+            if (_e.key == "h" || _e.key == "H") {
                 gameUI.showHelp();
             }
-            if (e.key == "i" || e.key == "I") {
+            if (_e.key == "i" || _e.key == "I") {
                 if (gameCore.spaceship.shield.isActivated) {
                     gameCore.spaceship.isInvincible = false;
                     gameCore.spaceship.shield.desactivate();
-                } else
+
+                } else {
                     gameCore.spaceship.isInvincible = true;
+                }
             }
-            if ((e.key == "j" || e.key == "J") && this.jokerCheatTimestamp + 1000 < Date.now()) {
+            if ((_e.key == "j" || _e.key == "J") && this.jokerCheatTimestamp + 1000 < Date.now()) {
                 this.jokerCheatTimestamp = Date.now();
                 gameCore.jokers.spawn();
             }

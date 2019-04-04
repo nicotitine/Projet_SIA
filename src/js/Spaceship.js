@@ -1,18 +1,13 @@
-class Spaceship extends ResizableObject {
-     constructor() {
-         var model = textureLoader.getSpaceship();
+ class Spaceship extends ExplosiveMesh {
+     constructor(_geometry, _material) {
 
-         super(model.geometry, model.material);
+         super(_geometry, _material, new THREE.Vector3(gameParameters.spaceship.scale, gameParameters.spaceship.scale, gameParameters.spaceship.scale), 2);
 
-         this.bullets = [];
          this.isHitted = false;
          this.needToReload = false;
-         this.reloadSoundPlayed = false;
-         this.isLoaded = false;
 
          this.rotation.x = Math.PI / 2;
-         this.rotation.y = Math.PI/2
-         this.rotation.z = 0.2;
+         this.rotation.y = 0;
          this.velocity = {
              distanceToAddX: 0,
              distanceToAddY: 0,
@@ -25,69 +20,45 @@ class Spaceship extends ResizableObject {
          };
          this.name = "Spaceship";
          this.position.z = 0;
-         this.scale.set(gameParameters.spaceship.scale, gameParameters.spaceship.scale, gameParameters.spaceship.scale);
-         this.geometry.center();
+
          this.lives = 3;
          this.size = new THREE.Vector3();
          new THREE.Box3().setFromObject(this).getSize(this.size);
          this.isLoaded = true;
          this.fire = new Fire(gameParameters.spaceship.fire.scale);
-         this.shield = new Shield(this.size, this.position)
+         this.shield = new Shield(textureLoader.shield.geometry, textureLoader.shield.material, this.size, this.position)
          this.isInvincible = true;
-         this.shootPosition = {
-             LEFT: 1,
-             RIGHT: 2,
-             BOTH: 3
-         };
-         this.lastShootPosition = this.shootPosition.RIGHT;
+
          this.isRapidFireActivated = false;
          this.isBonusTimerDisplayed = false;
-
+         this.layers.set(0);
          this.bonusTimer = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({
              color: 0xffffff
          }));
          this.bonusTimer.position.set(this.position.x, this.position.y - this.size.y, 0);
      }
 
-     shoot(isBonus) {
+     shoot(_isBonus) {
          if (!this.isHitted) {
-             var bulletPositionLeft = new THREE.Vector3().set(this.position.x - 20 * -Math.sin(this.rotation.y), this.position.y - 20 * Math.cos(this.rotation.y), 0);
-             var bulletPositionRight = new THREE.Vector3().set(this.position.x + 20 * -Math.sin(this.rotation.y), this.position.y + 20 * Math.cos(this.rotation.y), 0);
-             var bullet;
+             var laserPositionLeft = new THREE.Vector3().set(this.position.x - 20 * -Math.sin(this.rotation.y + Math.PI/2), this.position.y - 20 * Math.cos(this.rotation.y + Math.PI/2), 0);
+             var laserPositionRight = new THREE.Vector3().set(this.position.x + 20 * -Math.sin(this.rotation.y + Math.PI/2), this.position.y + 20 * Math.cos(this.rotation.y + Math.PI/2), 0);
+             var laser;
 
-             if (!isBonus && this.lastShootPosition == this.shootPosition.RIGHT) {
-                 //console.log("cos : ", Math.cos(this.rotation.y), ", sin : ", Math.sin(this.rotation.y), ", bullet position before : ", bulletPosition);
-                 bullet = new Bullet(bulletPositionLeft, this.matrix, this.rotation);
-             }
-             if (!isBonus && this.lastShootPosition == this.shootPosition.LEFT) {
-                 bullet = new Bullet(bulletPositionRight, this.matrix, this.rotation);
-             }
-             if (isBonus) {
-                 bullet = new Bullet(bulletPositionLeft, this.matrix, this.rotation);
-                 var additionalBullet = new Bullet(bulletPositionRight, this.matrix, this.rotation);
-                 gameCore.bullets.push(additionalBullet)
-                 gameCore.scene.add(additionalBullet);
+             if (_isBonus) {
+                 laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionLeft, this.matrix, this.rotation, gameParameters.laser.types.SPACESHIP);
+                 var additionalLaser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionRight, this.matrix, this.rotation, gameParameters.laser.types.SPACESHIP);
+                 gameCore.addSpaceshipLaser(additionalLaser);
                  setTimeout(() => {
                      if (this.isRapidFireActivated)
                          this.shoot(true);
-                 }, 400)
+                 }, 300)
              } else {
-                 gameCore.audioHandler.fireSound.play();
-                 this.needToReload = true;
-                 this.reloadSoundPlayed = false;
-                 this.updateBulletShootingPosition();
+                 laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, this.position, this.matrix, this.rotation, gameParameters.laser.types.SPACESHIP);
              }
-             gameCore.bullets.push(bullet)
-             gameCore.scene.add(bullet);
+             gameCore.audioHandler.fireSound.play();
+             this.needToReload = true;
+             gameCore.addSpaceshipLaser(laser);
 
-         }
-     }
-
-     updateBulletShootingPosition() {
-         if (this.lastShootPosition == this.shootPosition.LEFT) {
-             this.lastShootPosition = this.shootPosition.RIGHT;
-         } else {
-             this.lastShootPosition = this.shootPosition.LEFT;
          }
      }
 
@@ -99,7 +70,7 @@ class Spaceship extends ResizableObject {
      }
 
      hitted() {
-         var explosion = new Explosion(this.position, 2);
+
 
          this.isHitted = true;
          this.visible = false;
@@ -136,9 +107,10 @@ class Spaceship extends ResizableObject {
          }
      }
 
-     displayBonusTimer(bonusLifetime) {
+     displayBonusTimer(_bonusLifetime) {
          this.bonusTimer.spawntime = Date.now();
-         this.bonusTimer.lifetime = bonusLifetime;
+         this.bonusTimer.lifetime = _bonusLifetime;
+         this.bonusTimer.position.set(this.position.x, this.position.y - this.size.y, 0);
          this.bonusTimer.visible = true;
          this.bonusTimer.scale.set(100, 2, 1);
          this.isBonusTimerDisplayed = true;
@@ -150,14 +122,14 @@ class Spaceship extends ResizableObject {
      }
 
      incline() {
-         if(this.rotation.z < 0.2) {
-             this.rotation.z += 0.01;
+         if(this.rotation.x < 0.3) {
+             this.rotation.x += 0.005;
          }
      }
 
      decline() {
-         if(this.rotation.z >= 0) {
-             this.rotation.z -= 0.01;
+         if(this.rotation.x >= 0) {
+             this.rotation.x -= 0.005;
          }
      }
 
@@ -171,14 +143,15 @@ class Spaceship extends ResizableObject {
          if (eventHandler.keys[39]) this.velocity.arr = -gameParameters.spaceship.rotationSpeed;
          else this.velocity.arr = 0;
          if (eventHandler.keys[38]) {
-             this.velocity.forwardX = -Math.cos(this.rotation.y) * gameParameters.spaceship.speed;
-             this.velocity.forwardY = -Math.sin(this.rotation.y) * gameParameters.spaceship.speed;
+             this.velocity.forwardX = -Math.cos(this.rotation.y + Math.PI/2) * gameParameters.spaceship.speed;
+             this.velocity.forwardY = -Math.sin(this.rotation.y + Math.PI/2) * gameParameters.spaceship.speed;
+             //gameCore.engineFire.trailTarget.position.y += 0.5;
              this.fire.increase(0.2);
-             this.incline();
+             //this.incline();
          } else {
              this.velocity.forwardX = this.velocity.forwardY = 0;
              this.fire.decrease(0.2);
-             this.decline();
+             //this.decline();
          }
 
 
@@ -188,13 +161,8 @@ class Spaceship extends ResizableObject {
              timestamp = Date.now();
          }
 
-         // To be realistic, the sound must be played 400 ms before
-         if (timestamp + gameParameters.bullet.timestamp < Date.now() + 400 && this.needToReload && !this.reloadSoundPlayed) {
-             gameCore.audioHandler.reloadSound.play();
-             this.reloadSoundPlayed = true;
-         }
          // Then the player can really shot again
-         if (timestamp + gameParameters.bullet.timestamp < Date.now() && this.needToReload) {
+         if (timestamp + gameParameters.laser.spaceship.timestamp < Date.now() && this.needToReload) {
              this.needToReload = false;
          }
 
@@ -237,12 +205,7 @@ class Spaceship extends ResizableObject {
              this.rotation.y += this.velocity.vrl + this.velocity.vrr; // the sum represents the real rotation of the ship at time = t
 
              // Checks if out of scene
-             if (Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
-                 this.position.x = -this.position.x;
-             }
-             if (Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
-                 this.position.y = -this.position.y;
-             }
+             this.checkOutOfScreen();
 
              // Bonus timer updating
              if (this.isBonusTimerDisplayed && this.bonusTimer.scale.x > 1) {
@@ -268,12 +231,13 @@ class Spaceship extends ResizableObject {
          }
 
          // Update the shield
-         if (this.shield != null)
+         if (this.shield != null) {
              this.shield.update(this.position, this.isInvincible);
+         }
 
          // Update the fire
-         if (this.fire != null && this.position != null)
-             this.fire.update(this.position, this.size, this.rotation);
-
+         if (this.fire != null && this.position != null) {
+            this.fire.update(this.position, this.size, this.rotation);
+         }
      }
  }

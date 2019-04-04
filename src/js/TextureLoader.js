@@ -4,18 +4,16 @@ class TextureLoader {
         this.loader = new THREE.OBJLoader();
         this.loader.crossOrigin = '';
         this.textureLoader = new THREE.TextureLoader();
-        this.material = new THREE.MeshStandardMaterial({
-            color: "#ffffff",
-            flatShading: true,
-            roughness: 0.8,
-            metalness: 1
-        });;
+        this.MTLLoader = new THREE.MTLLoader();
+
+
+        this.GLTFLoader = new THREE.GLTFLoader();
 
         /* ######## GEOMETRY AND MODEL INSTANCING ########
             Les trois géométries sont créées une seule fois ici, en fonction de la taille des asteroids voulue
             materiel est null car pas encore chargé (voir fonction load en dessous) */
             this.asteroid = {
-                path: 'src/medias/models/explosion0.png',
+                path: 'src/medias/models/asteroid.png',
                 geometry: [
                     new THREE.IcosahedronBufferGeometry(gameParameters.asteroid.size.min, 5),
                     new THREE.IcosahedronBufferGeometry(gameParameters.asteroid.size.middle, 5),
@@ -25,22 +23,31 @@ class TextureLoader {
             }
         /* ############################################### */
 
-        this.bullet = {
-            path: "src/medias/models/missile-2.obj",
-            geometry: null,
-            material: this.material
+        this.laser = {
+            geometry: new THREE.CylinderGeometry(1, 1, 32, 20),
+            materialSpaceship: new THREE.MeshBasicMaterial({color: 0xff0000}),
+            materialEnemy: new THREE.MeshBasicMaterial({color: 0x00ff00}),
         };
 
         this.spaceship = {
-            path: 'src/medias/models/spaceship.obj',
-            pathTexture: 'src/medias/models/spaceshipTexture.jpg',
+            pathOBJ: 'src/medias/models/spaceship/geometry.obj',
+            pathMTL: 'src/medias/models/spaceship/material.mtl',
             geometry: null,
             material: null,
             texture: null
         };
 
+        this.enemy = {
+            pathOBJ: 'src/medias/models/ufo/geometry.obj',
+            pathMTL: 'src/medias/models/ufo/material.mtl',
+            geometry: null,
+            material: null
+        };
+
         this.shield = {
             path: 'src/medias/models/spaceship-shield.jpg',
+            geometry: new THREE.SphereGeometry(1, 32, 32),
+            material: null,
             texture: null
         };
 
@@ -95,34 +102,59 @@ class TextureLoader {
             path: [
                 'src/medias/models/spaceman/box/box-rapid-fire.png',
                 'src/medias/models/spaceman/box/box-shield.png',
-                'src/medias/models/spaceman/box/box-extra-life.png'
+                'src/medias/models/spaceman/box/box-extra-life.png',
+                'src/medias/models/spaceman/box/box.png'
             ],
             texture: []
         }
 
-        this.worldWrapperSide = {
-            path: 'src/medias/models/plasmaSide.png',
-            texture: null
-        };
-        this.worldWrapperFront = {
-            path: 'src/medias/models/plasmaFront.png',
-            texture: null
+        var loaderSkybox = new THREE.CubeTextureLoader();
+        loaderSkybox.setPath('src/medias/models/skybox/');
+        var envmap = loaderSkybox.load(['front.png', 'back.png', 'up.png', 'down.png', 'right.png', 'left.png']);
+        var cubeShader = THREE.ShaderLib['cube'];
+        cubeShader.uniforms['tCube'].value = envmap;
+
+        var skyBoxMaterial = new THREE.ShaderMaterial({
+            fragmentShader: cubeShader.fragmentShader,
+            vertexShader: cubeShader.vertexShader,
+            uniforms: cubeShader.uniforms,
+            side: THREE.BackSide
+        })
+
+        this.skybox = {
+            path: 'src/medias/models/wrapper.jpeg',
+            geometry: new THREE.BoxBufferGeometry(10000, 10000, 10000),
+            material: skyBoxMaterial,
+            transparent: true,
+            depthWrite: false
         };
 
         this.load();
     }
 
     load() {
-        this.loader.load(this.spaceship.path, object => {
-            this.spaceship.geometry = new THREE.Geometry().fromBufferGeometry(object.children[0].geometry);
-            this.textureLoader.load(this.spaceship.pathTexture, texture => {
-                this.spaceship.texture = texture;
-                this.spaceship.material = this.material
+        this.MTLLoader.load(this.spaceship.pathMTL, materials => {
+            // Spaceship material loading
+            materials.preload();
+            this.loader.setMaterials(materials).load(this.spaceship.pathOBJ, object => {
+                // Spaceship geometry loading
+                this.spaceship.geometry = object.children[0].geometry;
+                this.spaceship.material = object.children[0].material;
+
+                this.MTLLoader.load(this.enemy.pathMTL, materials => {
+                    // UFO Material loading
+                    materials.preload();
+                    this.loader.setMaterials(materials).load(this.enemy.pathOBJ, object => {
+                        // UFO geometry loading
+                        this.enemy.geometry = object.children[0].geometry;
+                        this.enemy.material = object.children[0].material;
+                    })
+                })
+
             })
         });
-        this.loader.load(this.bullet.path, object => {
-            this.bullet.geometry = object.children[0].geometry;
-        });
+
+
 
         /* ######## MODEL LOADING ########
             On charge la texture et on créé le matériel avec dans la foulée */
@@ -139,11 +171,14 @@ class TextureLoader {
                         },
                         weight: {
                             type: "f",
-                            value: 5.0
+                            value: .0
                         }
                     },
                     vertexShader: document.getElementById('vertexShader').textContent,
-                    fragmentShader: document.getElementById('fragmentShader').textContent
+                    fragmentShader: document.getElementById('fragmentShader').textContent,
+                    depthWrite: true,
+                    depthTest: true,
+                    opacity: 0.1
 
                 });
                 // A EVITER ABSOLUMENT :
@@ -160,11 +195,21 @@ class TextureLoader {
 
 
         this.textureLoader.load(this.shield.path, texture => {
-            this.shield.texture = texture;
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(4, 4);
+            this.shield.material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                depthTest: false,
+                depthWrite: false
+            });
         });
+
         this.textureLoader.load(this.fire.path, texture => {
             this.fire.texture = texture;
         });
+
         this.textureLoader.load(this.explosion.path, texture => {
             this.explosion.texture = texture;
         });
@@ -175,62 +220,17 @@ class TextureLoader {
             });
         }, this);
 
+
         this.spacemanBox.path.forEach(function(path, i) {
             this.textureLoader.load(path, texture => {
                 this.spacemanBox.texture[i] = texture;
             });
         }, this);
-        this.textureLoader.load(this.worldWrapperSide.path, texture => {
-            this.worldWrapperSide.texture = texture;
-        });
-        this.textureLoader.load(this.worldWrapperFront.path, texture => {
-            this.worldWrapperFront.texture = texture;
-        });
     }
 
     update() {
         /* ######## MATERIAL UPDATE ######## */
             this.asteroid.material.uniforms['time'].value = .00010 * (Date.now() - this.start);
         /* ################################# */
-    }
-
-    getBullet() {
-        return this.bullet;
-    }
-
-    getSpaceship() {
-        return this.spaceship;
-    }
-
-    getAsteroid() {
-        return this.asteroid;
-    }
-
-    getShield() {
-        return this.shield;
-    }
-
-    getFire() {
-        return this.fire;
-    }
-
-    getExplosion() {
-        return this.explosion;
-    }
-
-    getSpaceman() {
-        return this.spaceman;
-    }
-
-    getSpacemanBox() {
-        return this.spacemanBox;
-    }
-
-    getWorldWrapperSide() {
-        return this.worldWrapperSide;
-    }
-
-    getWorldWrapperFront() {
-        return this.worldWrapperFront;
     }
 }

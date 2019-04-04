@@ -1,6 +1,6 @@
-class Fire extends ResizableObject {
+class Fire extends ResizableMesh {
     constructor(scale) {
-        var fireTex = textureLoader.getFire().texture;
+        var fireTex = textureLoader.fire.texture;
         var fireMaterial = new THREE.ShaderMaterial({
             defines: THREE.FireShader.defines,
             uniforms: THREE.UniformsUtils.clone(THREE.FireShader.uniforms),
@@ -20,7 +20,7 @@ class Fire extends ResizableObject {
         fireMaterial.uniforms.scale.value = new THREE.Vector3(1, 1, 1);
         fireMaterial.uniforms.seed.value = Math.random() * 19.19;
 
-        super(new THREE.BoxGeometry(1.0, 1.0, 1.0), fireMaterial);
+        super(new THREE.BoxGeometry(1.0, 1.0, 1.0), fireMaterial, new THREE.Vector3(1, 1, 1));
 
         this.geometry.computeBoundingBox();
         this.scale.set(scale.x, scale.y, scale.z);
@@ -45,12 +45,12 @@ class Fire extends ResizableObject {
         this.material.uniforms.invModelMatrix.value = invModelMatrix;
         this.material.uniforms.scale.value = this.scale;
 
-        this.position.x = position.x + ((size.x + this.size.y) / 2 * Math.cos(rotation.y));
-        this.position.y = position.y + ((size.x + this.size.y) / 2 * Math.sin(rotation.y));
-        this.position.z = position.z + ((size.x + this.size.x) / 2 * Math.sin(rotation.z));
+        this.position.x = position.x + ((size.x + this.size.y) / 2 * -Math.cos(rotation.y + Math.PI/2));
+        this.position.y = position.y + ((size.x + this.size.y) / 2 * -Math.sin(rotation.y + Math.PI/2));
+        this.position.z = position.z + ((size.x + this.size.x) / 2 * Math.sin(rotation.z + Math.PI/2));
         this.rotation.x = rotation.x;
         this.rotation.y = rotation.y;
-        this.rotation.z = rotation.z - Math.PI/2;
+        this.rotation.z = rotation.z-Math.PI/4;
     }
 
     // magnitude works upside down. Low magnitude for large fire

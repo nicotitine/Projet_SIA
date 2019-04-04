@@ -329,6 +329,33 @@ input[type="range"].muted::-webkit-slider-thumb {
    background-image: url('../medias/images/sound_muted.png');
 }
 
+input[type=checkbox] {
+display:none;
+}
+
+input[type=checkbox] + label:hover {
+    cursor: pointer;
+}
+
+input[type=checkbox] + label {
+display:inline-block;
+padding: 0 0 0 0px;
+background:url("../medias/images/disabled_test.png") no-repeat;
+height: 80px;
+width: 80px;
+background-size: 100%;
+transition: all 1s;
+}
+
+input[type=checkbox]:checked + label {
+background:url("../medias/images/enabled_teste.png") no-repeat;
+height: 80px;
+width: 80px;
+display:inline-block;
+background-size: 100%;
+transition: all 1s;
+}
+
 .buttons {
     display: flex;
     flex-direction: column;
@@ -377,6 +404,8 @@ input[type="range"].muted::-webkit-slider-thumb {
     flex: 1;
     text-align: right;
 }
+
+
 
 @media screen and (max-width: 1600px) {
     #welcome {

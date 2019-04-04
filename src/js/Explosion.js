@@ -1,15 +1,15 @@
 class Explosion {
-    constructor(position, level) {
+    constructor(_position, _level) {
         this.group = new SPE.Group({
             texture: {
-                value: textureLoader.getExplosion().texture,
+                value: textureLoader.explosion.texture,
                 frames: new THREE.Vector2(5, 5),
                 loop: 1
             },
             depthTest: false,
             depthWrite: false,
             blending: THREE.AdditiveBlending,
-            scale: 600 * level
+            scale: 600 * _level
         });
         this.fireball = new SPE.Emitter({
             particleCount: 20,
@@ -38,9 +38,9 @@ class Explosion {
                 value: [0.5, 0.35, 0.1, 0]
             }
         });
-        
+
         this.group.addEmitter(this.fireball);
-        this.group.mesh.position.copy(position);
+        this.group.mesh.position.copy(_position);
         gameCore.scene.add(this.group.mesh);
 
         this.group.mesh.onBeforeRender = function() {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html>
 
 <head>
     <meta charset="utf-8">
@@ -17,18 +17,28 @@
     <script type="text/javascript" src="src/lib/ShaderExtras.js"></script>
     <script type="text/javascript" src="src/lib/SPE.js"></script>
     <script type="text/javascript" src="src/lib/Howler.min.js"></script>
-    <script src="src/lib/EffectComposer.js"></script>
-    <script src="src/lib/ShaderPass.js"></script>
+    <script src='https://threejs.org/examples/js/postprocessing/EffectComposer.js'></script>
+    <script src='https://threejs.org/examples/js/postprocessing/RenderPass.js'></script>
+    <script src='https://threejs.org/examples/js/postprocessing/ShaderPass.js'></script>
+    <script src='https://threejs.org/examples/js/shaders/CopyShader.js'></script>
+    <script src="https://threejs.org/examples/js/shaders/FXAAShader.js"></script>
+    <script src="https://threejs.org/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://threejs.org/examples/js/postprocessing/UnrealBloomPass.js"></script>
     <script src="src/lib/MaskPass.js"></script>
-    <script src="src/lib/RenderPass.js"></script>
     <script src="src/lib/BloomPass.js"></script>
     <script src="src/lib/FilmPass.js"></script>
     <script src="src/lib/CopyShader.js"></script>
     <script src="src/lib/ConvolutionShader.js"></script>
     <script src="src/lib/FilmShader.js"></script>
+    <script src="src/lib/GLTFLoader.js"></script>
+    <script src="https://a-jie.github.io/three.proton/engine/build/three.proton.min.js"></script>
 
-    <script type="text/javascript" src="src/js/ResizableObject.js"></script>
+    <script type="text/javascript" src="src/js/ResizableMesh.js"></script>
+    <script type="text/javascript" src="src/js/CollidableMesh.js"></script>
+    <script type="text/javascript" src="src/js/ExplosiveMesh.js"></script>
+    <script type="text/javascript" src="src/js/TimelapsMesh.js"></script>
     <script type="text/javascript" src="src/js/EventHandler.js"></script>
+    <script type="text/javascript" src="src/js/EnemyHandler.js"></script>
     <script type="text/javascript" src="src/js/Viewport.js"></script>
     <script type="text/javascript" src="src/js/GameParameters.js"></script>
     <script type="text/javascript" src="src/js/CameraHandler.js"></script>
@@ -41,8 +51,9 @@
     <script type="text/javascript" src="src/js/Shield.js"></script>
     <script type="text/javascript" src="src/js/Fire.js"></script>
     <script type="text/javascript" src="src/js/TextureLoader.js"></script>
-    <script type="text/javascript" src="src/js/Bullet.js"></script>
+    <script type="text/javascript" src="src/js/Laser.js"></script>
     <script type="text/javascript" src="src/js/Spaceship.js"></script>
+    <script type="text/javascript" src="src/js/Enemy.js"></script>
     <script type="text/javascript" src="src/js/Asteroid.js"></script>
     <script type="text/javascript" src="src/js/Starfield.js"></script>
     <script type="text/javascript" src="src/js/main.js"></script>
@@ -127,13 +138,18 @@
         </div>
         <div id="music" class="option">
             <div><label for="sliderMusic" class="sliderLabel">Music volume</label></div>
-            <div><input type="range" min="0" max="100" value="100" step="10" class="slider" id="sliderMusic" /></div>
+            <div><input type="range" min="0" max="100" value="100" step="10" class="slider" id="sliderMusic" name="sliderMusic"/></div>
             <div><label for="sliderMusic" class="sliderLabelValue" id="valueSliderMusic">100</label>%</div>
         </div>
         <div id="sounds" class="option">
             <div><label for="sliderSound" class="sliderLabel">Sounds volume</label></div>
-            <div><input type="range" min="0" max="100" value="100" step="10" class="slider" id="sliderSound" /></div>
+            <div><input type="range" min="0" max="100" value="100" step="10" class="slider" id="sliderSound" name="sliderSound" /></div>
             <div><label for="sliderSound" class="sliderLabelValue" id="valueSliderSound">100</label>%</div>
+        </div>
+        <div id="glowEffect" class="option">
+            <div><span for="glowEffectCheckbox">Glowing effect</span></div>
+            <div><input type="checkbox" id="glowEffectCheckbox" name="glowEffectCheckbox" checked/><label for="glowEffectCheckbox"></label></div>
+            <div><span for="glowEffectCheckbox" class="value">Activated</span></div>
         </div>
         <div class="return">
             <a href="#" id="returnOptions" class="custom-link" data-hover="Return">Return</a>
@@ -159,6 +175,7 @@
             <a href="#" class="custom-link" data-hover="Return" id="returnScores">Return</a>
         </div>
     </div>
+
     <script type="x-shader/x-vertex" id="vertexShader">
         vec3 mod289(vec3 x)
             {
@@ -369,8 +386,7 @@
 
             }
 
-        </script>
-
+    </script>
     <script type="x-shader/x-vertex" id="fragmentShader">
 
         varying vec2 vUv;
@@ -391,7 +407,30 @@
 
         }
 
-        </script>
+    </script>
+
+    <script id="vertexShaderGlow" type="x-shader/x-vertex">
+        uniform vec3 viewVector;
+        uniform float c;
+        uniform float p;
+        varying float intensity;
+        void main() {
+            vec3 vNormal = normalize( normalMatrix * normal );
+        	vec3 vNormel = normalize( normalMatrix * viewVector );
+        	intensity = pow( c - dot(vNormal, vNormel), p );
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+    </script>
+
+    <script id="fragmentShaderGlow" type="x-shader/x-vertex">
+        uniform vec3 glowColor;
+        varying float intensity;
+        void main(){
+        	vec3 glow = glowColor * intensity;
+            gl_FragColor = vec4( glow, 1.0 );
+        }
+    </script>
+
 </body>
 
 </html>

@@ -8,10 +8,6 @@ class AudioHandler {
             src: ['src/medias/sounds/fire.wav']
         });
 
-        this.reloadSound = new Howl({
-            src: ['src/medias/sounds/reload.wav']
-        });
-
         this.explosionSound = new Howl({
             src: ['src/medias/sounds/explosion.wav']
         });
@@ -20,13 +16,12 @@ class AudioHandler {
         this.backgroundMusic.loop(true);
     }
 
-    changeMusicVolume(newValue) {
-        this.backgroundMusic.volume(newValue);
+    changeMusicVolume(_value) {
+        this.backgroundMusic.volume(_value);
     }
 
-    changeSoundVolume(newValue) {
-        this.fireSound.volume(newValue);
-        this.reloadSound.volume(newValue);
-        this.explosionSound.volume(newValue);
+    changeSoundVolume(_value) {
+        this.fireSound.volume(_value);
+        this.explosionSound.volume(_value);
     }
 }

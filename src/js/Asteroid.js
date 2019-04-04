@@ -1,11 +1,11 @@
-class Asteroid extends ResizableObject {
-    constructor(position, level) {
+class Asteroid extends ExplosiveMesh {
+    constructor(_position, _level, _speed) {
         /* ######### GEOMETRY #########
             On récupère la géométrie et le materiel déjà créés */
-            super(textureLoader.asteroid.geometry[level - 1], textureLoader.asteroid.material);
+            super(textureLoader.asteroid.geometry[_level - 1], textureLoader.asteroid.material, new THREE.Vector3(1, 1, 1), _level);
         /*############################# */
 
-        this.level = level;
+        this.level = _level;
 
         /* ######### RANDOMNESS #########
             Pour donner un aspect "random" au materiel, car le materiel est unique, donc l'animation aussi */
@@ -17,41 +17,33 @@ class Asteroid extends ResizableObject {
         var y = (gameParameters.asteroid.spawnRadius.height / 2 - Math.random() * gameParameters.asteroid.spawnRadius.height) * centeredness;
         var z = 0;
 
-        if (position == null) {
+        if (_position == null) {
             this.position.set(x, y, z);
         } else {
-            this.position.copy(position);
+            this.position.copy(_position);
         }
 
         this.name = "Asteroid";
         this.direction = new THREE.Vector3(GameParameters.getRandom(1), GameParameters.getRandom(1), 0);
-        this.vector = this.direction.multiplyScalar(gameParameters.asteroid.speed, gameParameters.asteroid.speed, 0);
+        this.vector = this.direction.multiplyScalar(_speed, _speed, 0);
+        if(storage.data.options.glowingEffect) {
+            this.layers.enable(1);
+        } else {
+            this.layers.set(0);
+        }
     }
 
 
     update() {
-
-        /* ######## UPDATE ########
-            ON NE MET PAS A JOUR LE MATERIEL ICI MAIS DANS TextureLoader !!!
-            (fonction textureLoader.update() appelée dans la fonction update de gameCore)
-         ######################## */
-
         // Update position
         if (gameUI != null && (!gameUI.isPaused || gameUI.isWelcomeDisplayed)) {
             this.position.x += this.vector.x;
             this.position.y += this.vector.y;
         }
-
-        // Check if out of screen
-        if (Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
-            this.position.x = -this.position.x;
-        }
-        if (Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
-            this.position.y = -this.position.y;
-        }
+        this.checkOutOfScreen();
     }
 
-    collide() {
+    collide(_speed) {
         var rock, size, lastLife, newAsteroids = [];
         switch (this.level) {
             case 3:
@@ -68,10 +60,9 @@ class Asteroid extends ResizableObject {
         }
         if (!lastLife) {
             for (var i = 0; i < gameParameters.asteroid.divideNumber; i++) {
-                newAsteroids.push(new Asteroid(this.position, this.level - 1));
+                newAsteroids.push(new Asteroid(this.position, this.level - 1, _speed));
             }
         }
-        gameUI.scored(10);
         return newAsteroids;
     }
 }

@@ -1,6 +1,6 @@
 class Score {
-    constructor(pseudo, score) {
-        this.pseudo = pseudo;
-        this.score = score;
+    constructor(_pseudo, _score) {
+        this.pseudo = _pseudo;
+        this.score = _score;
     }
 }
