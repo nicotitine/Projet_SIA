@@ -55,7 +55,6 @@ class GameCore {
         if(indexFrom != -1) {
             this.collidableMeshesFromSpaceship[indexFrom] = null;
         }
-        console.log(_mesh);
         if(_mesh.name == "Enemy") {
             this.enemyHandler.remove(_mesh)
         }

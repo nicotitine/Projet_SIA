@@ -39,7 +39,6 @@ class Enemy extends ExplosiveMesh {
 
     shoot() {
         var shootDirection
-        console.log(this.aimbot);
         if(this.aimbot.activated) {
             let angleToSpaceship = Math.atan2(gameCore.spaceship.position.y - this.position.y, gameCore.spaceship.position.x - this.position.x);
             let precisionEffect = GameParameters.getRandom(Math.PI / this.aimbot.level)
