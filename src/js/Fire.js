@@ -1,5 +1,5 @@
 class Fire extends ResizableMesh {
-    constructor(scale) {
+    constructor(_side) {
         var fireTex = textureLoader.fire.texture;
         var fireMaterial = new THREE.ShaderMaterial({
             defines: THREE.FireShader.defines,
@@ -8,8 +8,10 @@ class Fire extends ResizableMesh {
             fragmentShader: THREE.FireShader.fragmentShader,
             transparent: true,
             depthWrite: true,
-            depthTest: false
+            depthTest: true
         });
+
+
 
         fireTex.magFilter = fireTex.minFilter = THREE.LinearFilter;
         fireTex.wrapS = THREE.wrapT = THREE.ClampToEdgeWrapping;
@@ -20,10 +22,14 @@ class Fire extends ResizableMesh {
         fireMaterial.uniforms.scale.value = new THREE.Vector3(1, 1, 1);
         fireMaterial.uniforms.seed.value = Math.random() * 19.19;
 
-        super(new THREE.BoxGeometry(1.0, 1.0, 1.0), fireMaterial, new THREE.Vector3(1, 1, 1));
+        super(new THREE.BoxGeometry(1.0, 1.0, 1.0), fireMaterial, new THREE.Vector3(gameParameters.spaceship.fire.scale.x, gameParameters.spaceship.fire.scale.y, gameParameters.spaceship.fire.scale.z));
 
-        this.geometry.computeBoundingBox();
-        this.scale.set(scale.x, scale.y, scale.z);
+        this.sides = {
+            LEFT: 1,
+            RIGHT: 2
+        };
+        this.side = _side;
+
         this.material.uniforms.magnitude.value = 3.5;
         this.material.uniforms.lacunarity.value = 0.0;
         this.size = new THREE.Vector3();
@@ -31,9 +37,10 @@ class Fire extends ResizableMesh {
         this.name = "Fire";
         this.rotation.z = -Math.PI / 2;
         this.clock = new THREE.Clock();
+        this.position.z = -5;
     }
 
-    update(position, size, rotation) {
+    update(_position, _size, _rotation) {
         this.clock.getDelta();
         var time = this.clock.elapsedTime;
         var invModelMatrix = this.material.uniforms.invModelMatrix.value;
@@ -45,12 +52,22 @@ class Fire extends ResizableMesh {
         this.material.uniforms.invModelMatrix.value = invModelMatrix;
         this.material.uniforms.scale.value = this.scale;
 
-        this.position.x = position.x + ((size.x + this.size.y) / 2 * -Math.cos(rotation.y + Math.PI/2));
-        this.position.y = position.y + ((size.x + this.size.y) / 2 * -Math.sin(rotation.y + Math.PI/2));
-        this.position.z = position.z + ((size.x + this.size.x) / 2 * Math.sin(rotation.z + Math.PI/2));
-        this.rotation.x = rotation.x;
-        this.rotation.y = rotation.y;
-        this.rotation.z = rotation.z-Math.PI/4;
+        switch (this.side) {
+            case this.sides.LEFT:
+                this.position.x = _position.x + 21 * Math.sin(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));
+                this.position.y = _position.y + 21 * -Math.cos(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.sin(_rotation.y + Math.PI/2));
+                this.position.z = -5;
+                break;
+            case this.sides.RIGHT:
+                this.position.x = _position.x - 21 * Math.sin(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));
+                this.position.y = _position.y - 21 * -Math.cos(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.sin(_rotation.y + Math.PI/2));
+                this.position.z = -5;
+                break;
+        }
+
+        this.rotation.x = _rotation.x;
+        this.rotation.y = _rotation.y + Math.PI/2;
+        this.rotation.z = _rotation.z - Math.PI/2;
     }
 
     // magnitude works upside down. Low magnitude for large fire

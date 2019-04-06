@@ -25,7 +25,10 @@
          this.size = new THREE.Vector3();
          new THREE.Box3().setFromObject(this).getSize(this.size);
          this.isLoaded = true;
-         this.fire = new Fire(gameParameters.spaceship.fire.scale);
+
+         this.fireLeft = new Fire(1);
+         this.fireRight = new Fire(2);
+
          this.shield = new Shield(textureLoader.shield.geometry, textureLoader.shield.material, this.size, this.position)
          this.isInvincible = true;
 
@@ -45,15 +48,15 @@
              var laser;
 
              if (_isBonus) {
-                 laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionLeft, this.matrix, this.rotation, gameParameters.laser.types.SPACESHIP);
-                 var additionalLaser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionRight, this.matrix, this.rotation, gameParameters.laser.types.SPACESHIP);
+                 laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionLeft, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP);
+                 var additionalLaser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionRight, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP);
                  gameCore.addSpaceshipLaser(additionalLaser);
                  setTimeout(() => {
                      if (this.isRapidFireActivated)
                          this.shoot(true);
                  }, 300)
              } else {
-                 laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, this.position, this.matrix, this.rotation, gameParameters.laser.types.SPACESHIP);
+                 laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, this.position, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP);
              }
              gameCore.audioHandler.fireSound.play();
              this.needToReload = true;
@@ -74,9 +77,11 @@
 
          this.isHitted = true;
          this.visible = false;
-         this.fire.visible = false;
+         this.fireLeft.visible = false;
+         this.fireRight.visible = false;
          this.position.z = 2000;
-         this.fire.position.z = 2000;
+         this.fireLeft.position.z = 2000;
+         this.fireRight.position.z = 2000;
          gameUI.editLives(this.lives, false)
          this.lives -= 1;
          this.hideBonusTimer();
@@ -84,9 +89,11 @@
          if (this.lives > 0) {
              setTimeout(() => {
                  this.isHitted = false;
-                 this.fire.position.z = 0;
+                 this.fireLeft.position.z = -5;
+                 this.fireRight.position.z = -5;
                  this.visible = true;
-                 this.fire.visible = true;
+                 this.fireLeft.visible = true;
+                 this.fireRight.visible = true;
                  this.position.set(0, 0, 0);
                  this.shield.activate(5, false);
                  this.displayBonusTimer(5000)
@@ -146,11 +153,13 @@
              this.velocity.forwardX = -Math.cos(this.rotation.y + Math.PI/2) * gameParameters.spaceship.speed;
              this.velocity.forwardY = -Math.sin(this.rotation.y + Math.PI/2) * gameParameters.spaceship.speed;
              //gameCore.engineFire.trailTarget.position.y += 0.5;
-             this.fire.increase(0.2);
+             this.fireLeft.increase(0.2);
+             this.fireRight.increase(0.2);
              //this.incline();
          } else {
              this.velocity.forwardX = this.velocity.forwardY = 0;
-             this.fire.decrease(0.2);
+             this.fireLeft.decrease(0.2);
+             this.fireRight.decrease(0.2);
              //this.decline();
          }
 
@@ -211,8 +220,8 @@
              if (this.isBonusTimerDisplayed && this.bonusTimer.scale.x > 1) {
                  let tick = (Date.now() - this.bonusTimer.spawntime) / this.bonusTimer.lifetime * 100;
                  if (gameCore.cameraHandler.cameraType == gameCore.cameraHandler.cameraTypes.PURSUIT) {
-                     this.bonusTimer.rotation.set(0, 0, this.rotation.y + Math.PI / 2)
-                     this.bonusTimer.position.set(this.fire.position.x, this.fire.position.y, -15);
+                     this.bonusTimer.rotation.set(0, 0, this.rotation.y)
+                     this.bonusTimer.position.set(this.fireLeft.position.x, this.fireLeft.position.y, -15);
                  } else {
                      this.bonusTimer.position.set(this.position.x, this.position.y - this.size.y, 0);
                      this.bonusTimer.rotation.set(0, 0, 0);
@@ -236,8 +245,9 @@
          }
 
          // Update the fire
-         if (this.fire != null && this.position != null) {
-            this.fire.update(this.position, this.size, this.rotation);
+         if (this.fireRight != null && this.fireLeft != null && this.position != null) {
+            this.fireLeft.update(this.position, this.size, this.rotation);
+            this.fireRight.update(this.position, this.size, this.rotation);
          }
      }
  }

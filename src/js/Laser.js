@@ -6,12 +6,8 @@ class Laser extends TimelapsMesh {
 
                 super(_geometry, _material, new THREE.Vector3(1, 1, 1), gameParameters.laser.spaceship.lifetime);
 
-                this.matrix = new THREE.Matrix4();
-                this.matrix.extractRotation(_direction);
-                this.direction = new THREE.Vector3(0, 0, 1);
-                this.direction.applyMatrix4(this.matrix).normalize();
-                this.vector = this.direction.multiplyScalar(gameParameters.laser.spaceship.speed, gameParameters.laser.spaceship.speed, gameParameters.laser.spaceship.speed);
-                this.rotation.set(0, 0, _rotation.y);
+                this.rotation.z = _direction + Math.PI;
+                this.vector = new THREE.Vector3(gameParameters.laser.spaceship.speed * - Math.sin(this.rotation.z), gameParameters.laser.spaceship.speed * Math.cos(this.rotation.z), 0)
                 break;
 
             case gameParameters.laser.types.ENEMY:
@@ -32,7 +28,6 @@ class Laser extends TimelapsMesh {
         this.position.x += this.vector.x;
         this.position.y += this.vector.y;
 
-        // Check if out of screen
         this.checkOutOfScreen();
 
         if(this.mustDie()) {

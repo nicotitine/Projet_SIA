@@ -40,12 +40,12 @@ class CameraHandler {
             case this.cameraTypes.PURSUIT:
 
                 this.camera.updateProjectionMatrix();
-
+                gameCore.spaceship.bonusTimer.rotation.copy(gameCore.spaceship.rotation)
                 var matrix = new THREE.Matrix4();
                 matrix.extractRotation(gameCore.spaceship.matrix);
                 var direction = new THREE.Vector3(0, -1, 1);
                 direction = direction.applyMatrix4(matrix);
-
+                gameCore.spaceship.shield.rotation.x = Math.PI / 2;
                 this.camera.rotation.y = gameCore.spaceship.rotation.y + Math.PI;
                 this.camera.position.set(gameCore.spaceship.position.x + direction.x * (-200) , gameCore.spaceship.position.y + direction.y * -200 , 50);
                 break;
@@ -70,13 +70,11 @@ class CameraHandler {
     }
 
     changeToPursuit() {
-        gameCore.spaceship.shield.rotation.x = Math.PI / 2;
         this.cameraType = this.cameraTypes.PURSUIT;
         this.camera.rotation.x = Math.PI/2;
         gameCore.jokers.jokers.forEach(function(joker) {
             joker.rotation.x = Math.PI / 2;
         });
-        gameCore.spaceship.bonusTimer.rotation.copy(gameCore.spaceship.rotation)
         gameCore.scene.remove(gameCore.starfield);
         gameCore.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
         gameCore.scene.add(gameCore.starfield);

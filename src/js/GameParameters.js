@@ -21,16 +21,16 @@ class GameParameters {
         }
 
         this.spaceship = {
-            friction: 0.98,
+            friction: 1,
             rotationFriction: 0.92,
             rotationSpeed: 0.005,
-            speed: 0.10,
+            speed: 0.05,
             scale: 0.08,
             fire: {
                 scale: {
                     x: 10,
-                    y: 40,
-                    z: 20
+                    y: 30,
+                    z: 12
                 }
             },
             shield: {

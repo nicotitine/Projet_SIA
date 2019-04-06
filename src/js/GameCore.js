@@ -61,14 +61,16 @@ class GameCore {
         this.filterArrays();
     }
 
-    setIsPaused(bool) {
-        this.isPaused = bool;
+    setIsPaused(_bool) {
+        this.isPaused = _bool;
     }
 
     showSpaceship() {
         this.scene.add(this.spaceship);
         this.scene.add(this.spaceship.shield);
         this.scene.add(this.spaceship.bonusTimer);
+        this.scene.add(this.spaceship.fireLeft);
+        this.scene.add(this.spaceship.fireRight);
     }
 
     initGlowingMeshes() {
@@ -211,7 +213,8 @@ class GameCore {
         }
         this.scene.remove(this.spaceship);
         this.scene.remove(this.spaceship.shield);
-        this.scene.remove(this.spaceship.fire);
+        this.scene.remove(this.spaceship.fireLeft);
+        this.scene.remove(this.spaceship.fireRight);
         this.scene.remove(this.spaceship.bonusTimer)
         this.collidableMeshesToSpaceship.forEach(function(_mesh) {
             this.removeMesh(_mesh)
