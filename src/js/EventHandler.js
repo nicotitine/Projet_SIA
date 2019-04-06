@@ -2,6 +2,7 @@ class EventHandler {
     constructor() {
         this.keys = [];
         this.jokerCheatTimestamp = Date.now();
+        this.isFullScreen = false;
 
         window.addEventListener('resize', function() {
             _viewport.scale = window.innerWidth / _viewport.width;
@@ -64,6 +65,33 @@ class EventHandler {
             if ((_e.key == "j" || _e.key == "J") && this.jokerCheatTimestamp + 1000 < Date.now()) {
                 this.jokerCheatTimestamp = Date.now();
                 gameCore.jokers.spawn();
+            }
+
+            if(_e.key == "f" || _e.key == "F") {
+                if(this.isFullScreen) {
+                    if (document.exitFullscreen) {
+                                document.exitFullscreen();
+                            } else if (document.webkitExitFullscreen) {
+                                document.webkitExitFullscreen();
+                            } else if (document.mozCancelFullScreen) {
+                                document.mozCancelFullScreen();
+                            } else if (document.msExitFullscreen) {
+                                document.msExitFullscreen();
+                            }
+                    this.isFullScreen = false;
+                } else {
+                    var body = document.getElementsByTagName("html")[0];
+                    if (body.requestFullscreen) {
+                      body.requestFullscreen();
+                    } else if (body.mozRequestFullScreen) { /* Firefox */
+                      body.mozRequestFullScreen();
+                    } else if (body.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                      body.webkitRequestFullscreen();
+                    } else if (body.msRequestFullscreen) { /* IE/Edge */
+                      body.msRequestFullscreen();
+                    }
+                    this.isFullScreen = true;
+                }
             }
         }.bind(this), false);
     }
