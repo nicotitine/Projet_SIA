@@ -13,7 +13,7 @@ class GameCore {
         this.clock = new THREE.Clock(true);
         this.enemyHandler = new EnemyHandler(this.clock.elapsedTime);
         this.jokerHandler = new JokerHandler(this.clock.elapsedTime);
-        this.spaceship = new Spaceship(textureLoader.spaceship.geometry, textureLoader.spaceship.material, this.clock.elapsedTime);
+        this.spaceship = new Spaceship(textureHandler.spaceship.geometry, textureHandler.spaceship.material, this.clock.elapsedTime);
         this.asteroidHandler = new AsteroidHandler(this.clock.elapsedTime);
 
         this.enemyCount = 0;
@@ -113,7 +113,7 @@ class GameCore {
         var time = this.clock.getElapsedTime();
 
         if(!gameUI.isPaused) {
-            textureLoader.update(time);
+            textureHandler.update(time);
             this.enemyHandler.update(gameUI.isGameLaunched, time);
             this.collidableMeshesToSpaceship.forEach(function(collidableMesh) {
                 collidableMesh.update(time);
@@ -228,7 +228,7 @@ class GameCore {
         this.glowingMesh = [];
 
         // Add the new objects
-        this.spaceship = new Spaceship(textureLoader.spaceship.geometry, textureLoader.spaceship.material, this.clock.elapsedTime);
+        this.spaceship = new Spaceship(textureHandler.spaceship.geometry, textureHandler.spaceship.material, this.clock.elapsedTime);
 
         this.showSpaceship();
         this.initGlowingMeshes();

@@ -1,4 +1,7 @@
 window.addEventListener('load', function() {
+    var gui = new dat.GUI({
+        hideable: false
+    });
     var params = {
         interation: 5000,
         width: 200,

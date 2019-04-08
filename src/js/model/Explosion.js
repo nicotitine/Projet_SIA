@@ -2,7 +2,7 @@ class Explosion {
     constructor(_position, _level) {
         this.group = new SPE.Group({
             texture: {
-                value: textureLoader.explosion.texture,
+                value: textureHandler.explosion.texture,
                 frames: new THREE.Vector2(5, 5),
                 loop: 1
             },

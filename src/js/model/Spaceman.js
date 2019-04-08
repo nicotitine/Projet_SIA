@@ -6,8 +6,8 @@ class Spaceman extends THREE.Group {
         this.type = _type;
         this.name = "Joker";
 
-        var spacemanModel = textureLoader.spaceman.texture;
-        var spacemanBoxModel = textureLoader.spacemanBox.texture;
+        var spacemanModel = textureHandler.spaceman.texture;
+        var spacemanBoxModel = textureHandler.spacemanBox.texture;
 
         var spacemanGeometry = new THREE.BoxGeometry(84, 48, 0);
         var spacemanBoxGeometry = new THREE.BoxGeometry(20, 20, 20);
@@ -80,7 +80,7 @@ class Spaceman extends THREE.Group {
         this.spaceman = new TimelapsMesh(spacemanGeometry, spacemanMaterials, new THREE.Vector3(1, 1, 1), _lifetime, _t);
         this.spacemanBox = new TimelapsMesh(spacemanBoxGeometry, spacemanBoxMaterials, new THREE.Vector3(1, 1, 1), _lifetime, _t);
         this.spacemanBox.position.y += 28;
-        
+
         if(_isPursuitCamera) {
             this.spaceman.visible = false;
             this.spacemanBox.position.y = 0;

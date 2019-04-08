@@ -1,6 +1,6 @@
 class Fire extends ResizableMesh {
     constructor(_side) {
-        var fireTex = textureLoader.fire.texture;
+        var fireTex = textureHandler.fire.texture;
         var fireMaterial = new THREE.ShaderMaterial({
             defines: THREE.FireShader.defines,
             uniforms: THREE.UniformsUtils.clone(THREE.FireShader.uniforms),

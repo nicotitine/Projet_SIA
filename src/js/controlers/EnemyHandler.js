@@ -47,7 +47,7 @@ class EnemyHandler {
     }
 
     spawn(_t) {
-        var enemy = new Enemy(textureLoader.enemy.geometry, textureLoader.enemy.material, gameCore.cameraHandler.size, this.difficulty.aimbot, gameCore.cameraHandler.isPursuitCamera, _t);
+        var enemy = new Enemy(textureHandler.enemy.geometry, textureHandler.enemy.material, gameCore.cameraHandler.size, this.difficulty.aimbot, gameCore.cameraHandler.isPursuitCamera, _t);
         gameCore.scene.add(enemy);
         gameCore.collidableMeshesToSpaceship.push(enemy);
         this.enemies.push(enemy);

@@ -1,4 +1,4 @@
-class TextureLoader {
+class TextureHandler {
     constructor() {
         this.start = Date.now();
         this.loader = new THREE.OBJLoader();

@@ -28,7 +28,7 @@ class Spaceship extends ExplosiveMesh {
         this.fireLeft = new Fire(1);
         this.fireRight = new Fire(2);
 
-        this.shield = new Shield(textureLoader.shield.geometry, textureLoader.shield.material, this.size, this.position, _t)
+        this.shield = new Shield(textureHandler.shield.geometry, textureHandler.shield.material, this.size, this.position, _t)
         this.isInvincible = true;
 
         this.isBonusTimerDisplayed = false;
@@ -60,11 +60,11 @@ class Spaceship extends ExplosiveMesh {
             var laser;
 
             if (_isBonus) {
-                laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionLeft, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
-                var additionalLaser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, laserPositionRight, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
+                laser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialSpaceship, laserPositionLeft, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
+                var additionalLaser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialSpaceship, laserPositionRight, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
                 gameCore.addSpaceshipLaser(additionalLaser);
             } else {
-                laser = new Laser(textureLoader.laser.geometry, textureLoader.laser.materialSpaceship, this.position, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
+                laser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialSpaceship, this.position, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
             }
             gameCore.audioHandler.fireSound.play();
             gameCore.addSpaceshipLaser(laser);

@@ -16,19 +16,18 @@ javascript: (function() {
 
 
 var eventHandler = new EventHandler();
-var storage = new Storage();
+var storageHandler = new StorageHandler();
 var _viewport = new Viewport();
 var gameParameters = new GameParameters();
 var gameUI;
-var gui;
-var textureLoader = new TextureLoader();
+var textureHandler = new TextureHandler();
 var gameCore;
 var composer, renderScene, bloomPass;
 var outlinePass;
 
 window.addEventListener('load', function() {
     gameCore = new GameCore();
-    storage.load()
+    storageHandler.load()
     gameUI = new GameUI(_viewport.width / 2, _viewport.height / 2);
     renderScene = new THREE.RenderPass( gameCore.scene, gameCore.cameraHandler.camera );
 
@@ -49,9 +48,7 @@ window.addEventListener('load', function() {
     }, 1000);
 
     document.body.appendChild(renderer.domElement);
-    gui = new dat.GUI({
-        hideable: false
-    });
+
 });
 
 var timestamp = Date.now();

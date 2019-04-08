@@ -74,7 +74,7 @@ class GameUI {
             else
                 pseudo = $('#pseudoInput').val();
 
-            storage.addNewRecord(new Score(pseudo, this.score), this.recordIndex);
+            storageHandler.addNewRecord(new Score(pseudo, this.score), this.recordIndex);
             this.endGame();
             this.hideLoose();
         }.bind(this));
@@ -92,7 +92,7 @@ class GameUI {
             this.hideEscape(false);
         }.bind(this))
 
-        this.dataFromStorage = storage.getData();
+        this.dataFromStorage = storageHandler.getData();
 
         this.changeSlider($("#valueSliderMusic"), $("#sliderMusic"));
         this.changeSlider($("#valueSliderSound"), $("#sliderSound"));
@@ -102,18 +102,18 @@ class GameUI {
         $("#sliderMusic").on('input change', function() {
             this.changeSlider($("#valueSliderMusic"), $("#sliderMusic"));
             gameCore.audioHandler.changeMusicVolume(Number($("#sliderMusic").val()) / 100);
-            storage.save();
+            storageHandler.save();
         }.bind(this));
 
         $('#sliderSound').on('input change', function() {
             this.changeSlider($('#valueSliderSound'), $('#sliderSound'));
             gameCore.audioHandler.changeSoundVolume(Number($("#sliderSound").val()) / 100);
-            storage.save();
+            storageHandler.save();
         }.bind(this));
 
         $('#glowEffectCheckbox').on('click', function() {
-            storage.save();
-            if(!storage.data.options.glowingEffect) {
+            storageHandler.save();
+            if(!storageHandler.data.options.glowingEffect) {
                 $('#glowEffect .value').html('Desactivated');
                 gameCore.setGlowLayers(0);
             } else {
@@ -303,7 +303,7 @@ class GameUI {
         this.looseDiv.css('display', 'flex');
         this.size(this.width, this.height, new Array(this.looseDiv));
         this.isGameLaunched = false;
-        let isNewRecord = storage.isNewRecord(this.score);
+        let isNewRecord = storageHandler.isNewRecord(this.score);
         if (isNewRecord[0]) {
             this.recordIndex = isNewRecord[1];
             this.newrecordDiv.fadeIn(500);

@@ -12,7 +12,7 @@ class Shield extends ResizableMesh {
         this.shieldRequested = false;
         this.material.opacity = 0.2;
         this.material.depthTest = false;
-        if(storage.data.options.glowingEffect) {
+        if(storageHandler.data.options.glowingEffect) {
             this.layers.enable(1);
         } else {
             this.layers.set(0);

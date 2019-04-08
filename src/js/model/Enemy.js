@@ -52,7 +52,7 @@ class Enemy extends ExplosiveMesh {
             shootDirection = this.shootDirection;
         }
         this.timestamp = _t;
-        gameCore.addEnemyLaser(new Laser(textureLoader.laser.geometry, textureLoader.laser.materialEnemy, this.position, shootDirection, this.rotation, gameParameters.laser.types.ENEMY, _t));
+        gameCore.addEnemyLaser(new Laser(textureHandler.laser.geometry, textureHandler.laser.materialEnemy, this.position, shootDirection, this.rotation, gameParameters.laser.types.ENEMY, _t));
         this.shootDirection += Math.PI/4;
     }
 

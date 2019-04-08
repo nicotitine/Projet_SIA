@@ -1,4 +1,4 @@
-class Storage {
+class StorageHandler {
     constructor() {
         this.isFirstLaunch;
         this.data = {
