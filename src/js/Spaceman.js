@@ -1,9 +1,10 @@
 class Spaceman extends THREE.Group {
-    constructor(_type, _cameraSize) {
+    constructor(_type, _cameraSize, _isPursuitCamera, _lifetime, _t) {
 
         super();
 
         this.type = _type;
+        this.name = "Joker";
 
         var spacemanModel = textureLoader.spaceman.texture;
         var spacemanBoxModel = textureLoader.spacemanBox.texture;
@@ -76,9 +77,14 @@ class Spaceman extends THREE.Group {
             })
         ];
 
-        this.spaceman = new THREE.Mesh(spacemanGeometry, spacemanMaterials);
-        this.spacemanBox = new THREE.Mesh(spacemanBoxGeometry, spacemanBoxMaterials);
+        this.spaceman = new TimelapsMesh(spacemanGeometry, spacemanMaterials, new THREE.Vector3(1, 1, 1), _lifetime, _t);
+        this.spacemanBox = new TimelapsMesh(spacemanBoxGeometry, spacemanBoxMaterials, new THREE.Vector3(1, 1, 1), _lifetime, _t);
         this.spacemanBox.position.y += 28;
+        
+        if(_isPursuitCamera) {
+            this.spaceman.visible = false;
+            this.spacemanBox.position.y = 0;
+        }
 
         this.borders = {
             TOP: 1,
@@ -123,33 +129,50 @@ class Spaceman extends THREE.Group {
         this.spaceman.layers.set(0);
         this.spacemanBox.layers.set(0);
         this.layers.set(0);
-        
+
+        this.spacemanBox.name = "Joker";
+
         this.add(this.spaceman);
         this.add(this.spacemanBox);
     }
 
-    update() {
+    update(_isPursuitCamera, _t) {
+        if(this.spacemanBox.mustDie(_t)) {
+            gameCore.removeMesh(this);
+        }
         this.updateMatrixWorld();
         this.boxPosition = new THREE.Vector3();
         this.boxPosition.setFromMatrixPosition(this.spacemanBox.matrixWorld);
         this.spacemanBox.rotation.y += 0.05;
 
-        this.index = (this.index + 1) % (this.texture.length - 1);
-        // Front face texture is change for the next image
-        this.spaceman.material[4].map = this.texture[this.index];
-        if (this.index > 18 && this.index < 31) {
+        if(!_isPursuitCamera) {
+            this.index = (this.index + 1) % (this.texture.length - 1);
+            // Front face texture is change for the next image
+            this.spaceman.material[4].map = this.texture[this.index];
+            if (this.index > 18 && this.index < 31) {
+                this.position.x += this.speedMaxVector.x;
+                this.position.y += this.speedMaxVector.y;
+            } else {
+                this.position.x += this.speedMinVector.x;
+                this.position.y += this.speedMinVector.y;
+            }
+        } else {
             this.position.x += this.speedMaxVector.x;
             this.position.y += this.speedMaxVector.y;
-        } else {
-            this.position.x += this.speedMinVector.x;
-            this.position.y += this.speedMinVector.y;
         }
-
         if (Math.abs(this.position.x) > gameCore.cameraHandler.size.x / 2) {
-            this.position.x = -this.position.x;
+            if(this.position.x > 0) {
+                this.position.x = -this.position.x + this.spaceman.radius / 2;
+            } else {
+                this.position.x = -this.position.x - this.spaceman.radius / 2;
+            }
         }
         if (Math.abs(this.position.y) > gameCore.cameraHandler.size.y / 2) {
-            this.position.y = -this.position.y;
+            if(this.position.y > 0) {
+                this.position.y = -this.position.y + this.spaceman.radius / 2;
+            } else {
+                this.position.y = -this.position.y - this.spaceman.radius / 2;
+            }
         }
     }
 }

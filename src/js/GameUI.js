@@ -25,6 +25,7 @@ class GameUI {
         this.optionsDiv = $('#options');
         this.scoresDiv = $('#scores');
         this.escapeDiv = $('#escape');
+        this.pauseTime = 0;
 
 
         this.scoreValue = document.getElementById('scoreValue');
@@ -210,7 +211,7 @@ class GameUI {
         this.showLevelUp(false);
         this.showLives();
         this.showScore();
-        gameCore.launchGame()
+        gameCore.launchGame(gameCore.clock.elapsedTime);
         this.isGameLaunched = true;
     }
 
@@ -257,7 +258,7 @@ class GameUI {
     }
 
     showHelp() {
-        if (!this.isHelpDisplayed) {
+        if (!this.isHelpDisplayed && !this.isEscapeDisplayed) {
             this.isHelpDisplayed = true;
             this.helpDiv.fadeIn(500);
             this.helpDiv.css('display', 'flex');
@@ -340,19 +341,22 @@ class GameUI {
     }
 
     showEscape() {
-        if (this.isGameLaunched && !this.isEscapeDisplayed) {
+        if (this.isGameLaunched && !this.isEscapeDisplayed && !this.isHelpDisplayed) {
             this.escapeDiv.fadeIn(500);
             this.isPaused = true;
             this.isEscapeDisplayed = true;
+            this.pauseTime = gameCore.clock.elapsedTime;
         } else if (this.isEscapeDisplayed) {
             this.hideEscape(true);
         }
         gameCore.setIsPaused(this.isPaused);
     }
+
     hideEscape(_continu) {
         this.escapeDiv.fadeOut(500, function() {
             this.isPaused = false;
             gameCore.setIsPaused(this.isPaused);
+            gameCore.clock.elapsedTime -= (gameCore.clock.elapsedTime - this.pauseTime);
         }.bind(this));
         this.isEscapeDisplayed = false;
         if (!_continu) {

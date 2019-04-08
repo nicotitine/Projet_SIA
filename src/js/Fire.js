@@ -38,6 +38,7 @@ class Fire extends ResizableMesh {
         this.rotation.z = -Math.PI / 2;
         this.clock = new THREE.Clock();
         this.position.z = -5;
+        this.layers.enable(1)
     }
 
     update(_position, _size, _rotation) {

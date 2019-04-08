@@ -42,27 +42,4 @@ class Asteroid extends ExplosiveMesh {
         }
         this.checkOutOfScreen();
     }
-
-    collide(_speed) {
-        var rock, size, lastLife, newAsteroids = [];
-        switch (this.level) {
-            case 3:
-                size = gameParameters.asteroidMidleSize;
-                lastLife = false;
-                break;
-            case 2:
-                size = gameParameters.asteroidMinSize;
-                lastLife = false;
-                break;
-            case 1:
-                lastLife = true;
-            default:
-        }
-        if (!lastLife) {
-            for (var i = 0; i < gameParameters.asteroid.divideNumber; i++) {
-                newAsteroids.push(new Asteroid(this.position, this.level - 1, _speed));
-            }
-        }
-        return newAsteroids;
-    }
 }

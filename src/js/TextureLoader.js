@@ -2,12 +2,8 @@ class TextureLoader {
     constructor() {
         this.start = Date.now();
         this.loader = new THREE.OBJLoader();
-        this.loader.crossOrigin = '';
         this.textureLoader = new THREE.TextureLoader();
         this.MTLLoader = new THREE.MTLLoader();
-
-
-        this.GLTFLoader = new THREE.GLTFLoader();
 
         /* ######## GEOMETRY AND MODEL INSTANCING ########
             Les trois géométries sont créées une seule fois ici, en fonction de la taille des asteroids voulue
@@ -106,27 +102,6 @@ class TextureLoader {
                 'src/medias/models/spaceman/box/box.png'
             ],
             texture: []
-        }
-
-        var loaderSkybox = new THREE.CubeTextureLoader();
-        loaderSkybox.setPath('src/medias/models/skybox/');
-        var envmap = loaderSkybox.load(['front.png', 'back.png', 'up.png', 'down.png', 'right.png', 'left.png']);
-        var cubeShader = THREE.ShaderLib['cube'];
-        cubeShader.uniforms['tCube'].value = envmap;
-
-        var skyBoxMaterial = new THREE.ShaderMaterial({
-            fragmentShader: cubeShader.fragmentShader,
-            vertexShader: cubeShader.vertexShader,
-            uniforms: cubeShader.uniforms,
-            side: THREE.BackSide
-        })
-
-        this.skybox = {
-            path: 'src/medias/models/wrapper.jpeg',
-            geometry: new THREE.BoxBufferGeometry(10000, 10000, 10000),
-            material: skyBoxMaterial,
-            transparent: true,
-            depthWrite: false
         };
 
         this.load();
@@ -148,10 +123,9 @@ class TextureLoader {
                         // UFO geometry loading
                         this.enemy.geometry = object.children[0].geometry;
                         this.enemy.material = object.children[0].material;
-                    })
-                })
-
-            })
+                    });
+                });
+            });
         });
 
 
@@ -201,8 +175,8 @@ class TextureLoader {
             this.shield.material = new THREE.MeshBasicMaterial({
                 map: texture,
                 transparent: true,
-                depthTest: false,
-                depthWrite: false
+                depthTest: true,
+                depthWrite: true
             });
         });
 
@@ -228,9 +202,9 @@ class TextureLoader {
         }, this);
     }
 
-    update() {
+    update(_t) {
         /* ######## MATERIAL UPDATE ######## */
-            this.asteroid.material.uniforms['time'].value = .00010 * (Date.now() - this.start);
+            this.asteroid.material.uniforms['time'].value = _t / 10;
         /* ################################# */
     }
 }

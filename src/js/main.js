@@ -24,16 +24,9 @@ var gui;
 var textureLoader = new TextureLoader();
 var gameCore;
 var composer, renderScene, bloomPass;
-var skydome;
+var outlinePass;
 
 window.addEventListener('load', function() {
-    skydome = {
-        scene: new THREE.Scene(),
-        camera: new THREE.PerspectiveCamera(50, _viewport.ratio, 0.1, 1000 )
-    };
-    var worldWrapper = new WorldWrapper(textureLoader.skybox.geometry, textureLoader.skybox.material);
-
-    skydome.scene.add(worldWrapper);
     gameCore = new GameCore();
     storage.load()
     gameUI = new GameUI(_viewport.width / 2, _viewport.height / 2);
@@ -41,6 +34,7 @@ window.addEventListener('load', function() {
 
     bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1, 0, -1. )
     bloomPass.renderToScreen = true;
+
     composer = new THREE.EffectComposer( renderer )
     composer.setSize( window.innerWidth, window.innerHeight )
     composer.addPass( renderScene )
@@ -67,6 +61,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.context.disable(renderer.context.DEPTH_TEST);
 renderer.sortObjects = false;
 renderer.gammaOutput = true;
+renderer.gammaInput = true;
 renderer.autoClear = false;
 
 var points = 0;
@@ -143,7 +138,7 @@ var render = function() {
     requestAnimationFrame(render);
 
     if (gameCore != null) {
-        renderer.clearDepth();
+        renderer.clear();
 
         renderScene.camera.layers.set(1);
         update();
@@ -152,7 +147,6 @@ var render = function() {
         renderer.clearDepth();
         renderScene.camera.layers.set(0);
         renderer.render(gameCore.scene, gameCore.cameraHandler.camera);
-        //renderer.render(skydome.scene, skydome.camera)
     }
 };
 

@@ -9,36 +9,82 @@ class CameraHandler {
         this.frustum = new THREE.Frustum();
         this.cameraViewProjectionMatrix = new THREE.Matrix4();
         this.camera = new THREE.PerspectiveCamera(50, _viewport.ratio, 0.1, 1000);
-        this.light = new THREE.AmbientLight( 0xffffff,  3 );
+        this.light = new THREE.AmbientLight(0xffffff, 3);
         this.light.position.set(0, 0, 500);
+
+        this.isPursuitCamera = false;
 
         this.camera.position.set(0, 0, 500);
         this.camera.layers.enable(1);
         this.camera.far = 10000;
         this.isCameraChanged = false;
+
+        this.lightningColor = new THREE.Color(0xB0FFFF);
+        this.outlineColor = new THREE.Color(0x00FFFF);
+        this.lightningMaterial = new THREE.MeshBasicMaterial( { color: this.lightningColor } );
+        this.lightningParams = {
+
+					sourceOffset: new THREE.Vector3(),
+					destOffset: new THREE.Vector3(),
+					radius0: 0.8,
+					radius1: 0.8,
+					minRadius: 2.5,
+					maxIterations: 7,
+					isEternal: true,
+
+					timeScale: 1,
+
+					propagationTimeFactor: 0.05,
+					vanishingTimeFactor: 0.95,
+					subrayPeriod: 5,
+					subrayDutyCycle: 0.07,
+					maxSubrayRecursion: 3,
+					ramification: 7,
+					recursionProbability: 0.6,
+
+					roughness: 0.85,
+					straightness: 0.95
+
+		};
+        this.lightningStrike = new THREE.LightningStrike( this.lightningParams );
+        this.lightningStrikeMesh = new THREE.Mesh( this.lightningStrike, this.lightningMaterial );
+        this.lightningStrikeMesh.layers.enable(1);
+        this.lightnings = [this.lightningStrike];
+        this.lightningStrike.rayParameters.sourceOffset.set( 0, 233, 0 );
+					//lightningStrike.rayParameters.sourceOffset.y -= 400;
+					this.lightningStrike.rayParameters.destOffset.set( 0, -233, 0 );
+        this.currentTime = 0;
+        this.clock = new THREE.Clock();
+
         this.size = {
             x: 0,
             y: 0
         }
         this.getCameraSize();
+
+        this.lightningBox = new LightningBox(this.size);
     }
 
     update(_position) {
-        this.camera.updateMatrixWorld();
-        this.camera.updateProjectionMatrix();
+        this.currentTime += this.clock.getDelta();
+
+					//lightningStrike.rayParameters.destOffset.y += 400;
+
+					this.lightningBox.update( this.currentTime );
+
         this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
         this.cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
         this.frustum.setFromMatrix(this.cameraViewProjectionMatrix);
-        this.light.position.copy(this.camera.position)
+
         switch (this.cameraType) {
-            case this.cameraTypes.FIXED:
-                break;
             case this.cameraTypes.MOVING:
                 this.camera.position.x = gameCore.spaceship.position.x;
                 this.camera.position.y = gameCore.spaceship.position.y;
                 break;
             case this.cameraTypes.PURSUIT:
+                gameCore.jokerHandler.jokers.forEach(function(_joker) {
 
+                })
                 this.camera.updateProjectionMatrix();
                 gameCore.spaceship.bonusTimer.rotation.copy(gameCore.spaceship.rotation)
                 var matrix = new THREE.Matrix4();
@@ -55,29 +101,54 @@ class CameraHandler {
     resize(_ratio) {
         this.camera.aspect = _ratio;
         this.camera.updateProjectionMatrix();
+        this.getCameraSize();
+        this.lightningBox.resize(this.size);
     }
 
     changeToFixed() {
+        this.changeToTop();
+
+        this.isPursuitCamera = false;
         this.camera.position.set(0, 0, 500);
         this.camera.rotation.set(0, 0, 0);
         gameCore.spaceship.shield.rotation.x = 0;
     }
 
     changeToMoving() {
+        this.changeToTop();
+
+        this.isPursuitCamera = false;
         gameCore.spaceship.shield.rotation.x = 0;
         this.camera.position.set(gameCore.spaceship.position.x, gameCore.spaceship.position.y, 500);
         this.camera.rotation.set(0, 0, 0);
     }
 
+    changeToTop() {
+        gameCore.enemyHandler.enemies.forEach(function(_enemy) {
+            _enemy.rotation.x = 0;
+        });
+        gameCore.jokerHandler.jokers.forEach(function(_joker) {
+            _joker.rotation.x = 0;
+            _joker.spaceman.visible = true;
+            _joker.spacemanBox.position.y = 28;
+        });
+    }
+
     changeToPursuit() {
         this.cameraType = this.cameraTypes.PURSUIT;
         this.camera.rotation.x = Math.PI/2;
-        gameCore.jokers.jokers.forEach(function(joker) {
-            joker.rotation.x = Math.PI / 2;
+        gameCore.jokerHandler.jokers.forEach(function(_joker) {
+            _joker.rotation.x = Math.PI / 2;
+            _joker.spaceman.visible = false;
+            _joker.spacemanBox.position.y = 0;
         });
+        gameCore.enemyHandler.enemies.forEach(function(_enemy) {
+            _enemy.rotation.x = Math.PI/2;
+        })
         gameCore.scene.remove(gameCore.starfield);
         gameCore.starfield = new Starfield(gameParameters.starfield.number, gameParameters.starfield.spread);
         gameCore.scene.add(gameCore.starfield);
+        this.isPursuitCamera = true;
 
     }
 
@@ -85,10 +156,5 @@ class CameraHandler {
         // Set up the width and height of the camera fov at z = 0
         this.size.y = Math.tan(this.camera.fov * Math.PI / 180 * 0.5) * this.camera.position.z * 2;
         this.size.x = this.size.y * _viewport.ratio;
-        var geometry = new THREE.BoxBufferGeometry(this.size.x, this.size.y, 50);
-        var edges = new THREE.EdgesGeometry(geometry);
-        this.limitLines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({
-            color: 0xffffff
-        }));
     }
 }

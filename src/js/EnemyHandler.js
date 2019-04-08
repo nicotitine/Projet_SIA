@@ -1,7 +1,11 @@
 class EnemyHandler {
-    constructor() {
+    constructor(_t) {
+        this.init(_t);
+    }
+
+    init(_t) {
         this.enemies = [];
-        this.timestamp = Date.now();
+        this.timestamp = _t;
         this.enemiesCount = 0;
 
         this.difficulty = {
@@ -12,17 +16,17 @@ class EnemyHandler {
                 activated: false,
                 level: 0
             }
-        }
+        };
     }
 
-    launch() {
-        this.timestamp = Date.now();
+    launch(_t) {
+        this.init(_t);
     }
 
     levelUp() {
         this.difficulty.enemiesPerLevel += 1;
-        if(this.difficulty.spawntime > 10000) {
-            this.difficulty.spawntime -= 1000;
+        if(this.difficulty.spawntime > 10) {
+            this.difficulty.spawntime -= 1;
         }
         this.difficulty.level += 1;
         if(this.difficulty.level > 2) {
@@ -42,18 +46,19 @@ class EnemyHandler {
         this.enemyCount -= 1;
     }
 
-    spawn() {
-        var enemy = new Enemy(textureLoader.enemy.geometry, textureLoader.enemy.material, gameCore.cameraHandler.size, this.difficulty.aimbot);
+    spawn(_t) {
+        var enemy = new Enemy(textureLoader.enemy.geometry, textureLoader.enemy.material, gameCore.cameraHandler.size, this.difficulty.aimbot, gameCore.cameraHandler.isPursuitCamera, _t);
         gameCore.scene.add(enemy);
         gameCore.collidableMeshesToSpaceship.push(enemy);
         this.enemies.push(enemy);
-        this.timestamp = Date.now();
+        this.timestamp = _t;
     }
 
 
-    update(_gameLaunched) {
-        if(_gameLaunched && this.timestamp + this.difficulty.spawntime < Date.now() && this.enemies.length < this.difficulty.enemiesPerLevel) {
-            this.spawn();
+    update(_gameLaunched, _t) {
+        //console.log(_t);
+        if(_gameLaunched && this.timestamp + this.difficulty.spawntime < _t && this.enemies.length < this.difficulty.enemiesPerLevel) {
+            this.spawn(_t);
         }
     }
 }

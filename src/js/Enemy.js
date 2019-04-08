@@ -1,5 +1,5 @@
 class Enemy extends ExplosiveMesh {
-    constructor(_geometry, _material, _cameraSize, _aimbot) {
+    constructor(_geometry, _material, _cameraSize, _aimbot, _isPursuitCamera, _t) {
 
         super(_geometry, _material, new THREE.Vector3(1, 1, 1), 2);
 
@@ -8,6 +8,10 @@ class Enemy extends ExplosiveMesh {
             RIGHT: 2,
             BOTTOM: 3,
             LEFT: 4
+        }
+
+        if(_isPursuitCamera) {
+            this.rotation.x = Math.PI/2;
         }
 
         this.borderToSpawn = GameParameters.getRandomInt(this.borders.TOP, this.borders.LEFT)
@@ -26,7 +30,7 @@ class Enemy extends ExplosiveMesh {
                 break;
         }
 
-        this.timestamp = Date.now();
+        this.timestamp = _t;
         this.direction = new THREE.Vector3(GameParameters.getRandom(1), GameParameters.getRandom(1), 0);
         this.shootDirection = 0;
         this.vector = this.direction.multiplyScalar(gameParameters.enemy.speed, gameParameters.enemy.speed, 0);
@@ -35,9 +39,10 @@ class Enemy extends ExplosiveMesh {
             level: _aimbot.level
         }
         this.name = "Enemy";
+        this.layers.enable(1);
     }
 
-    shoot() {
+    shoot(_t) {
         var shootDirection
         if(this.aimbot.activated) {
             let angleToSpaceship = Math.atan2(gameCore.spaceship.position.y - this.position.y, gameCore.spaceship.position.x - this.position.x);
@@ -46,19 +51,19 @@ class Enemy extends ExplosiveMesh {
         } else {
             shootDirection = this.shootDirection;
         }
-        this.timestamp = Date.now();
-        gameCore.addEnemyLaser(new Laser(textureLoader.laser.geometry, textureLoader.laser.materialEnemy, this.position, shootDirection, this.rotation, gameParameters.laser.types.ENEMY));
+        this.timestamp = _t;
+        gameCore.addEnemyLaser(new Laser(textureLoader.laser.geometry, textureLoader.laser.materialEnemy, this.position, shootDirection, this.rotation, gameParameters.laser.types.ENEMY, _t));
         this.shootDirection += Math.PI/4;
     }
 
-    update() {
+    update(_t) {
         this.position.x += this.vector.x;
         this.position.y += this.vector.y
 
         this.checkOutOfScreen();
 
-        if(this.timestamp + gameParameters.enemy.shotTimespawn < Date.now()) {
-            this.shoot()
+        if(this.timestamp + gameParameters.enemy.shotTimespawn < _t) {
+            this.shoot(_t)
         }
 
         this.rotation.y += 0.0125;

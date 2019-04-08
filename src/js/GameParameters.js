@@ -39,21 +39,21 @@ class GameParameters {
         }
 
         this.enemy = {
-            shotTimespawn: 3000,
-            speed: 2,
-            spawntime: 20000
+            shotTimespawn: 3.0,
+            speed: 2.0,
+            spawntime: 20.0
         };
 
         this.laser = {
             spaceship: {
                 speed: 10,
                 scale: 1,
-                timestamp: 500,
-                lifetime: 1500
+                timestamp: 0.5,
+                lifetime: 1.5
             },
             enemy :{
                 speed: 1,
-                lifetime: 5000
+                lifetime: 5.0
             },
             types: {
                 SPACESHIP: 1,
@@ -66,7 +66,12 @@ class GameParameters {
             spaceman: {
                 speedMax: 5,
                 speedMin: 2
-            }
+            },
+            shoot: {
+                timestamp: 0.3
+            },
+            lifetime: 10.0,
+            timestamp: 20.0
         }
 
         this.starfield = {

@@ -48,7 +48,7 @@ class EventHandler {
                 gameUI.showEscape();
             }
             if ((_e.key == "k" || _e.key == "K") && !gameUI.isLevelingUp && !gameUI.isPaused) {
-                gameCore.levelUp(true);
+                gameCore.levelUp(true, gameCore.clock.elapsedTime);
             }
             if (_e.key == "h" || _e.key == "H") {
                 gameUI.showHelp();
@@ -64,7 +64,7 @@ class EventHandler {
             }
             if ((_e.key == "j" || _e.key == "J") && this.jokerCheatTimestamp + 1000 < Date.now()) {
                 this.jokerCheatTimestamp = Date.now();
-                gameCore.jokers.spawn();
+                gameCore.jokerHandler.spawn(gameCore.clock.elapsedTime);
             }
 
             if(_e.key == "f" || _e.key == "F") {
