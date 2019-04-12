@@ -53,15 +53,17 @@ class Fire extends ResizableMesh {
         this.material.uniforms.invModelMatrix.value = invModelMatrix;
         this.material.uniforms.scale.value = this.scale;
 
+        //console.log(_size);
+        //console.log(this.size.x);
         switch (this.side) {
             case this.sides.LEFT:
-                this.position.x = _position.x + 21 * Math.sin(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));
-                this.position.y = _position.y + 21 * -Math.cos(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.sin(_rotation.y + Math.PI/2));
+                this.position.x = _position.x + (_size.x * 0.308) * Math.sin(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));
+                this.position.y = _position.y + (_size.x * 0.308) * -Math.cos(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.sin(_rotation.y + Math.PI/2));
                 this.position.z = -5;
                 break;
             case this.sides.RIGHT:
-                this.position.x = _position.x - 21 * Math.sin(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));
-                this.position.y = _position.y - 21 * -Math.cos(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.sin(_rotation.y + Math.PI/2));
+                this.position.x = _position.x - (_size.x * 0.308) * Math.sin(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));
+                this.position.y = _position.y - (_size.x * 0.308) * -Math.cos(_rotation.y + Math.PI/2) + ((_size.x + this.size.y) / 2 * Math.sin(_rotation.y + Math.PI/2));
                 this.position.z = -5;
                 break;
         }

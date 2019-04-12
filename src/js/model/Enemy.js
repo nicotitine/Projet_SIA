@@ -40,10 +40,16 @@ class Enemy extends ExplosiveMesh {
         }
         this.name = "Enemy";
         this.layers.enable(1);
+
+        this.lasers = [];
+    }
+
+    removeLaser(_laser) {
+
     }
 
     shoot(_t) {
-        var shootDirection
+        var shootDirection, laser;
         if(this.aimbot.activated) {
             let angleToSpaceship = Math.atan2(gameCore.spaceship.position.y - this.position.y, gameCore.spaceship.position.x - this.position.x);
             let precisionEffect = GameParameters.getRandom(Math.PI / this.aimbot.level)
@@ -52,7 +58,9 @@ class Enemy extends ExplosiveMesh {
             shootDirection = this.shootDirection;
         }
         this.timestamp = _t;
-        gameCore.addEnemyLaser(new Laser(textureHandler.laser.geometry, textureHandler.laser.materialEnemy, this.position, shootDirection, this.rotation, gameParameters.laser.types.ENEMY, _t));
+        laser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialEnemy, this.position, shootDirection, this.rotation, gameParameters.laser.types.ENEMY, _t)
+        gameCore.addEnemyLaser(laser);
+        gameCore.enemyHandler.lasers.push(laser);
         this.shootDirection += Math.PI/4;
     }
 
@@ -62,7 +70,7 @@ class Enemy extends ExplosiveMesh {
 
         this.checkOutOfScreen();
 
-        if(this.timestamp + gameParameters.enemy.shotTimespawn < _t) {
+        if(this.timestamp + gameParameters.laser.enemy.timestamp < _t) {
             this.shoot(_t)
         }
 

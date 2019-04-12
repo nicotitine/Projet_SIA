@@ -44,6 +44,8 @@ class Spaceship extends ExplosiveMesh {
         this.shootBonusLifetime = 0;
 
         this.laserShootBonusTimestamp = 0;
+
+        this.lasers = [];
     }
 
     activateShootBonus(_lifetime, _t) {
@@ -51,6 +53,13 @@ class Spaceship extends ExplosiveMesh {
         this.shootBonusTimestamp = _t;
         this.shootBonusLifetime = _lifetime;
         this.laserShootBonusTimestamp = _t;
+    }
+
+    removeLaser(_laser) {
+        this.lasers[this.lasers.indexOf(_laser)] = null;
+        this.lasers = this.lasers.filter(function(el) {
+            return el != null;
+        })
     }
 
     shoot(_isBonus, _t) {
@@ -63,11 +72,13 @@ class Spaceship extends ExplosiveMesh {
                 laser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialSpaceship, laserPositionLeft, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
                 var additionalLaser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialSpaceship, laserPositionRight, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
                 gameCore.addSpaceshipLaser(additionalLaser);
+                this.lasers.push(additionalLaser);
             } else {
                 laser = new Laser(textureHandler.laser.geometry, textureHandler.laser.materialSpaceship, this.position, this.rotation.y, this.rotation, gameParameters.laser.types.SPACESHIP, _t);
             }
             gameCore.audioHandler.fireSound.play();
             gameCore.addSpaceshipLaser(laser);
+            this.lasers.push(laser);
 
         }
     }

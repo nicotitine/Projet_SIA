@@ -12,6 +12,8 @@ class Shield extends ResizableMesh {
         this.shieldRequested = false;
         this.material.opacity = 0.2;
         this.material.depthTest = false;
+        this.size = new THREE.Vector3();
+        new THREE.Box3().setFromObject(this).getSize(this.size);
         if(storageHandler.data.options.glowingEffect) {
             this.layers.enable(1);
         } else {

@@ -34,7 +34,7 @@ canvas {
     letter-spacing: 5px;
 }
 
-.title {
+.title-custom {
     color: white;
     font-size: 100px;
     font-family: Lazer84;
@@ -140,11 +140,15 @@ canvas {
 }
 
 #welcome {
-    z-index: 10;
+    z-index: 1;
 }
 
 #mainButtons {
     flex: 2;
+}
+
+.dg.ac {
+    z-index: 2!important;
 }
 
 .controls {
@@ -334,8 +338,8 @@ input[type="range"].muted::-webkit-slider-thumb {
    background-image: url('../medias/images/sound_muted.png');
 }
 
-input[type=checkbox] {
-display:none;
+#options input[type=checkbox] {
+    display:none;
 }
 
 input[type=checkbox] + label:hover {
@@ -412,12 +416,12 @@ transition: all 1s;
 
 
 @media screen and (max-width: 1100px) {
-    .title {
+    .title-custom {
         height: 50px;
     }
 }
 @media screen and (max-width: 1725px) {
-    #welcome, .title {
+    #welcome, .title-custom {
         font-size: 50px;
         text-align: center;
     }

@@ -53,6 +53,8 @@ class GameParameters {
             },
             enemy :{
                 speed: 1,
+                scale: 1,
+                timestamp: 3.0,
                 lifetime: 5.0
             },
             types: {

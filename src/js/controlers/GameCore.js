@@ -75,6 +75,13 @@ class GameCore {
         if(_mesh.name == "Joker") {
             this.jokerHandler.remove(_mesh)
         }
+        if(_mesh.name == "Laser") {
+            if(_mesh.type == gameParameters.laser.types.SPACESHIP) {
+                this.spaceship.removeLaser(_mesh);
+            } else {
+                this.enemyHandler.removeLaser(_mesh);
+            }
+        }
 
         this.filterArrays();
     }

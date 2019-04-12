@@ -5,6 +5,7 @@ class EnemyHandler {
 
     init(_t) {
         this.enemies = [];
+        this.lasers = [];
         this.timestamp = _t;
         this.enemiesCount = 0;
 
@@ -38,6 +39,13 @@ class EnemyHandler {
         }, this);
     }
 
+    removeLaser(_laser) {
+        this.lasers[this.lasers.indexOf(_laser)] = null;
+        this.lasers = this.lasers.filter(function(el) {
+            return el != null;
+        });
+    }
+
     remove(_mesh) {
         this.enemies[this.enemies.indexOf(_mesh)] = null;
         this.enemies = this.enemies.filter(function(el) {
@@ -56,7 +64,6 @@ class EnemyHandler {
 
 
     update(_gameLaunched, _t) {
-        //console.log(_t);
         if(_gameLaunched && this.timestamp + this.difficulty.spawntime < _t && this.enemies.length < this.difficulty.enemiesPerLevel) {
             this.spawn(_t);
         }

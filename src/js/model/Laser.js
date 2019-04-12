@@ -4,7 +4,7 @@ class Laser extends TimelapsMesh {
         switch (_laserType) {
             case gameParameters.laser.types.SPACESHIP:
 
-                super(_geometry, _material, new THREE.Vector3(1, 1, 1), gameParameters.laser.spaceship.lifetime, _t);
+                super(_geometry, _material, new THREE.Vector3(gameParameters.laser.spaceship.scale, gameParameters.laser.spaceship.scale, gameParameters.laser.spaceship.scale), gameParameters.laser.spaceship.lifetime, _t);
 
                 this.rotation.z = _direction + Math.PI;
                 this.vector = new THREE.Vector3(gameParameters.laser.spaceship.speed * - Math.sin(this.rotation.z), gameParameters.laser.spaceship.speed * Math.cos(this.rotation.z), 0)
@@ -12,12 +12,13 @@ class Laser extends TimelapsMesh {
 
             case gameParameters.laser.types.ENEMY:
 
-                super(_geometry, _material, new THREE.Vector3(1, 1, 1), gameParameters.laser.enemy.lifetime, _t);
-
+                super(_geometry, _material, new THREE.Vector3(gameParameters.laser.enemy.scale, gameParameters.laser.enemy.scale, gameParameters.laser.enemy.scale), gameParameters.laser.enemy.lifetime, _t);
+                console.log(this.scale);
                 this.rotation.z = _direction;
-                this.vector = new THREE.Vector3(2 * -Math.sin(this.rotation.z), 2 * Math.cos(this.rotation.z), 0)
+                this.vector = new THREE.Vector3(gameParameters.laser.enemy.speed * -Math.sin(this.rotation.z), gameParameters.laser.enemy.speed * Math.cos(this.rotation.z), 0)
                 break;
         }
+        this.type = _laserType;
         this.position.copy(_position);
         this.name = "Laser";
         this.layers.enable(1);
@@ -32,9 +33,5 @@ class Laser extends TimelapsMesh {
         if(this.mustDie(_t)) {
             gameCore.removeMesh(this);
         }
-    }
-
-    updateSpeed() {
-        this.vector = this.direction.multiplyScalar(gameParameters.bullet.speed, gameParameters.bullet.speed, gameParameters.bullet.speed);
     }
 }
