@@ -1,6 +1,5 @@
 class StorageHandler {
     constructor() {
-        this.isFirstLaunch;
         this.data = {
             options: {
                 musicVolume: 50,
