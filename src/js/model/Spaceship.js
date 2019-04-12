@@ -79,7 +79,6 @@ class Spaceship extends ExplosiveMesh {
             gameCore.audioHandler.fireSound.play();
             gameCore.addSpaceshipLaser(laser);
             this.lasers.push(laser);
-
         }
     }
 
