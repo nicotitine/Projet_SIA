@@ -59,7 +59,6 @@ canvas {
     display: none;
 }
 
-
 #lives .live {
     width: 50px;
     margin-left: 20px;
@@ -76,6 +75,7 @@ canvas {
     align-items: flex-end;
     display: none;
 }
+
 #welcome, #help {
     width: 100%;
     height: 100%;
@@ -94,6 +94,7 @@ canvas {
     justify-content: space-between;
     width: 100%;
 }
+
 #loading {
     color: white;
     font-family: Lazer84;
@@ -174,13 +175,10 @@ canvas {
     text-decoration: none;
 }
 
-.custom-link:hover,
-.custom-link:focus {
+.custom-link:hover, .custom-link:focus {
 	outline: none;
 }
 
-
-/* Effect 11: text fill based on Lea Verou's animation http://dabblet.com/gist/6046779 */
 .custom-link {
 	text-shadow: none;
     white-space: nowrap;
@@ -188,13 +186,11 @@ canvas {
 }
 
 .custom-link::before {
-
 	position: absolute;
 	top: 0;
 	left: 0;
 	overflow: hidden;
 	max-width: 0;
-
 	content: attr(data-hover);
 	-webkit-transition: max-width 0.5s;
 	-moz-transition: max-width 0.5s;
@@ -202,11 +198,11 @@ canvas {
     padding: 0px 20px;
 }
 
-.custom-link:hover::before,
-.custom-link:focus::before {
+.custom-link:hover::before, .custom-link:focus::before {
     color: #888888;
 	max-width: 100%;
 }
+
 #options {
     width: 100%;
     height: 100%;
@@ -347,22 +343,22 @@ input[type=checkbox] + label:hover {
 }
 
 input[type=checkbox] + label {
-display:inline-block;
-padding: 0 0 0 0px;
-background:url("../medias/images/disabled_test.png") no-repeat;
-height: 80px;
-width: 80px;
-background-size: 100%;
-transition: all 1s;
+    display:inline-block;
+    padding: 0 0 0 0px;
+    background:url("../medias/images/disabled_test.png") no-repeat;
+    height: 80px;
+    width: 80px;
+    background-size: 100%;
+    transition: all 1s;
 }
 
 input[type=checkbox]:checked + label {
-background:url("../medias/images/enabled_teste.png") no-repeat;
-height: 80px;
-width: 80px;
-display:inline-block;
-background-size: 100%;
-transition: all 1s;
+    background:url("../medias/images/enabled_teste.png") no-repeat;
+    height: 80px;
+    width: 80px;
+    display:inline-block;
+    background-size: 100%;
+    transition: all 1s;
 }
 
 .buttons {
@@ -377,8 +373,6 @@ transition: all 1s;
 .buttons a {
     margin-top: 40px;
 }
-
-
 
 #escape {
     position: absolute;
@@ -414,12 +408,12 @@ transition: all 1s;
     text-align: right;
 }
 
-
 @media screen and (max-width: 1100px) {
     .title-custom {
         height: 50px;
     }
 }
+
 @media screen and (max-width: 1725px) {
     #welcome, .title-custom {
         font-size: 50px;
@@ -454,10 +448,6 @@ transition: all 1s;
     text-align: center;
     justify-content: center;
 }
-
-
-
-
 
 @keyframes lds-pacman-1 {
   0% {

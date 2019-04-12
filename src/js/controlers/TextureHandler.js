@@ -159,10 +159,10 @@ class TextureHandler {
                 //      Appliquer n'importe quelle fonction sur la géométrie dans Asteroid.js
                 // A FAIRE ABSOLUMENT :
                 //      Appliquer les fonctions liées à la géométrie ici, une seule fois par géométrie
-                this.asteroid.geometry.forEach(function(geometry) {
+                this.asteroid.geometry.forEach(function(_geometry) {
                     // Utile pour avoir le rayon de l'asteroid, pour la collision
                     // Utilisation : geometry.boundingSphere.radius
-                    geometry.computeBoundingSphere();
+                    _geometry.computeBoundingSphere();
                 })
             });
         /* #################### */
@@ -188,16 +188,16 @@ class TextureHandler {
             this.explosion.texture = texture;
         });
 
-        this.spaceman.path.forEach(function(path, i) {
-            this.textureLoader.load(path, texture => {
-                this.spaceman.texture[i] = texture;
+        this.spaceman.path.forEach(function(_path, _i) {
+            this.textureLoader.load(_path, texture => {
+                this.spaceman.texture[_i] = texture;
             });
         }, this);
 
 
-        this.spacemanBox.path.forEach(function(path, i) {
-            this.textureLoader.load(path, texture => {
-                this.spacemanBox.texture[i] = texture;
+        this.spacemanBox.path.forEach(function(_path, _i) {
+            this.textureLoader.load(_path, texture => {
+                this.spacemanBox.texture[_i] = texture;
             });
         }, this);
     }

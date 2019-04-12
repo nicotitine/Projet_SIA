@@ -18,6 +18,7 @@ class Laser extends TimelapsMesh {
                 this.vector = new THREE.Vector3(gameParameters.laser.enemy.speed * -Math.sin(this.rotation.z), gameParameters.laser.enemy.speed * Math.cos(this.rotation.z), 0)
                 break;
         }
+        
         this.type = _laserType;
         this.position.copy(_position);
         this.name = "Laser";

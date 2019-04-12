@@ -123,18 +123,18 @@ class GameCore {
         }, this)
     }
 
-
     update() {
+
         var time = this.clock.getElapsedTime();
 
         if(!gameUI.isPaused) {
             textureHandler.update(time);
             this.enemyHandler.update(gameUI.isGameLaunched, time);
-            this.collidableMeshesToSpaceship.forEach(function(collidableMesh) {
-                collidableMesh.update(time);
+            this.collidableMeshesToSpaceship.forEach(function(_collidableMesh) {
+                _collidableMesh.update(time);
             })
-            this.collidableMeshesFromSpaceship.forEach(function(collidableMesh) {
-                collidableMesh.update(time);
+            this.collidableMeshesFromSpaceship.forEach(function(_collidableMesh) {
+                _collidableMesh.update(time);
             })
             this.spaceship.update(time);
 
@@ -143,18 +143,13 @@ class GameCore {
             }
         }
 
-        if (this.spaceman != null) {
-            this.spaceman.update();
-        }
-
-        if (this.spaceship != null && !this.spaceship.isHitted)
-            this.cameraHandler.update();
+        this.cameraHandler.update();
 
         if (this.starfield != null)
             this.starfield.update(this.cameraHandler.frustum, gameParameters.starfield.speed, gameParameters.starfield.spread);
 
+        // Collision detection
         if(gameUI.isGameLaunched) {
-
             for(var i = 0; i < this.collidableMeshesToSpaceship.length; i++) {
                 for(var j = 0; j < this.collidableMeshesFromSpaceship.length; j++) {
                     if(this.collidableMeshesToSpaceship[i] != null && this.collidableMeshesToSpaceship[i].name != "Laser" && this.collidableMeshesToSpaceship[i].checkCollide(this.collidableMeshesFromSpaceship[j])) {
@@ -180,7 +175,6 @@ class GameCore {
                 }
             }
         }
-
     }
 
     levelUp(_isCheat, _t) {
@@ -211,6 +205,7 @@ class GameCore {
             this.enemyToDestroy = null;
             textureHandler.enemy.material.opacity = 1;
         }
+
         this.rebuildGame();
         this.spaceship.isInvincible = false;
         this.spaceship.shield.activate(4, _t);

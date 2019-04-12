@@ -27,7 +27,7 @@ class JokerHandler {
     }
 
     spawn(_t) {
-        var joker = new Spaceman(THREE.Math.randInt(0, 2), gameCore.cameraHandler.size, gameCore.cameraHandler.isPursuitCamera, this.lifetime, _t);
+        var joker = new Joker(THREE.Math.randInt(0, 2), gameCore.cameraHandler.size, gameCore.cameraHandler.isPursuitCamera, this.lifetime, _t);
 
 
         this.jokers.push(joker);
@@ -40,10 +40,10 @@ class JokerHandler {
             this.spawn(_t);
         }
 
-        this.jokers.forEach(function(joker) {
-            joker.update(gameCore.cameraHandler.isPursuitCamera, _t);
-            if (joker.boxPosition.distanceTo(gameCore.spaceship.position) < gameCore.spaceship.size.x) {
-                switch (joker.type) {
+        this.jokers.forEach(function(_joker) {
+            _joker.update(gameCore.cameraHandler.isPursuitCamera, _t);
+            if (_joker.boxPosition.distanceTo(gameCore.spaceship.position) < gameCore.spaceship.size.x) {
+                switch (_joker.type) {
                     case 1:
                         gameCore.spaceship.shield.activate(this.lifetime, _t);
                         gameCore.spaceship.displayBonusTimer(this.lifetime, _t);
@@ -56,8 +56,8 @@ class JokerHandler {
                         break;
 
                 }
-                gameCore.scene.remove(joker);
-                this.jokers[this.jokers.indexOf(joker)] = null;
+                gameCore.scene.remove(_joker);
+                this.jokers[this.jokers.indexOf(_joker)] = null;
                 this.jokers = this.jokers.filter(function(el) {
                     return el != null;
                 });

@@ -47,14 +47,13 @@ class Fire extends ResizableMesh {
         var invModelMatrix = this.material.uniforms.invModelMatrix.value;
         this.updateMatrix();
         invModelMatrix.getInverse(this.matrix);
+        
         if (time !== undefined) {
             this.material.uniforms.time.value = time;
         }
         this.material.uniforms.invModelMatrix.value = invModelMatrix;
         this.material.uniforms.scale.value = this.scale;
 
-        //console.log(_size);
-        //console.log(this.size.x);
         switch (this.side) {
             case this.sides.LEFT:
                 this.position.x = _position.x + (_size.x * 0.290) * Math.sin(_rotation.y + Math.PI/2) + ((_size.y + this.size.y) / 2 * Math.cos(_rotation.y + Math.PI/2));

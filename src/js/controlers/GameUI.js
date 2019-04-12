@@ -126,8 +126,8 @@ class GameUI {
     displayFromStorage() {
         if (this.dataFromStorage != null) {
             this.scoresContainer.innerHTML = "";
-            this.dataFromStorage.scores.forEach(function(score) {
-                this.scoresContainer.innerHTML += '<div class="score"><div class="right">' + score.pseudo + '</div><div class="left">' + score.score + '</div></div>';
+            this.dataFromStorage.scores.forEach(function(_score) {
+                this.scoresContainer.innerHTML += '<div class="score"><div class="right">' + _score.pseudo + '</div><div class="left">' + _score.score + '</div></div>';
             }, this);
         }
     }
@@ -159,29 +159,6 @@ class GameUI {
         } else {
             _slider.removeClass('muted');
         }
-    }
-
-    size(width, height, elements) {
-        // this.width = width;
-        // this.height = height;
-        // var isGameLaunched = this.isGameLaunched;
-        // var bottomScreenElementsHeight = this.livesDiv.clientHeight;
-        // elements.forEach(function(element) {
-        //     if(element.id == "welcome" || element.id == "help" || element.id == "lives" ||element.id == "score") {
-        //         element.style.bottom = 20 + "px";
-        //         if(element.id == "help" && isGameLaunched)
-        //             element.style.bottom = bottomScreenElementsHeight + 30 + "px";
-        //     } else {
-        //         element.style.top = (height / 2) - (element.clientHeight / 2) + "px";
-        //     }
-        //     if(element.id == "lives") {
-        //         element.style.left = 20 + "px";
-        //     } else if(element.id == "score") {
-        //         element.style.right = 20 + "px";
-        //     } else {
-        //         element.style.left = (width / 2) - (element.clientWidth / 2) + "px";
-        //     }
-        // });
     }
 
     editLives(_livesnb, _win) {
@@ -230,7 +207,6 @@ class GameUI {
         this.welcomeDiv.css("display", "flex")
         this.showTitle();
         this.showHelp();
-        //this.size(this.width, this.height, new Array(this.welcomeDiv));
         this.titleDiv.innerHTML = "SPACE RUNNER";
         this.titleDiv.css('font-size', '150px');
     }
@@ -249,9 +225,7 @@ class GameUI {
         }
         this.levelUpDiv.fadeIn(500);
         this.levelUpDiv.css('display', 'flex');
-        this.size(this.width, this.height, new Array(this.levelUpDiv));
         setTimeout(() => {
-            this.size(this.width, this.height, new Array(this.levelUpDiv));
             this.levelUpDiv.fadeOut(500);
             this.isLevelingUp = false;
         }, 2500);
@@ -291,7 +265,6 @@ class GameUI {
 
     showLives() {
         this.livesDiv.fadeIn(500);
-        this.size(this.width, this.height, new Array(this.livesDiv));
     }
     hideLives() {
         this.livesDiv.fadeOut(500);
@@ -301,7 +274,6 @@ class GameUI {
         this.finalScore.innerHTML = this.score;
         this.looseDiv.fadeIn(500);
         this.looseDiv.css('display', 'flex');
-        this.size(this.width, this.height, new Array(this.looseDiv));
         this.isGameLaunched = false;
         let isNewRecord = storageHandler.isNewRecord(this.score);
         if (isNewRecord[0]) {
@@ -317,7 +289,6 @@ class GameUI {
 
     showScore() {
         this.scoreDiv.fadeIn(500);
-        this.size(this.width, this.height, new Array(this.scoreDiv));
     }
     hideScore() {
         this.scoreDiv.fadeOut(500);

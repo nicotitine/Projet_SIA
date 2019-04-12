@@ -1,51 +1,27 @@
 class CameraHandler {
     constructor() {
+
         this.cameraTypes = {
             FIXED: 0,
             MOVING: 1,
             PURSUIT: 2
         };
+
         this.cameraType = this.cameraTypes.FIXED;
         this.frustum = new THREE.Frustum();
+
         this.cameraViewProjectionMatrix = new THREE.Matrix4();
         this.camera = new THREE.PerspectiveCamera(50, _viewport.ratio, 0.1, 1000);
-        this.light = new THREE.AmbientLight(0xffffff, 3);
-        this.light.position.set(0, 0, 500);
-
-        this.isPursuitCamera = false;
-
         this.camera.position.set(0, 0, 500);
         this.camera.layers.enable(1);
         this.camera.far = 10000;
         this.isCameraChanged = false;
 
-        this.lightningColor = new THREE.Color(0xB0FFFF);
-        this.outlineColor = new THREE.Color(0x00FFFF);
-        this.lightningMaterial = new THREE.MeshBasicMaterial( { color: this.lightningColor } );
-        this.lightningParams = {
+        this.light = new THREE.AmbientLight(0xffffff, 3);
+        this.light.position.set(0, 0, 500);
 
-					sourceOffset: new THREE.Vector3(),
-					destOffset: new THREE.Vector3(),
-					radius0: 0.8,
-					radius1: 0.8,
-					minRadius: 2.5,
-					maxIterations: 7,
-					isEternal: true,
+        this.isPursuitCamera = false;
 
-					timeScale: 1,
-
-					propagationTimeFactor: 0.05,
-					vanishingTimeFactor: 0.95,
-					subrayPeriod: 5,
-					subrayDutyCycle: 0.07,
-					maxSubrayRecursion: 3,
-					ramification: 7,
-					recursionProbability: 0.6,
-
-					roughness: 0.85,
-					straightness: 0.95
-
-		};
       
         this.currentTime = 0;
         this.clock = new THREE.Clock();

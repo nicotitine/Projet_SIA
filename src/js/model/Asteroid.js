@@ -33,7 +33,6 @@ class Asteroid extends ExplosiveMesh {
         }
     }
 
-
     update() {
         // Update position
         if (gameUI != null && (!gameUI.isPaused || gameUI.isWelcomeDisplayed)) {

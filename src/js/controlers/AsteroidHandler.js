@@ -12,7 +12,6 @@ class AsteroidHandler {
             asteroidPerLevel:  gameParameters.asteroid.number,
             asteroidSpeed : gameParameters.asteroid.speed
         }
-
         this.createAsteroids();
     }
 
@@ -33,7 +32,6 @@ class AsteroidHandler {
             return el != null;
         });
     }
-
 
     collide(_asteroid) {
         var size, lastLife;

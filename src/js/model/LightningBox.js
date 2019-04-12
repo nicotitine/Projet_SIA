@@ -1,9 +1,11 @@
 class LightningBox {
     constructor(_size) {
+
         this.resize(_size)
         this.lightningColor = new THREE.Color(0xB0FFFF);
         this.outlineColor = new THREE.Color(0x00FFFF);
         this.lightningMaterial = new THREE.MeshBasicMaterial( { color: this.lightningColor } );
+
         this.lightningParams = {
 			sourceOffset: new THREE.Vector3(),
 			destOffset: new THREE.Vector3(),
@@ -26,6 +28,7 @@ class LightningBox {
 
         this.lightnings = [];
         this.lightningsMesh = [];
+
         this.links.forEach(function(_link) {
             this.lightnings.push(new THREE.LightningStrike( this.lightningParams ));
             this.lightningsMesh.push(new THREE.Mesh( this.lightnings[this.lightnings.length - 1], this.lightningMaterial ));
@@ -68,9 +71,9 @@ class LightningBox {
     }
 
     update(_t) {
-        this.lightnings.forEach(function(_lightning, i) {
-            _lightning.rayParameters.sourceOffset.set(this.positions[this.links[i][0]].x, this.positions[this.links[i][0]].y, this.positions[this.links[i][0]].z);
-            _lightning.rayParameters.destOffset.set(this.positions[this.links[i][1]].x, this.positions[this.links[i][1]].y, this.positions[this.links[i][1]].z);
+        this.lightnings.forEach(function(_lightning, _i) {
+            _lightning.rayParameters.sourceOffset.set(this.positions[this.links[_i][0]].x, this.positions[this.links[_i][0]].y, this.positions[this.links[_i][0]].z);
+            _lightning.rayParameters.destOffset.set(this.positions[this.links[_i][1]].x, this.positions[this.links[_i][1]].y, this.positions[this.links[_i][1]].z);
             _lightning.update(_t);
         }, this);
     }
