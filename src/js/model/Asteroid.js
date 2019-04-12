@@ -2,7 +2,7 @@ class Asteroid extends ExplosiveMesh {
     constructor(_position, _level, _speed) {
         /* ######### GEOMETRY #########
             On récupère la géométrie et le materiel déjà créés */
-            super(textureHandler.asteroid.geometry[_level - 1], textureHandler.asteroid.material, new THREE.Vector3(1, 1, 1), _level);
+            super(textureHandler.asteroid.geometry[_level - 1], textureHandler.asteroid.material, new THREE.Vector3(gameParameters.asteroid.scale, gameParameters.asteroid.scale, gameParameters.asteroid.scale), _level);
         /*############################# */
 
         this.level = _level;

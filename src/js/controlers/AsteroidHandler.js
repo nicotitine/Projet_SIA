@@ -58,8 +58,6 @@ class AsteroidHandler {
                 gameCore.addAsteroid(asteroid);
             }
         }
-
-
     }
 
     createAsteroids() {

@@ -31,13 +31,17 @@ class GameCore {
         this.scene.add(this.cameraHandler.light);
         this.scene.add(this.cameraHandler.camera);
         this.scene.add(this.starfield);
-        this.scene.add(this.cameraHandler.lightningStrikeMesh)
         this.cameraHandler.lightningBox.lightningsMesh.forEach(function(_lightningMesh) {
             this.scene.add(_lightningMesh);
         }, this);
 
         this.showSpaceship();
         this.initGlowingMeshes();
+
+        // To avoid freeze on first create
+        this.enemyToDestroy = new Enemy(textureHandler.enemy.geometry, textureHandler.enemy.material, null, null, null, null);
+        this.enemyToDestroy.visible = false;
+        this.scene.add(this.enemyToDestroy);
     }
 
     addEnemyLaser(_laser) {
@@ -198,6 +202,10 @@ class GameCore {
     }
 
     launchGame(_t) {
+        if(this.enemyToDestroy != null) {
+            this.scene.remove(this.enemyToDestroy);
+            this.enemyToDestroy = null;
+        }
         this.rebuildGame();
         this.spaceship.isInvincible = false;
         this.spaceship.shield.activate(4, _t);

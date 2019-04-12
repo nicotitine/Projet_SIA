@@ -13,7 +13,7 @@ class Laser extends TimelapsMesh {
             case gameParameters.laser.types.ENEMY:
 
                 super(_geometry, _material, new THREE.Vector3(gameParameters.laser.enemy.scale, gameParameters.laser.enemy.scale, gameParameters.laser.enemy.scale), gameParameters.laser.enemy.lifetime, _t);
-                console.log(this.scale);
+                
                 this.rotation.z = _direction;
                 this.vector = new THREE.Vector3(gameParameters.laser.enemy.speed * -Math.sin(this.rotation.z), gameParameters.laser.enemy.speed * Math.cos(this.rotation.z), 0)
                 break;

@@ -46,13 +46,7 @@ class CameraHandler {
 					straightness: 0.95
 
 		};
-        this.lightningStrike = new THREE.LightningStrike( this.lightningParams );
-        this.lightningStrikeMesh = new THREE.Mesh( this.lightningStrike, this.lightningMaterial );
-        this.lightningStrikeMesh.layers.enable(1);
-        this.lightnings = [this.lightningStrike];
-        this.lightningStrike.rayParameters.sourceOffset.set( 0, 233, 0 );
-					//lightningStrike.rayParameters.sourceOffset.y -= 400;
-					this.lightningStrike.rayParameters.destOffset.set( 0, -233, 0 );
+      
         this.currentTime = 0;
         this.clock = new THREE.Clock();
 
@@ -68,10 +62,7 @@ class CameraHandler {
     update(_position) {
         this.currentTime += this.clock.getDelta();
 
-					//lightningStrike.rayParameters.destOffset.y += 400;
-
-					this.lightningBox.update( this.currentTime );
-
+		this.lightningBox.update( this.currentTime );
         this.camera.matrixWorldInverse.getInverse(this.camera.matrixWorld);
         this.cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
         this.frustum.setFromMatrix(this.cameraViewProjectionMatrix);

@@ -17,7 +17,8 @@ class GameParameters {
             spawnRadius: {
                 width: 900,
                 height: 500
-            }
+            },
+            scale: 1
         }
 
         this.spaceship = {
@@ -41,7 +42,8 @@ class GameParameters {
         this.enemy = {
             shotTimespawn: 3.0,
             speed: 2.0,
-            spawntime: 20.0
+            spawntime: 2.0,
+            scale: 1
         };
 
         this.laser = {

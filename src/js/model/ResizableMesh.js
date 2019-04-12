@@ -4,7 +4,6 @@ class ResizableMesh extends THREE.Mesh {
         super(_geometry, _material);
 
         this.scale.copy(_scale);
-        console.log(this, this.scale);
         this.geometry.center();
         this.geometry.computeBoundingSphere();
         this.radius = this.geometry.boundingSphere.radius * this.scale.x;
@@ -16,24 +15,16 @@ class ResizableMesh extends THREE.Mesh {
             this.rotation.set(Math.PI/2, 0, 0);
         }
         if(this.name == "Fire") {
-            console.log("fire");
             this.rotation.set(0, 0, 0)
         }
-        console.log(this.size, this.scale);
         this.scale.set(_valueX, _valueY, _valueZ);
         this.size = new THREE.Vector3();
         new THREE.Box3().setFromObject(this).getSize(this.size);
-        console.log(this.size, this.scale);
         this.geometry.center();
         this.geometry.computeBoundingSphere();
         this.radius = this.geometry.boundingSphere.radius * this.scale.x;
         this.geometry.verticesNeedsUpdate = true;
         this.rotation.copy(oldRotation);
-
-
-
-
-
 
         if (this.name == "Spaceship") {
             this.fireLeft.resize(_valueX * 125, _valueY * 375, _valueZ * 150);
