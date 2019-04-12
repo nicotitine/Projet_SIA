@@ -22,7 +22,8 @@ window.addEventListener('load', function() {
         enemyLaserScale: gameParameters.laser.enemy.scale,
         enemyScale: gameParameters.enemy.scale,
         enemySpeed: 1,
-        asteroidScale: gameParameters.asteroid.scale
+        asteroidScale: gameParameters.asteroid.scale,
+        asteroidSpeed: gameParameters.asteroid.speed
         
     };
 
@@ -59,7 +60,8 @@ window.addEventListener('load', function() {
             gameParameters.spaceship.friction = 0.98;
         } else {
             gameParameters.spaceship.friction = 1.0;
-        }
+        }       
+        params.spaceshipFriction = gameParameters.spaceship.friction;
     });
 
     var f2 = gui.addFolder('Enemy options');
@@ -97,5 +99,11 @@ window.addEventListener('load', function() {
             _asteroid.resize(_newValue, _newValue, _newValue);
         });
         gameParameters.asteroid.scale = _newValue;
+    });
+    f3.add(params, 'asteroidSpeed').min(0).max(4).step(gameParameters.asteroid.speed / 20).name('Multiply speed by').onFinishChange(function(_newValue) {
+        gameCore.asteroidHandler.asteroids.forEach(function(_asteroid) {
+            _asteroid.updateSpeed(_newValue);
+        });
+        gameParameters.asteroid.speed *= _newValue;
     });
 });

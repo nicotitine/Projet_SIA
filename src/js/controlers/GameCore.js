@@ -40,7 +40,11 @@ class GameCore {
 
         // To avoid freeze on first create
         this.enemyToDestroy = new Enemy(textureHandler.enemy.geometry, textureHandler.enemy.material, null, null, null, null);
-        this.enemyToDestroy.visible = false;
+        this.enemyToDestroy.material.transparent = true;
+        this.enemyToDestroy.material.opacity = 0.1;
+        this.enemyToDestroy.scale.set(0.1, 0.1, 0.1);
+        
+
         this.scene.add(this.enemyToDestroy);
     }
 
@@ -205,6 +209,7 @@ class GameCore {
         if(this.enemyToDestroy != null) {
             this.scene.remove(this.enemyToDestroy);
             this.enemyToDestroy = null;
+            textureHandler.enemy.material.opacity = 1;
         }
         this.rebuildGame();
         this.spaceship.isInvincible = false;
@@ -239,6 +244,11 @@ class GameCore {
         this.collidableMeshesFromSpaceship.forEach(function(_mesh) {
             this.removeMesh(_mesh)
         }, this);
+        this.jokerHandler.jokers.forEach(function(_joker) {
+            this.scene.remove(_joker);
+            _joker = null;
+        }, this);
+        this.jokerHandler.jokers = [];
         this.filterArrays();
         this.glowingMesh = [];
 

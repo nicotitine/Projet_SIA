@@ -42,4 +42,8 @@ class Asteroid extends ExplosiveMesh {
         }
         this.checkOutOfScreen();
     }
+
+    updateSpeed(_value) {
+        this.vector = this.direction.multiplyScalar(_value, _value, 0);        
+    }
 }
